@@ -1,9 +1,9 @@
-import { Currio } from "src/app/shared/models/currio.model"; // Usa il modello Currio
+import { Currio } from "src/app/shared/models/currio.model";
 import { CurrioSubmission } from "src/app/shared/models/currio-submission.model";
 
-export interface CurrioState { // Rinomina da EventsState
-  currios: Currio[]; // Rinomina da events
-  selectedCurrio: Currio | null; // Opzionale: per il currio caricato nella pagina di modifica
+export interface CurrioState {
+  currios: Currio[];
+  selectedCurrio: Currio | null;
   currioSubmissions: CurrioSubmission[];
   loading: boolean;
   error: string | null;

@@ -6,7 +6,6 @@ import { AppState } from 'src/app/shared/app.state';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Subscription, filter } from 'rxjs';
-// Importa le azioni NGRX per creare/aggiornare
 import { createCurrio, updateCurrio, loadCurrios } from '../state/currio.action';
 
 @Component({
@@ -34,12 +33,12 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
       this.currioId = params.get('id');
       if (this.currioId && this.currioId !== 'new') {
         this.isEditMode = true;
-        this.store.dispatch(loadCurrios()); // Assicura che i dati siano caricati (o usa un loadCurrio({id: this.currioId}))
+        this.store.dispatch(loadCurrios());
         this.currioSubscription = this.store
           .select(getCurrioById, { id: this.currioId })
-          .pipe(filter(data => !!data)) // Filtra emissioni null/undefined iniziali
+          .pipe(filter(data => !!data))
           .subscribe((data) => {
-            this.currio = data as Currio; // Cast a Currio
+            this.currio = data as Currio;
             this.initializeForm();
           });
       } else {
@@ -52,7 +51,7 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
 
   getEmptyCurrio(): Currio {
     return {
-      id: '', // Sarà generato dal backend/Firebase
+      id: '',
       nomePortfolio: '',
       heroTitle: '',
       heroSubtitle: '',
@@ -99,20 +98,16 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
 
     const formValue = this.currioForm.value;
     const currioToSave: Currio = {
-      ...this.currio, // Mantiene l'ID originale e altri dati non nel form (se presenti)
-      id: this.isEditMode && this.currio ? this.currio.id : undefined, // L'ID per Firebase viene gestito diversamente in creazione vs update
+      ...this.currio,
+      id: this.isEditMode && this.currio ? this.currio.id : undefined,
       ...formValue,
     };
 
     if (this.isEditMode && currioToSave.id) {
-      // L'azione di NGRX dovrebbe prendere l'intero oggetto Currio
-      // Firebase richiede l'ID nel path e i dati da aggiornare nel body,
-      // quindi l'effetto NGRX gestirà questa logica.
       this.store.dispatch(updateCurrio({ currio: currioToSave as any }));
       console.log("Dispatch Update:", currioToSave);
     } else {
-      // Per la creazione, Firebase genererà un ID. L'oggetto non dovrebbe avere un 'id' definito.
-      const { id, ...currioDataToCreate } = currioToSave; // Rimuovi l'id se presente
+      const { id, ...currioDataToCreate } = currioToSave;
       this.store.dispatch(createCurrio({ currio: currioDataToCreate as any }));
       console.log("Dispatch Create:", currioDataToCreate);
     }
@@ -126,9 +121,9 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
 
   openPreviewInNewTab(): void {
     if (this.currio && this.currio.id) {
-      // Qui dovresti costruire l'URL per l'anteprima del Currio.
+      // Costruire l'URL per l'anteprima del Currio.
       // Questo potrebbe essere un'altra rotta Angular o un link diretto se l'HTML è generato staticamente.
-      // Esempio (ipotetico, dovrai creare questa rotta/logica):
+      // Esempio:
       // const previewUrl = this.router.serializeUrl(this.router.createUrlTree(['/currio/view', this.currio.id]));
       // window.open(previewUrl, '_blank');
       alert("Funzionalità di anteprima in nuova scheda da implementare. Dovresti creare una pagina di visualizzazione per il Curriò.");

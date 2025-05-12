@@ -1,9 +1,9 @@
 import { createReducer, on } from '@ngrx/store';
 import { initialState, CurrioState } from './currio.state';
-import * as CurrioActions from './currio.action'; // Importa tutte le azioni
+import * as CurrioActions from './currio.action'; 
 import { Currio } from 'src/app/shared/models/currio.model';
 
-const _currioReducer = createReducer( // Rinomina
+const _currioReducer = createReducer(
   initialState,
   on(CurrioActions.loadCurrios, CurrioActions.loadCurrioById, CurrioActions.createCurrio, CurrioActions.updateCurrio, CurrioActions.deleteCurrio, (state) => ({
     ...state,
@@ -18,8 +18,8 @@ const _currioReducer = createReducer( // Rinomina
   })),
   on(CurrioActions.loadCurrioByIdSuccess, (state, { currio }) => ({
     ...state,
-    selectedCurrio: currio, // Salva il currio selezionato
-    currios: state.currios.find(c => c.id === currio.id) ? state.currios.map(c => c.id === currio.id ? currio : c) : [...state.currios, currio], // Aggiorna o aggiungi alla lista
+    selectedCurrio: currio,
+    currios: state.currios.find(c => c.id === currio.id) ? state.currios.map(c => c.id === currio.id ? currio : c) : [...state.currios, currio],
     loading: false,
   })),
   on(CurrioActions.createCurrioSuccess, (state, { currio }) => ({
@@ -52,7 +52,6 @@ const _currioReducer = createReducer( // Rinomina
     })
   ),
 
-  // Reducer per CurrioSubmissions (già esistente)
   on(CurrioActions.loadCurrioSubmissionsSuccess, (state, action) => {
     return {
       ...state,

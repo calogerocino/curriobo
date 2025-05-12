@@ -2,7 +2,7 @@ import { CurrioState } from './currio.state';
 import { createFeatureSelector, createSelector } from '@ngrx/store';
 import { Currio } from 'src/app/shared/models/currio.model';
 
-export const CURRIO_STATE_NAME = 'currioState'; // Rinomina da PRODUCT_STATE_NAME o events
+export const CURRIO_STATE_NAME = 'currioState';
 const getCurrioFeatureState = createFeatureSelector<CurrioState>(CURRIO_STATE_NAME);
 
 export const getCurrios = createSelector(
@@ -14,7 +14,6 @@ export const getCurrioById = createSelector(
   getCurrioFeatureState,
   (state: CurrioState, props: { id: string | null }) => {
     if (!props.id) return undefined;
-    // Cerca prima nel selectedCurrio, poi nella lista
     if (state.selectedCurrio && state.selectedCurrio.id === props.id) {
         return state.selectedCurrio;
     }
@@ -22,7 +21,7 @@ export const getCurrioById = createSelector(
   }
 );
 
-export const getSelectedCurrio = createSelector( // Selettore per il currio attualmente in modifica
+export const getSelectedCurrio = createSelector(
     getCurrioFeatureState,
     state => state.selectedCurrio
 );
@@ -37,7 +36,6 @@ export const getCurrioError = createSelector(
     state => state.error
 );
 
-// Selettore per Currio Submissions (già esistente, verifica nomi)
 export const getCurrioSubmissions = createSelector(
     getCurrioFeatureState,
     (state) => state.currioSubmissions

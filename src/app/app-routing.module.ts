@@ -43,10 +43,8 @@ const routes: Routes = [
       {
         path: 'currio',
         loadChildren: () =>
-          import('./views/currio/currio.module').then((m) => m.CatalogoModule),
+          import('./views/currio/currio.module').then((m) => m.CurrioModule),
       },
-      // { path: '', redirectTo: 'admin/dashboard', pathMatch: 'full' },
-      // { path: '**', redirectTo: 'dashboard', pathMatch: 'full' }
     ],
   },
   {
