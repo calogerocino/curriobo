@@ -3,7 +3,7 @@ import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { map } from 'rxjs/operators';
-import { firebaseConfig } from 'src/environments/environment';
+import { environment } from 'src/environments/environment';
 @Injectable({
   providedIn: 'root',
 })
@@ -13,7 +13,7 @@ export class EventsService {
   getEvents(): Observable<Event[]> {
     return this.http
       .get<Event[]>(
-        `${firebaseConfig.firebase.databaseURL}/eventi.json`
+        `${environment.firebase.databaseURL}/eventi.json`
       )
       .pipe(
         map((data) => {
@@ -28,7 +28,7 @@ export class EventsService {
 
   addEvent(event: Event): Observable<{ name: string }> {
     return this.http.post<{ name: string }>(
-      `${firebaseConfig.firebase.databaseURL}/eventi.json`,
+      `${environment.firebase.databaseURL}/eventi.json`,
       event
     );
   }
@@ -38,14 +38,14 @@ export class EventsService {
       [event.id]: { title: event.title, description: event.description },
     };
     return this.http.patch(
-      `${firebaseConfig.firebase.databaseURL}/eventi.json`,
+      `${environment.firebase.databaseURL}/eventi.json`,
       postData
     );
   }
 
   deleteEvent(id: string) {
     return this.http.delete(
-      `${firebaseConfig.firebase.databaseURL}/eventi/${id}.json`
+      `${environment.firebase.databaseURL}/eventi/${id}.json`
     );
   }
 }
