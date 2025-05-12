@@ -17,10 +17,10 @@ const DEFAULT_DROPZONE_CONFIG: DropzoneConfigInterface = {
   acceptedFiles: 'image/*',
 };
 
-import { EventiComponent } from './eventi.component';
-import { ListaEventiComponent } from './listaeventi/listaeventi.component';
-import { EventoNewComponent } from './eventi-new/evento-new.component';
-import { EventoEditComponent } from './eventi-edit/evento-edit.component';
+import { CurrioComponent } from './currio.component';
+import { ListaCurrioComponent } from './listacurrio/listacurrio.component';
+import { CurrioNewComponent } from './currio-new/currio-new.component';
+import { CurrioEditComponent } from './currio-edit/currio-edit.component';
 import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import { CatalogoEffects } from './state/catalogo.effects';
@@ -31,27 +31,27 @@ import { TranslateModule } from '@ngx-translate/core';
 const routes: Routes = [
   {
     path: '',
-    component: EventiComponent,
+    component: CurrioComponent,
     children: [
       {
         path: '',
-        redirectTo: 'eventi',
+        redirectTo: 'currio',
         pathMatch: 'full',
       },
       {
-        path: 'listaeventi',
-        component: ListaEventiComponent,
-        data: { title: 'Eventi' },
+        path: 'listacurrio',
+        component: ListaCurrioComponent,
+        data: { title: 'Currio' },
       },
       {
-        path: 'evento',
-        component: EventoNewComponent,
-        data: { title: 'Crea evento' },
+        path: 'currio',
+        component: CurrioNewComponent,
+        data: { title: 'Crea currio' },
       },
       {
         path: 'edit/:id',
-        component: EventoEditComponent,
-        data: { title: 'Modifica evento' },
+        component: CurrioEditComponent,
+        data: { title: 'Modifica currio' },
       },
     ],
   },
@@ -59,10 +59,10 @@ const routes: Routes = [
 
 @NgModule({
   declarations: [
-    EventiComponent,
-    ListaEventiComponent,
-    EventoNewComponent,
-    EventoEditComponent,
+    CurrioComponent,
+    ListaCurrioComponent,
+    CurrioNewComponent,
+    CurrioEditComponent,
   ],
   imports: [
     CommonModule,

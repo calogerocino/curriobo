@@ -1,6 +1,6 @@
-import { updateEvent } from '../state/catalogo.action';
+// import { updateEvent } from '../state/catalogo.action';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
-import { Event } from 'src/app/shared/models/event.model';
+import { Event } from 'src/app/shared/models/currio.model';
 import { getEventById } from '../state/catalogo.selector';
 import { AppState } from 'src/app/shared/app.state';
 import { Component, OnDestroy, OnInit } from '@angular/core';
@@ -9,11 +9,11 @@ import { Store } from '@ngrx/store';
 import { Subscription } from 'rxjs';
 
 @Component({
-  selector: 'app-evento-edit',
-  templateUrl: './evento-edit.component.html',
-  styleUrls: ['./evento-edit.component.scss'],
+  selector: 'app-currio-edit',
+  templateUrl: './currio-edit.component.html',
+  styleUrls: ['./currio-edit.component.scss'],
 })
-export class EventoEditComponent implements OnInit, OnDestroy {
+export class CurrioEditComponent implements OnInit, OnDestroy {
   event: Event;
   productForm: FormGroup;
   productSubscription: Subscription;
@@ -63,8 +63,8 @@ export class EventoEditComponent implements OnInit, OnDestroy {
     };
 
     //dispatch the action
-    this.store.dispatch(updateEvent({ event }));
-    this.router.navigate(['catalogo/Eventi']);
+    // this.store.dispatch(updateEvent({ event }));
+    this.router.navigate(['catalogo/Currio']);
   }
 
   ngOnDestroy() {

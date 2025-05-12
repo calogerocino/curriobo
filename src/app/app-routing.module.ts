@@ -41,9 +41,9 @@ const routes: Routes = [
           import('./views/utente/utente.module').then((m) => m.UtenteModule),
       },
       {
-        path: 'eventi',
+        path: 'currio',
         loadChildren: () =>
-          import('./views/eventi/eventi.module').then((m) => m.CatalogoModule),
+          import('./views/currio/currio.module').then((m) => m.CatalogoModule),
       },
       // { path: '', redirectTo: 'admin/dashboard', pathMatch: 'full' },
       // { path: '**', redirectTo: 'dashboard', pathMatch: 'full' }

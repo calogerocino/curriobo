@@ -1,0 +1,66 @@
+<div class="row">
+  <div class="col-md-12">
+    <h3>{{"generale.layout.menu.richieste" | translate}}</h3>
+
+    <div>
+      <a routerLink="/admin/currio/currio" class="btn btn-primary"> {{"generale.shared.modifica" | translate}} </a>
+    </div>
+
+    <h4 class="mt-4">Currio Registrati</h4>
+    <table class="table table-striped" *ngIf="events$ | async as eventsData else loadingEvents">
+      <thead>
+        <tr>
+          <th>Id</th>
+          <th>{{"tabella.head.stato"|translate}}</th> <th>{{"tabella.head.descrizione"|translate}}</th>
+          <th>{{"tabella.head.Azioni"|translate}}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let event of eventsData">
+          <td>{{ event.id }}</td>
+          <td>{{ event.title }}</td>
+          <td>{{ event.description }}</td>
+          <td>
+            <a [routerLink]="['/admin/currio/edit', event.id]" class="btn btn-sm btn-primary mr-2"> {{"generale.shared.aggiorna" | translate}}
+            </a>
+            <button class="btn btn-sm btn-info mr-2"> Slot
+            </button>
+            <button class="btn btn-sm btn-danger" (click)="onDeleteEvent(event.id)">
+              {{"generale.shared.elimina" | translate}}
+            </button>
+          </td>
+        </tr>
+        <tr *ngIf="eventsData.length === 0">
+            <td colspan="4" class="text-center">Nessun currio trovato.</td>
+        </tr>
+      </tbody>
+    </table>
+    <ng-template #loadingEvents><p>Caricamento currio...</p></ng-template>
+  </div>
+
+  <div class="col-md-12 mt-5">
+    <h4>Richieste dalla Landing Page (Curriò)</h4>
+    <table class="table table-striped" *ngIf="currioSubmissions$ | async as submissionsData else loadingSubmissions">
+      <thead>
+        <tr>
+          <th>ID Richiesta</th>
+          <th>Nome</th>
+          <th>Email</th>
+          <th>Esperienze</th>
+          </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let submission of submissionsData">
+          <td>{{ submission.id }}</td>
+          <td>{{ submission.nome }}</td>
+          <td>{{ submission.email }}</td>
+          <td>{{ submission.esperienze }}</td>
+          </tr>
+        <tr *ngIf="submissionsData.length === 0">
+            <td colspan="4" class="text-center">Nessuna richiesta dalla landing page trovata.</td>
+        </tr>
+      </tbody>
+    </table>
+    <ng-template #loadingSubmissions><p>Caricamento richieste Curriò...</p></ng-template>
+  </div>
+</div>

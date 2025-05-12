@@ -8,7 +8,7 @@ import { AuthService } from '../guard/auth.service';
 export class FirebaseService {
   ApiURL= "https://iforalogistics-default-rtdb.europe-west1.firebasedatabase.app/"
   DB_persone ="persone"
-  DB_eventi ="eventi"
+  DB_currio ="currio"
   DB_fornitori ="fornitori"
 
   constructor(private readonly http: HttpClient, private readonly authService: AuthService) {}

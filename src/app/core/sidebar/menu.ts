@@ -25,10 +25,10 @@ export const MENU: MenuItem[] = [
     subItems: [
       {
         label: 'generale.layout.menu.richieste.listarichieste',
-        link: '/admin/eventi/listaeventi',
+        link: '/admin/currio/listacurrio',
       },{
         label: 'generale.layout.menu.richieste.listacurrio',
-        link: '/admin/eventi/listacurrio',
+        link: '/admin/currio/listacurrio',
       }
     ]
   },

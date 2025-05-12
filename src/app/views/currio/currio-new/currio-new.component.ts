@@ -1,5 +1,5 @@
-import { addEvent } from '../state/catalogo.action';
-import { Event } from 'src/app/shared/models/event.model';
+// import { addEvent } from '../state/catalogo.action';
+import { Event } from 'src/app/shared/models/currio.model';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
@@ -7,10 +7,10 @@ import { AppState } from 'src/app/shared/app.state';
 
 @Component({
   selector: 'app-add-event',
-  templateUrl: './evento-new.component.html',
-  styleUrls: ['./evento-new.component.scss'],
+  templateUrl: './currio-new.component.html',
+  styleUrls: ['./currio-new.component.scss'],
 })
-export class EventoNewComponent implements OnInit {
+export class CurrioNewComponent implements OnInit {
   productForm: FormGroup;
 
   constructor(private readonly store: Store<AppState>) {}
@@ -52,6 +52,6 @@ export class EventoNewComponent implements OnInit {
       description: this.productForm.value.description,
     };
 
-    this.store.dispatch(addEvent({ event }));
+    // this.store.dispatch(addEvent({ event }));
   }
 }
