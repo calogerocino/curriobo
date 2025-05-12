@@ -1,0 +1,43 @@
+<div class="row">
+  <div class="col-md-12">
+    <h3>Lista eventi</h3>
+
+    <div>
+      <a href="#" class="btn btn-primary" [routerLink]="['/admin/eventi/evento']">
+        {{"tabella.head.Azioni" | translate}}
+      </a>
+    </div>
+
+    <table class="table table-striped" *ngIf="events$ | async as productsData">
+      <thead>
+        <tr>
+          <th>Id</th>
+          <th>{{"tabella.head.titolo"|translate}}</th>
+          <th>{{"tabella.head.descrizione"|translate}}</th>
+          <th>{{"tabella.head.Azioni"|translate}}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let event of productsData">
+          <td>{{ event.id }}</td>
+          <td>{{ event.title }}</td>
+          <td>{{ event.description }}</td>
+          <td>
+            <a href="" class="btn btn-primary" [routerLink]="['/admin/eventi/edit' , event.id]">
+              {{"generale.shared.aggiorna" | translate}}</a>&nbsp;
+            <button class="btn btn-primary">
+              Slot
+            </button>&nbsp;
+            <button class="btn btn-danger" (click)="onDeleteEvent(event.id)">
+              {{"generale.shared.elimina" | translate}}
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="col-md-4">
+    <router-outlet></router-outlet>
+  </div>
+</div>

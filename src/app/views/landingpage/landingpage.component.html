@@ -1,0 +1,42 @@
+<body>
+  <header class="header">
+    <img src="assets/images/logo.png" alt="Curriò Logo" class="logo">
+  </header>
+
+  <main class="main-content">
+    <h1>Curriò: Il Tuo Curriculum del Futuro, Creato dall'IA.</h1>
+    <p class="subheadline">
+      Smetti di perdere tempo con layout complicati. Lascia che la nostra tecnologia crei per te un curriculum/portfolio
+      automatico, visivamente sorprendente e personalizzato.
+    </p>
+    <button id="ctaButton" class="cta-button">Inizia Ora: Crea il Tuo Curriò</button>
+  </main>
+
+  <div id="formModal" class="modal">
+    <div class="modal-content">
+      <span class="close-button">&times;</span>
+      <h2>Inserisci i dati per Curriò</h2>
+      <p>Fornisci le informazioni base per permettere alla nostra IA di generare una bozza del tuo Curriò.</p>
+      <form id="currioForm">
+        <div class="form-group">
+          <label for="nome">Nome Completo:</label>
+          <input type="text" id="nome" name="nome" required>
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email:</label>
+          <input type="email" id="email" name="email" required>
+        </div>
+
+        <div class="form-group">
+          <label for="esperienze">Breve descrizione esperienze (o link profilo LinkedIn):</label>
+          <textarea id="esperienze" name="esperienze" rows="4" required></textarea>
+        </div>
+
+        <button type="submit" class="submit-button">Invia Dati</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>

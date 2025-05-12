@@ -1,0 +1,33 @@
+<div class="row">
+  <div class="col-md-12">
+    <h3>Lista utenti</h3>
+
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>{{'tabella.head.immagine' | translate}}</th>
+          <th>{{'tabella.head.idlocale' | translate}}</th>
+          <th>{{'tabella.head.nome' | translate}}</th>
+          <th>{{'tabella.head.mailverificata' | translate}}</th>
+          <th>{{'tabella.head.Azioni' | translate}}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let ffl of fflist">
+          <td> <img [src]="ffl.ffdata.photoURL" alt=""></td>
+          <td>{{ ffl.id }}</td>
+          <td>{{ ffl.ffdata.displayName }}</td>
+          <td>{{ ffl.ffdata.emailVerified }}</td>
+          <td>
+            <a href="" class="btn btn-primary" [routerLink]="['/admin/utente/profilo' , ffl.id]">{{'generale.shared.modifica'
+              | translate}}</a>&nbsp;
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="col-md-4">
+    <router-outlet></router-outlet>
+  </div>
+</div>

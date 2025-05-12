@@ -1,0 +1,34 @@
+.auth-page {
+  .auth-left-wrapper {
+    width: 100%;
+    height: 100%;
+    background-image: linear-gradient(-45deg, #1970e2, #4695ff);
+    background-size: cover;
+  }
+
+  .bg-holder {
+    position: absolute;
+    width: 100%;
+    min-height: 100%;
+    top: 0;
+    left: 0;
+    background-size: cover;
+    background-position: center;
+    overflow: hidden;
+    will-change: transform, opacity, filter;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    background-repeat: no-repeat;
+    z-index: 0;
+
+    background-position: 0 133%;
+    background-image: url(../../images/base/half-circle.png);
+  }
+
+  .bg-auth-circle-shape {
+    background-image: url(../../images/base/bg-shape.png);
+    position: absolute;
+    right: -8.75rem;
+    top: -5.125rem;
+}
+}
