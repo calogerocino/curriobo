@@ -17,9 +17,9 @@
 	"generale.layout.menu.clienti.indirizzi": "Adressen",
 	"generale.layout.menu.contabilita.utenti": "Benutzer",
 	"generale.layout.menu.dashboard": "Armaturenbrett",
-	"generale.layout.menu.eventi": "Veranstaltungen",
-	"generale.layout.menu.eventi.listaeventi": "Veranstaltungsliste",
-	"generale.layout.menu.eventi.esterni": "Extern",
+	"generale.layout.menu.richieste": "Anfrage",
+	"generale.layout.menu.richieste.listarichieste": "Anforderungsliste",
+	"generale.layout.menu.richieste.listacurrio": "Curriò Liste",
 	"generale.layout.menu.listautenti": "Benutzerliste",
 	"generale.layout.menu.main": "Hauptsächlich",
 	"generale.layout.menu.sito": "Seite",
@@ -62,6 +62,6 @@
 	"tabella.head.immagine": "Bild",
 	"tabella.head.mailverificata": "Email überprüft",
 	"tabella.head.nome": "Name",
-    "tabella.head.titolo": "Titel",
+    "tabella.head.stato": "Staat",
     "tabella.head.descrizione": "Beschreibung"
 }
