@@ -1,13 +1,13 @@
 export const environment = {
   firebase: {
-    projectId: 'iforalogistics',
-    appId: '1:511052173876:web:bf3887067a6cb9cb32f061',
-    databaseURL: 'https://iforalogistics-default-rtdb.europe-west1.firebasedatabase.app',
-    // storageBucket: 'pixelsmart-6b352.appspot.com',
-    locationId: 'europe-west1',
-    apiKey: 'AIzaSyA6ArV7B4vQOTu-aGj9gOuAfYN63DrhC0Q',
-    // authDomain: '',
-    messagingSenderId: '529681295627',
-    // measurementId: 'G-9291PL1243',
+    apiKey: 'AIzaSyCjMV8pwBtidPRICqr7wI9XZkcCswQUQbM',
+    authDomain: 'curriobo.firebaseapp.com',
+    databaseURL:
+      'https://curriobo-default-rtdb.europe-west1.firebasedatabase.app',
+    projectId: 'curriobo',
+    storageBucket: 'curriobo.firebasestorage.app',
+    messagingSenderId: '677748640100',
+    appId: '1:677748640100:web:58f2a76ba6d79f18cf1271',
+    measurementId: 'G-02MGCTPE5L',
   },
 };

@@ -1,74 +1,76 @@
-import { Component, Renderer2 } from '@angular/core';
+// landingpage.component.ts
+
+import { Component } from '@angular/core';
+import { AngularFireDatabase } from '@angular/fire/compat/database'; // Import Firebase Realtime Database service
+import { NgForm } from '@angular/forms'; // Import NgForm for template-driven forms
 
 @Component({
-  selector: 'app-landingpage',
+  selector: 'app-landingpage', // Assicurati che questo selettore sia corretto per il tuo progetto
   templateUrl: './landingpage.component.html',
   styleUrls: ['./landingpage.component.css'],
 })
 export class LandingpageComponent {
-  constructor(private renderer: Renderer2) {}
+  // Property to control modal visibility
+  isModalOpen = false;
 
-  private imageUrls: string[] = [
-    '/assets/images/lp/image1.png',
-    '/assets/images/lp/image2.png',
-    '/assets/images/lp/image3.png',
-    '/assets/images/lp/image4.png',
-  ];
-  private currentIndex = 0;
-  private intervalId!: ReturnType<typeof setInterval>;
+  // Object to hold form data using ngModel
+  formData = {
+    nome: '',
+    email: '',
+    esperienze: '',
+    // Aggiungi qui altri campi se necessario
+  };
 
-  targetDate = new Date('2025-01-15T00:00:00').getTime();
-  days: number = 0;
-  hours: number = 0;
-  minutes: number = 0;
-  seconds: number = 0;
+  // Inject AngularFireDatabase
+  constructor(private db: AngularFireDatabase) {}
 
-  ngOnInit() {
-    this.loadScript('assets/js/modernizr.js');
-    this.loadScript('assets/js/jquery-3.2.1.min.js');
-    this.loadScript('assets/js/main.js');
-    this.loadScript('assets/js/plugins.js');
-    this.updateCountdown();
-    setInterval(() => this.updateCountdown(), 1000);
-
-    this.startBackgroundChange();
+  // Method to open the modal
+  openModal(): void {
+    this.isModalOpen = true;
+    // Optional: disable body scroll when modal is open
+    document.body.style.overflow = 'hidden';
   }
 
-  updateCountdown() {
-    const now = new Date().getTime();
-    const timeLeft = this.targetDate - now;
-
-    this.days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
-    this.hours = Math.floor(
-      (timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
-    );
-    this.minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-    this.seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+  // Method to close the modal
+  closeModal(): void {
+    this.isModalOpen = false;
+    // Optional: restore body scroll when modal is closed
+    document.body.style.overflow = 'auto';
   }
 
-  loadScript(url: string) {
-    const script = this.renderer.createElement('script');
-    script.src = url;
-    script.type = 'text/javascript';
-    script.async = true;
-    this.renderer.appendChild(document.body, script);
-  }
+  // Method to handle form submission
+  onSubmit(form: NgForm): void {
+    // Check if the form is valid
+    if (form.valid) {
+      console.log('Dati del form raccolti:', this.formData);
 
-  private startBackgroundChange(): void {
-    const backgroundElement = document.querySelector(
-      '.home-slider-img'
-    ) as HTMLElement;
-    this.changeBackgroundImage(backgroundElement); // Imposta l'immagine iniziale
+      // --- Firebase Integration ---
+      // Get a reference to the Firebase Realtime Database list/node where you want to store the data
+      // Sostituisci 'currioSubmissions' con il nome desiderato per il nodo nel tuo database
+      const itemsRef = this.db.list('currioSubmissions');
 
-    this.intervalId = setInterval(() => {
-      this.changeBackgroundImage(backgroundElement);
-    }, 3000);
-  }
-
-  private changeBackgroundImage(element: HTMLElement): void {
-    element.style.backgroundImage = `url('${
-      this.imageUrls[this.currentIndex]
-    }')`;
-    this.currentIndex = (this.currentIndex + 1) % this.imageUrls.length;
+      // Push the form data to Firebase
+      itemsRef
+        .push(this.formData)
+        .then((response) => {
+          // Success handling
+          console.log('Dati inviati a Firebase con successo!', response);
+          alert('Dati inviati con successo! Grazie.'); // User feedback
+          this.closeModal(); // Close the modal
+          form.resetForm(); // Reset the form fields
+        })
+        .catch((error) => {
+          // Error handling
+          console.error("Errore durante l'invio dei dati a Firebase:", error);
+          alert(
+            "Si è verificato un errore durante l'invio dei dati. Riprova più tardi."
+          ); // User feedback
+        });
+      // --- End of Firebase Integration ---
+    } else {
+      // Form is invalid, show an error or highlight fields
+      console.error('Il form non è valido.');
+      alert('Per favore, compila tutti i campi obbligatori.');
+    }
   }
 }

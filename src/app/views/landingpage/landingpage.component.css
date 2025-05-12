@@ -1,299 +1,308 @@
-/* Basic reset and font settings */
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+
+/* Basic reset and font settings applied within the component scope */
+:host {
+  display: block; /* Ensures the component takes up space */
+  height: 100%;
+  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.6;
+  color: #ffffff;
+  overflow-x: hidden;
 }
 
-html, body {
-    height: 100%;
-    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Using Inter font */
-    line-height: 1.6;
-    color: #ffffff; /* White text for contrast */
-    overflow-x: hidden; /* Prevent horizontal scrolling */
-}
-
-/* Animated Gradient Background (Gemini-inspired colors) */
-body {
-    background: linear-gradient(-45deg, #4285F4, #9B72CB, #D96570, #F2A60C, #4285F4); /* Blue, Purple, Pink, Orange */
-    background-size: 400% 400%;
-    animation: gradientBG 18s ease infinite;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh; /* Ensure body takes at least full viewport height */
+/* Apply gradient background to the host element or a container inside if preferred */
+:host {
+  background: linear-gradient(-45deg, #4285F4, #9B72CB, #D96570, #F2A60C, #4285F4);
+  background-size: 400% 400%;
+  animation: gradientBG 18s ease infinite;
+  /* display: flex; */ /* Flex might be handled by parent or app structure */
+  /* flex-direction: column; */
+  min-height: 100vh;
 }
 
 /* Keyframes for the background animation */
 @keyframes gradientBG {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 /* Header styling */
 .header {
-    padding: 20px 30px; /* More padding */
-    position: absolute; /* Positioned absolutely */
-    top: 0;
-    left: 0;
-    width: 100%;
-    z-index: 10; /* Ensure header is above background but below modal */
+  padding: 20px 30px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 10;
 }
 
 /* Logo styling */
 .logo {
-    height: 45px; /* Slightly larger logo */
-    width: auto;
-    opacity: 0.9;
+  height: 45px;
+  width: auto;
+  opacity: 0.9;
 }
 
 /* Main content centering and styling */
 .main-content {
-    flex-grow: 1; /* Allows main content to fill available space */
-    display: flex;
-    flex-direction: column;
-    justify-content: center; /* Center vertically */
-    align-items: center; /* Center horizontally */
-    text-align: center;
-    padding: 60px 20px; /* Increased padding */
-    position: relative; /* Needed for z-index */
-    z-index: 1;
+  /* flex-grow: 1; */ /* May not be needed depending on parent layout */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 100px 20px 60px; /* Adjusted padding top to account for absolute header */
+  min-height: 80vh; /* Ensure content area has height */
+  position: relative;
+  z-index: 1;
 }
 
 /* Headline styling */
 h1 {
-    font-size: clamp(2rem, 5vw, 3.2rem); /* Responsive font size */
-    margin-bottom: 20px;
-    max-width: 850px; /* Max width for readability */
-    font-weight: 700; /* Bolder headline */
-    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.3); /* Subtle text shadow */
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  margin-bottom: 20px;
+  max-width: 850px;
+  font-weight: 700;
+  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.3);
 }
 
 /* Subheadline styling */
 .subheadline {
-    font-size: clamp(1rem, 2.5vw, 1.3rem); /* Responsive font size */
-    margin-bottom: 40px;
-    max-width: 650px; /* Max width */
-    opacity: 0.95; /* Slightly less opaque */
-    font-weight: 400;
+  font-size: clamp(1rem, 2.5vw, 1.3rem);
+  margin-bottom: 40px;
+  max-width: 650px;
+  opacity: 0.95;
+  font-weight: 400;
 }
 
 /* Call to Action Button styling */
 .cta-button {
-    padding: 16px 40px; /* Larger padding */
-    font-size: clamp(1rem, 2vw, 1.2rem); /* Responsive font size */
-    font-weight: 700; /* Bold text */
-    color: #333; /* Dark text for contrast on light button */
-    background-color: rgba(255, 255, 255, 0.95); /* Almost opaque white */
-    border: none;
-    border-radius: 50px; /* Fully rounded corners */
-    cursor: pointer;
-    transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); /* More prominent shadow */
-    text-transform: uppercase; /* Uppercase text */
-    letter-spacing: 0.5px;
+  padding: 16px 40px;
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  font-weight: 700;
+  color: #333;
+  background-color: rgba(255, 255, 255, 0.95);
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 /* CTA button hover effect */
 .cta-button:hover {
-    background-color: #ffffff; /* Fully opaque white on hover */
-    transform: scale(1.05); /* Slightly enlarge on hover */
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25); /* Enhanced shadow on hover */
+  background-color: #ffffff;
+  transform: scale(1.05);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
 }
 
-/* Modal styles */
+/* --- Modal styles --- */
 .modal {
-    display: none; /* Hidden by default */
-    position: fixed; /* Stays in place */
-    z-index: 1000; /* On top of everything */
-    left: 0;
+  /* display: none; Replaced by *ngIf */
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden; /* Prevent background scroll */
+  /* background-color: rgba(0, 0, 0, 0.7); Moved to overlay */
+  display: flex; /* Use flex to center content */
+  align-items: center; /* Vertical centering */
+  justify-content: center; /* Horizontal centering */
+  animation: fadeIn 0.4s ease-in-out;
+}
+
+/* Modal overlay */
+.modal-overlay {
+    position: absolute;
     top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
-    overflow: auto; /* Enable scroll if needed */
     background-color: rgba(0, 0, 0, 0.7); /* Darker overlay */
-    animation: fadeIn 0.4s ease-in-out; /* Fade in animation */
+    z-index: 1001; /* Below content, above page */
 }
+
 
 /* Fade-in animation for modal */
 @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 /* Modal content box styling */
 .modal-content {
-    background-color: #f8f9fa; /* Light background for the form */
-    color: #333; /* Dark text for readability */
-    margin: 8% auto; /* Centered vertically (approx) and horizontally */
-    padding: 35px 45px; /* More padding */
-    border-radius: 12px; /* More rounded corners */
-    width: 90%; /* Responsive width */
-    max-width: 650px; /* Max width */
-    position: relative;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-    animation: slideIn 0.4s ease-in-out; /* Slide in animation */
+  background-color: #f8f9fa;
+  color: #333;
+  /* margin: 8% auto; Replaced by flex centering */
+  padding: 35px 45px;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 650px;
+  position: relative; /* Ensure it's above overlay */
+  z-index: 1002; /* Above overlay */
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  animation: slideIn 0.4s ease-in-out;
+  max-height: 90vh; /* Limit height */
+  overflow-y: auto; /* Allow scrolling within modal if content overflows */
 }
 
 /* Slide-in animation for modal content */
 @keyframes slideIn {
-    from { transform: translateY(-40px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
+  from { transform: translateY(-40px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
 }
 
 /* Modal close button styling */
 .close-button {
-    color: #aaa;
-    position: absolute;
-    top: 15px;
-    right: 25px;
-    font-size: 32px; /* Larger close button */
-    font-weight: bold;
-    cursor: pointer;
-    transition: color 0.2s ease;
+  color: #aaa;
+  position: absolute;
+  top: 15px;
+  right: 25px;
+  font-size: 32px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  z-index: 1003; /* Ensure close button is clickable */
 }
 
 /* Close button hover/focus effect */
 .close-button:hover,
 .close-button:focus {
-    color: #555; /* Darker on hover */
-    text-decoration: none;
+  color: #555;
+  text-decoration: none;
 }
 
 /* Modal title styling */
 .modal-content h2 {
-    margin-bottom: 10px;
-    color: #333;
-    text-align: center;
+  margin-bottom: 10px;
+  color: #333;
+  text-align: center;
 }
 
 /* Modal paragraph styling */
 .modal-content p {
-    margin-bottom: 25px;
-    text-align: center;
-    color: #555;
+  margin-bottom: 25px;
+  text-align: center;
+  color: #555;
 }
 
-/* Form styling */
+/* --- Form styling --- */
 #currioForm {
-    display: flex;
-    flex-direction: column;
-    gap: 18px; /* Space between form groups */
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
 }
 
 /* Form group styling */
 .form-group {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Form label styling */
 #currioForm label {
-    font-weight: bold;
-    margin-bottom: 6px; /* Space below label */
-    font-size: 0.95rem;
-    color: #444;
+  font-weight: bold;
+  margin-bottom: 6px;
+  font-size: 0.95rem;
+  color: #444;
 }
 
 /* Form input and textarea styling */
 #currioForm input[type="text"],
 #currioForm input[type="email"],
 #currioForm textarea {
-    width: 100%;
-    padding: 14px; /* More padding */
-    border: 1px solid #ccc;
-    border-radius: 6px; /* Slightly rounded corners */
-    font-size: 1rem;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  width: 100%;
+  padding: 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 /* Focus effect for inputs/textarea */
 #currioForm input[type="text"]:focus,
 #currioForm input[type="email"]:focus,
 #currioForm textarea:focus {
-    border-color: #4285F4; /* Blue border on focus */
-    box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.2); /* Subtle glow */
-    outline: none;
+  border-color: #4285F4;
+  box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.2);
+  outline: none;
 }
 
 /* Textarea specific styling */
 #currioForm textarea {
-    resize: vertical; /* Allow vertical resize only */
-    min-height: 80px; /* Minimum height */
+  resize: vertical;
+  min-height: 80px;
 }
 
 /* Form submit button styling */
 .submit-button {
-    background-color: #4285F4; /* Gemini Blue */
-    color: white;
-    padding: 14px 25px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 1.1rem;
-    font-weight: bold;
-    transition: background-color 0.2s ease, transform 0.1s ease;
-    margin-top: 15px;
-    align-self: center; /* Center button */
-    width: fit-content; /* Button width fits content */
+  background-color: #4285F4;
+  color: white;
+  padding: 14px 25px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1.1rem;
+  font-weight: bold;
+  transition: background-color 0.2s ease, transform 0.1s ease, opacity 0.2s ease;
+  margin-top: 15px;
+  align-self: center;
+  width: fit-content;
 }
 
 /* Submit button hover effect */
-.submit-button:hover {
-    background-color: #357ae8; /* Darker blue on hover */
+.submit-button:hover:not(:disabled) {
+  background-color: #357ae8;
 }
 
 /* Submit button active (click) effect */
-.submit-button:active {
-    transform: scale(0.98); /* Slightly shrink on click */
+.submit-button:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+/* Submit button disabled state */
+.submit-button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+/* Basic error message styling */
+.error-message {
+    color: #dc3545; /* Red color for errors */
+    font-size: 0.85rem;
+    margin-top: 4px;
+}
+
+/* Input/Textarea invalid state */
+input.ng-invalid.ng-touched,
+textarea.ng-invalid.ng-touched {
+    border-color: #dc3545; /* Red border for invalid fields that have been touched */
 }
 
 
-/* Responsive Design Adjustments */
+/* --- Responsive Design Adjustments --- */
 @media (max-width: 768px) {
-    .header {
-        padding: 15px 20px;
-    }
-    .logo {
-        height: 35px;
-    }
-    .main-content {
-        padding: 40px 15px;
-    }
-    .modal-content {
-        width: 90%;
-        margin: 15% auto; /* Adjust vertical margin */
-        padding: 25px 30px;
-    }
+  .header { padding: 15px 20px; }
+  .logo { height: 35px; }
+  .main-content { padding: 80px 15px 40px; } /* Adjust padding */
+  .modal-content { width: 90%; padding: 25px 30px; }
 }
 
 @media (max-width: 480px) {
-    .header {
-        padding: 10px 15px;
-    }
-    .logo {
-        height: 30px;
-    }
-    .main-content {
-        padding: 30px 10px;
-    }
-    .cta-button {
-        padding: 14px 30px;
-    }
-     .modal-content {
-        margin: 20% auto; /* Adjust vertical margin for small screens */
-        padding: 20px 25px;
-    }
-    #currioForm {
-        gap: 15px;
-    }
-    #currioForm input[type="text"],
-    #currioForm input[type="email"],
-    #currioForm textarea {
-        padding: 12px;
-    }
-    .submit-button {
-        width: 100%; /* Full width button on small screens */
-        padding: 12px;
-    }
+  .header { padding: 10px 15px; }
+  .logo { height: 30px; }
+  .main-content { padding: 70px 10px 30px; } /* Adjust padding */
+  .cta-button { padding: 14px 30px; }
+  .modal-content { padding: 20px 25px; max-height: 85vh; }
+  #currioForm { gap: 15px; }
+  #currioForm input[type="text"],
+  #currioForm input[type="email"],
+  #currioForm textarea { padding: 12px; }
+  .submit-button { width: 100%; padding: 12px; }
 }

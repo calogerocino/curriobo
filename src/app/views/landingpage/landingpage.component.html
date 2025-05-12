@@ -1,42 +1,49 @@
-<body>
-  <header class="header">
-    <img src="assets/images/logo.png" alt="Curriò Logo" class="logo">
-  </header>
+<header class="header">
+  <img src="assets/images/logo.png" alt="Curriò Logo" class="logo"
+       onerror="this.onerror=null; this.src='[https://placehold.co/150x50/ffffff/cccccc?text=Logo+Error](https://placehold.co/150x50/ffffff/cccccc?text=Logo+Error)';"> </header>
 
-  <main class="main-content">
-    <h1>Curriò: Il Tuo Curriculum del Futuro, Creato dall'IA.</h1>
-    <p class="subheadline">
-      Smetti di perdere tempo con layout complicati. Lascia che la nostra tecnologia crei per te un curriculum/portfolio
-      automatico, visivamente sorprendente e personalizzato.
-    </p>
-    <button id="ctaButton" class="cta-button">Inizia Ora: Crea il Tuo Curriò</button>
-  </main>
+<main class="main-content">
+  <h1>Curriò: Il Tuo Curriculum del Futuro, Creato dall'IA.</h1>
+  <p class="subheadline">
+    Smetti di perdere tempo con layout complicati. Lascia che la nostra tecnologia crei per te un curriculum/portfolio automatico, visivamente sorprendente e personalizzato.
+  </p>
+  <button (click)="openModal()" class="cta-button">Inizia Ora: Crea il Tuo Curriò</button>
+</main>
 
-  <div id="formModal" class="modal">
-    <div class="modal-content">
-      <span class="close-button">&times;</span>
-      <h2>Inserisci i dati per Curriò</h2>
-      <p>Fornisci le informazioni base per permettere alla nostra IA di generare una bozza del tuo Curriò.</p>
-      <form id="currioForm">
-        <div class="form-group">
-          <label for="nome">Nome Completo:</label>
-          <input type="text" id="nome" name="nome" required>
+<div id="formModal" class="modal" *ngIf="isModalOpen" (keydown.escape)="closeModal()" tabindex="0">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <span class="close-button" (click)="closeModal()">&times;</span>
+    <h2>Inserisci i dati per Curriò</h2>
+    <p>Fornisci le informazioni base per permettere alla nostra IA di generare una bozza del tuo Curriò.</p>
+
+    <form id="currioForm" #currioForm="ngForm" (ngSubmit)="onSubmit(currioForm)">
+      <div class="form-group">
+        <label for="nome">Nome Completo:</label>
+        <input type="text" id="nome" name="nome" [(ngModel)]="formData.nome" required #nomeInput="ngModel">
+        <div *ngIf="nomeInput.invalid && (nomeInput.dirty || nomeInput.touched)" class="error-message">
+          Nome è obbligatorio.
         </div>
+      </div>
 
-        <div class="form-group">
-          <label for="email">Email:</label>
-          <input type="email" id="email" name="email" required>
-        </div>
+      <div class="form-group">
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" [(ngModel)]="formData.email" required email #emailInput="ngModel">
+         <div *ngIf="emailInput.invalid && (emailInput.dirty || emailInput.touched)" class="error-message">
+           <span *ngIf="emailInput.errors?.['required']">Email è obbligatoria.</span>
+           <span *ngIf="emailInput.errors?.['email']">Inserisci un indirizzo email valido.</span>
+         </div>
+      </div>
 
-        <div class="form-group">
-          <label for="esperienze">Breve descrizione esperienze (o link profilo LinkedIn):</label>
-          <textarea id="esperienze" name="esperienze" rows="4" required></textarea>
-        </div>
+      <div class="form-group">
+        <label for="esperienze">Breve descrizione esperienze (o link profilo LinkedIn):</label>
+        <textarea id="esperienze" name="esperienze" rows="4" [(ngModel)]="formData.esperienze" required #esperienzeInput="ngModel"></textarea>
+         <div *ngIf="esperienzeInput.invalid && (esperienzeInput.dirty || esperienzeInput.touched)" class="error-message">
+           Descrizione esperienze è obbligatoria.
+         </div>
+      </div>
 
-        <button type="submit" class="submit-button">Invia Dati</button>
-      </form>
-    </div>
+      <button type="submit" class="submit-button" [disabled]="!currioForm.valid">Invia Dati</button>
+    </form>
   </div>
-
-  <script src="script.js"></script>
-</body>
+  <div class="modal-overlay" (click)="closeModal()"></div>
+</div>
