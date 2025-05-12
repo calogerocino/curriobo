@@ -1,7 +1,7 @@
 // import { updateEvent } from '../state/catalogo.action';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Event } from 'src/app/shared/models/currio.model';
-import { getEventById } from '../state/catalogo.selector';
+import { getEventById } from '../state/currio.selector';
 import { AppState } from 'src/app/shared/app.state';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';

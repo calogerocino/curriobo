@@ -1,4 +1,4 @@
-import { EventsState } from './catalogo.state';
+import { EventsState } from './currio.state';
 import { createFeatureSelector, createSelector } from '@ngrx/store';
 // import { CurrioSubmission } from 'src/app/shared/models/currio-submission.model'; // Non necessario qui se non si filtra per ID
 

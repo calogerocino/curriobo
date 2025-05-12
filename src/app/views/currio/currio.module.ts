@@ -19,13 +19,12 @@ const DEFAULT_DROPZONE_CONFIG: DropzoneConfigInterface = {
 
 import { CurrioComponent } from './currio.component';
 import { ListaCurrioComponent } from './listacurrio/listacurrio.component';
-import { CurrioNewComponent } from './currio-new/currio-new.component';
 import { CurrioEditComponent } from './currio-edit/currio-edit.component';
 import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
-import { CatalogoEffects } from './state/catalogo.effects';
-import { PRODUCT_STATE_NAME } from './state/catalogo.selector';
-import { productsReducer } from './state/catalogo.reducer';
+import { CatalogoEffects } from './state/currio.effects';
+import { PRODUCT_STATE_NAME } from './state/currio.selector';
+import { productsReducer } from './state/currio.reducer';
 
 import { TranslateModule } from '@ngx-translate/core';
 const routes: Routes = [
@@ -44,11 +43,6 @@ const routes: Routes = [
         data: { title: 'Currio' },
       },
       {
-        path: 'currio',
-        component: CurrioNewComponent,
-        data: { title: 'Crea currio' },
-      },
-      {
         path: 'edit/:id',
         component: CurrioEditComponent,
         data: { title: 'Modifica currio' },
@@ -61,7 +55,6 @@ const routes: Routes = [
   declarations: [
     CurrioComponent,
     ListaCurrioComponent,
-    CurrioNewComponent,
     CurrioEditComponent,
   ],
   imports: [

@@ -4,8 +4,8 @@ import { Event } from "src/app/shared/models/currio.model";
 import { CurrioSubmission } from "src/app/shared/models/currio-submission.model"; // << AGGIUNGI
 import { Store } from "@ngrx/store";
 import { AppState } from "src/app/shared/app.state";
-import { getEvents, getCurrioSubmissions } from "../state/catalogo.selector"; // << AGGIORNA SELETTORE
-import { loadEvents, loadCurrioSubmissions } from "../state/catalogo.action"; // << AGGIORNA AZIONE
+import { getEvents, getCurrioSubmissions } from "../state/currio.selector"; // << AGGIORNA SELETTORE
+import { loadEvents, loadCurrioSubmissions } from "../state/currio.action"; // << AGGIORNA AZIONE
 
 @Component({
   selector: "app-listacurrio",

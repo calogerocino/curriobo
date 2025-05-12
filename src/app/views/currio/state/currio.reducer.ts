@@ -1,9 +1,9 @@
 import {
   loadEventsSuccess,
   loadCurrioSubmissionsSuccess, // << AGGIUNGI
-} from './catalogo.action';
+} from './currio.action';
 import { createReducer, on } from '@ngrx/store';
-import { initialState } from './catalogo.state';
+import { initialState } from './currio.state';
 
 const _productsReducer = createReducer(
   initialState,

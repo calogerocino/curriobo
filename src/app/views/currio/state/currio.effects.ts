@@ -7,7 +7,7 @@ import {
   loadCurrioSubmissionsSuccess,    // << AGGIUNGI
   // deleteCurrioSubmission,       // Esempio
   // deleteCurrioSubmissionSuccess // Esempio
-} from './catalogo.action';
+} from './currio.action';
 import { EventsService } from 'src/app/shared/servizi/currio.service';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { Injectable } from '@angular/core';
