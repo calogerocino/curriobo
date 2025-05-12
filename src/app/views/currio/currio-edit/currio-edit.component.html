@@ -1,41 +1,134 @@
 <div class="row">
   <div class="col-md-12">
-    <h3>Update Event</h3>
+    <h3 *ngIf="isEditMode && currioForm.get('nomePortfolio')?.value">
+      {{'generale.shared.modifica' | translate}} Curriò: {{ currioForm.get('nomePortfolio').value }}
+    </h3>
+    <h3 *ngIf="!isEditMode">Crea Nuovo Curriò</h3>
     <hr />
+  </div>
+</div>
 
-    <form [formGroup]="productForm" (ngSubmit)="onSubmit()">
-      <div class="mb-3">
-        <label>Title</label>
-        <input type="text" class="form-control" formControlName="title" />
-        <!-- <div
-          *ngIf="productForm.get('title').touched && !productForm.get('title').valid"
-        >
-          <div *ngIf="productForm.get('title').errors.['required']">
-            Title is required
+<div class="row mt-4">
+  <div class="col-md-5">
+    <h4>Anteprima Curriò (Layout Ispirato a home.html)</h4>
+    <div class="card">
+      <div class="card-body">
+        <ng-container *ngIf="currioForm.value as formData">
+          <div class="hero-preview py-3 text-center bg-light mb-3">
+            <h1 class="h4">{{ formData.heroTitle || 'Titolo Hero' }}</h1>
+            <p>{{ formData.heroSubtitle || 'Sottotitolo Hero...' }}</p>
           </div>
-          <div *ngIf="productForm.get('title').errors.['minlength']">
-            Title should be minimum 6 characters
+
+          <h5>{{ formData.nomePortfolio || 'Nome del Tuo Curriò' }}</h5>
+          <hr>
+
+          <div *ngIf="formData.chiSonoDescrizione1" class="mb-3">
+            <h6>Chi Sono:</h6>
+            <p><small>{{ formData.chiSonoDescrizione1 }}</small></p>
           </div>
-        </div> -->
+
+          <div *ngIf="formData.contatti && formData.contatti.email" class="mb-3">
+             <h6>Contatti:</h6>
+             <p><small>Email: {{ formData.contatti.email }}</small></p>
+             <p *ngIf="formData.contatti.github"><small>GitHub: {{ formData.contatti.github }}</small></p>
+             <p *ngIf="formData.contatti.linkedin"><small>LinkedIn: {{ formData.contatti.linkedin }}</small></p>
+          </div>
+        </ng-container>
+        <em *ngIf="!currioForm.value.nomePortfolio">(L'anteprima si aggiornerà con i dati del form)</em>
       </div>
-      <div class="mb-3">
-        <label>Description</label>
-        <textarea class="form-control" formControlName="description"></textarea>
-        <!-- <div *ngIf="
-            productForm.get('description').touched &&
-            !productForm.get('description').valid
-          ">
-          <div *ngIf="productForm.get('description').errors.['required']">
-            Description is required
+    </div>
+     <button *ngIf="isEditMode && currio" type="button" (click)="openPreviewInNewTab()" class="btn btn-info mt-3 w-100">
+        <i class="feather icon-external-link"></i> Visualizza Anteprima Completa
+    </button>
+  </div>
+
+  <div class="col-md-7">
+    <h4>Dati Curriò</h4>
+    <form [formGroup]="currioForm" (ngSubmit)="onSubmit()">
+      <div class="card mb-3">
+        <div class="card-header">Informazioni Principali</div>
+        <div class="card-body">
+          <div class="mb-3">
+            <label for="currioNomePortfolio" class="form-label">Nome del Curriò (es. Curriò di Mario Rossi)</label>
+            <input type="text" id="currioNomePortfolio" class="form-control" formControlName="nomePortfolio" />
+            <div *ngIf="currioForm.get('nomePortfolio')?.invalid && currioForm.get('nomePortfolio')?.touched" class="text-danger small">
+              Nome portfolio è obbligatorio.
+            </div>
           </div>
-          <div *ngIf="productForm.get('description').errors.['minlength']">
-            Description should be minimum 10 characters
+
+          <div class="mb-3">
+            <label for="currioHeroTitle" class="form-label">Titolo Hero (es. Ciao, sono Mario Rossi!)</label>
+            <input type="text" id="currioHeroTitle" class="form-control" formControlName="heroTitle" />
+             <div *ngIf="currioForm.get('heroTitle')?.invalid && currioForm.get('heroTitle')?.touched" class="text-danger small">
+              Titolo Hero è obbligatorio.
+            </div>
           </div>
-        </div> -->
+
+          <div class="mb-3">
+            <label for="currioHeroSubtitle" class="form-label">Sottotitolo Hero</label>
+            <textarea id="currioHeroSubtitle" class="form-control" formControlName="heroSubtitle" rows="2"></textarea>
+          </div>
+           <div class="mb-3">
+            <label for="linguaDefault" class="form-label">Lingua Predefinita</label>
+            <select id="linguaDefault" class="form-select" formControlName="linguaDefault">
+                <option value="it">Italiano</option>
+                <option value="en">Inglese</option>
+            </select>
+          </div>
+        </div>
       </div>
 
-      <div class="my-3">
-        <button type="submit" class="btn btn-primary">Update Event</button>
+      <div class="card mb-3">
+        <div class="card-header">Chi Sono</div>
+        <div class="card-body">
+          <div class="mb-3">
+            <label for="chiSonoFotoUrl" class="form-label">URL Foto (opzionale)</label>
+            <input type="url" id="chiSonoFotoUrl" class="form-control" formControlName="chiSonoFotoUrl" placeholder="https://example.com/foto.jpg" />
+          </div>
+          <div class="mb-3">
+            <label for="chiSonoDescrizione1" class="form-label">Descrizione Paragrafo 1</label>
+            <textarea id="chiSonoDescrizione1" class="form-control" formControlName="chiSonoDescrizione1" rows="3"></textarea>
+          </div>
+           <div class="mb-3">
+            <label for="chiSonoDescrizione2" class="form-label">Descrizione Paragrafo 2 (opzionale)</label>
+            <textarea id="chiSonoDescrizione2" class="form-control" formControlName="chiSonoDescrizione2" rows="2"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div formGroupName="contatti" class="card mb-3">
+        <div class="card-header">Contatti</div>
+        <div class="card-body">
+          <div class="mb-3">
+            <label for="contattiEmail" class="form-label">Email</label>
+            <input type="email" id="contattiEmail" class="form-control" formControlName="email" />
+             <div *ngIf="currioForm.get('contatti.email')?.invalid && currioForm.get('contatti.email')?.touched" class="text-danger small">
+              Inserisci un'email valida.
+            </div>
+          </div>
+           <div class="mb-3">
+            <label for="contattiGithub" class="form-label">Profilo GitHub (URL completo)</label>
+            <input type="url" id="contattiGithub" class="form-control" formControlName="github" placeholder="https://github.com/tuoutente" />
+          </div>
+           <div class="mb-3">
+            <label for="contattiLinkedin" class="form-label">Profilo LinkedIn (URL completo)</label>
+            <input type="url" id="contattiLinkedin" class="form-control" formControlName="linkedin" placeholder="https://linkedin.com/in/tuoutente" />
+          </div>
+        </div>
+      </div>
+
+      <div class="alert alert-info">
+        Le sezioni Progetti, Esperienze e Competenze saranno implementabili qui con FormArray.
+      </div>
+
+      <div class="my-4">
+        <button type="submit" class="btn btn-primary me-2" [disabled]="!currioForm.valid">
+          <i class="feather icon-save"></i>
+          {{ (isEditMode ? 'generale.shared.aggiorna' : 'Crea') | translate }} Curriò
+        </button>
+        <button type="button" class="btn btn-secondary" (click)="goBack()">
+          Annulla
+        </button>
       </div>
     </form>
   </div>

@@ -1,89 +1,157 @@
-import { map, mergeMap, switchMap, catchError, tap } from 'rxjs/operators'; // Aggiungi catchError
-import { of } from 'rxjs'; // Aggiungi of
-import {
-  loadEvents,
-  loadEventsSuccess,
-  loadCurrioSubmissions,           // << AGGIUNGI
-  loadCurrioSubmissionsSuccess,    // << AGGIUNGI
-  // deleteCurrioSubmission,       // Esempio
-  // deleteCurrioSubmissionSuccess // Esempio
-} from './currio.action';
-import { EventsService } from 'src/app/shared/servizi/currio.service';
-import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { Injectable } from '@angular/core';
-import { Store } from '@ngrx/store'; // Importa Store
-import { AppState } from 'src/app/shared/app.state'; // Importa AppState
-import { setLoadingSpinner, setErrorMessage } from 'src/app/shared/store/shared.actions'; // Per gestione errori/loading
+import { Actions, createEffect, ofType } from '@ngrx/effects';
+import { Store } from '@ngrx/store';
+import { of } from 'rxjs';
+import { map, mergeMap, catchError, tap, switchMap } from 'rxjs/operators';
+import { AppState } from 'src/app/shared/app.state';
+// Rinomina EventsService in CurrioService
+import { CurrioService } from 'src/app/shared/servizi/currio.service';
+import { setLoadingSpinner, setErrorMessage } from 'src/app/shared/store/shared.actions';
+import * as CurrioActions from './currio.action';
+import { Router } from '@angular/router';
+import { Currio } from 'src/app/shared/models/currio.model';
+
 
 @Injectable()
-export class CatalogoEffects {
+export class CurrioEffects { // Rinomina da CatalogoEffects
   constructor(
     private readonly actions$: Actions,
-    private readonly eventsService: EventsService, // Nome del servizio
-    private readonly store: Store<AppState> // Inietta Store
+    private readonly currioService: CurrioService, // Servizio rinominato
+    private readonly store: Store<AppState>,
+    private readonly router: Router
   ) {}
 
-  loadEvents$ = createEffect(() => {
+  loadCurrios$ = createEffect(() => {
     return this.actions$.pipe(
-      ofType(loadEvents),
-      tap(() => this.store.dispatch(setLoadingSpinner({ status: true }))), // Opzionale: loading
-      mergeMap(() => { // 'action' non è usato qui
-        return this.eventsService.getEvents().pipe(
-          map((events) => {
-            this.store.dispatch(setLoadingSpinner({ status: false })); // Opzionale: loading
-            return loadEventsSuccess({ events });
-          }),
-          catchError(err => { // Opzionale: gestione errori
+      ofType(CurrioActions.loadCurrios), // Usa l'azione corretta
+      tap(() => this.store.dispatch(setLoadingSpinner({ status: true }))),
+      mergeMap(() => {
+        return this.currioService.getCurrios().pipe( // Dovrai creare getCurrios() nel servizio
+          map((currios) => {
             this.store.dispatch(setLoadingSpinner({ status: false }));
-            this.store.dispatch(setErrorMessage({ message: 'Errore nel caricamento currio' }));
-            return of(); // O un'azione di fallimento specifica
+            return CurrioActions.loadCurriosSuccess({ currios: currios as Currio[] }); // Cast se il servizio ritorna Event[]
+          }),
+          catchError(err => {
+            this.store.dispatch(setLoadingSpinner({ status: false }));
+            const message = err.message || 'Errore nel caricamento dei Curriò';
+            this.store.dispatch(setErrorMessage({ message }));
+            return of(CurrioActions.loadCurriosFailure({ error: err }));
           })
         );
       })
     );
   });
 
-  // addEvent$ = createEffect(() => {
-  //   return this.actions$.pipe(
-  //     ofType(addEvent),
-  //     // ... (codice esistente)
-  //   );
-  // });
+  // Opzionale: Carica un singolo currio se necessario
+  loadCurrioById$ = createEffect(() => {
+    return this.actions$.pipe(
+      ofType(CurrioActions.loadCurrioById),
+      tap(() => this.store.dispatch(setLoadingSpinner({ status: true }))),
+      mergeMap((action) => {
+        // Assumi che esista un metodo getEvent(id) nel servizio che restituisce un singolo Currio/Event
+        return this.currioService.getCurrioById(action.id).pipe( // Dovrai creare getCurrioById(id) nel servizio
+          map((currio) => {
+            this.store.dispatch(setLoadingSpinner({ status: false }));
+            return CurrioActions.loadCurrioByIdSuccess({ currio: currio as Currio });
+          }),
+          catchError(err => {
+            this.store.dispatch(setLoadingSpinner({ status: false }));
+            const message = `Errore nel caricamento del Curriò con ID: ${action.id}`;
+            this.store.dispatch(setErrorMessage({ message }));
+            return of(CurrioActions.loadCurrioByIdFailure({ error: err }));
+          })
+        );
+      })
+    );
+  });
 
-  // updateEvent$ = createEffect(() => {
-  //   return this.actions$.pipe(
-  //     ofType(updateEvent),
-  //     // ... (codice esistente)
-  //   );
-  // });
+  createCurrio$ = createEffect(() => {
+    return this.actions$.pipe(
+      ofType(CurrioActions.createCurrio),
+      tap(() => this.store.dispatch(setLoadingSpinner({ status: true }))),
+      switchMap((action) => {
+        // Il tuo servizio deve avere un metodo per creare un Currio.
+        // Firebase tipicamente restituisce un oggetto { name: <ID_GENERATO> }
+        // Dovrai poi aggiornare il currio creato con l'ID restituito.
+        return this.currioService.createCurrio(action.currio as any).pipe( // Usa createCurrio(data) nel servizio
+          map((response) => { // response potrebbe essere { name: string } da Firebase
+            this.store.dispatch(setLoadingSpinner({ status: false }));
+            const createdCurrio: Currio = { ...action.currio, id: response.name }; // Aggiungi l'ID restituito
+            return CurrioActions.createCurrioSuccess({ currio: createdCurrio });
+          }),
+          catchError(err => {
+            this.store.dispatch(setLoadingSpinner({ status: false }));
+            this.store.dispatch(setErrorMessage({ message: 'Errore nella creazione del Curriò' }));
+            return of(CurrioActions.createCurrioFailure({ error: err }));
+          })
+        );
+      })
+    );
+  });
 
-  // deleteEvent$ = createEffect(() => {
-  //   return this.actions$.pipe(
-  //     ofType(deleteEvent),
-  //     // ... (codice esistente)
-  //   );
-  // });
+  updateCurrio$ = createEffect(() => {
+    return this.actions$.pipe(
+      ofType(CurrioActions.updateCurrio),
+      tap(() => this.store.dispatch(setLoadingSpinner({ status: true }))),
+      switchMap((action) => {
+        // Il servizio deve avere un metodo per aggiornare un Currio.
+        // Firebase per l'update non restituisce il corpo intero, solo una conferma o errore.
+        const { id, ...dataToUpdate } = action.currio;
+        return this.currioService.updateCurrio({ id, ...dataToUpdate } as any).pipe(
+          map(() => {
+            this.store.dispatch(setLoadingSpinner({ status: false }));
+            // L'aggiornamento nello store avviene tramite il reducer
+            // L'azione di successo potrebbe passare le modifiche per NgRx Data/Entity o l'ID
+            return CurrioActions.updateCurrioSuccess({ currio: { id: action.currio.id, changes: dataToUpdate }});
+          }),
+          catchError(err => {
+            this.store.dispatch(setLoadingSpinner({ status: false }));
+            this.store.dispatch(setErrorMessage({ message: 'Errore nell\'aggiornamento del Curriò' }));
+            return of(CurrioActions.updateCurrioFailure({ error: err }));
+          })
+        );
+      })
+    );
+  });
 
-  // << NUOVO EFFETTO PER CURRIO SUBMISSIONS >>
+  deleteCurrio$ = createEffect(() => {
+    return this.actions$.pipe(
+      ofType(CurrioActions.deleteCurrio),
+      tap(() => this.store.dispatch(setLoadingSpinner({ status: true }))),
+      mergeMap((action) => {
+        return this.currioService.deleteCurrio(action.id).pipe(
+          map(() => {
+            this.store.dispatch(setLoadingSpinner({ status: false }));
+            return CurrioActions.deleteCurrioSuccess({ id: action.id });
+          }),
+          catchError(err => {
+            this.store.dispatch(setLoadingSpinner({ status: false }));
+            this.store.dispatch(setErrorMessage({ message: 'Errore nell\'eliminazione del Curriò' }));
+            return of(CurrioActions.deleteCurrioFailure({ error: err }));
+          })
+        );
+      })
+    );
+  });
+
+  // Effetto per CurrioSubmissions (già esistente, verifica nome e servizio)
   loadCurrioSubmissions$ = createEffect(() => {
     return this.actions$.pipe(
-      ofType(loadCurrioSubmissions),
-      tap(() => this.store.dispatch(setLoadingSpinner({ status: true }))), // Opzionale: loading
-      mergeMap(() => { // 'action' non è usato qui
-        return this.eventsService.getCurrioSubmissions().pipe(
+      ofType(CurrioActions.loadCurrioSubmissions),
+      tap(() => this.store.dispatch(setLoadingSpinner({ status: true }))),
+      mergeMap(() => {
+        return this.currioService.getCurrioSubmissions().pipe(
           map((submissions) => {
-            this.store.dispatch(setLoadingSpinner({ status: false })); // Opzionale: loading
-            return loadCurrioSubmissionsSuccess({ submissions });
+            this.store.dispatch(setLoadingSpinner({ status: false }));
+            return CurrioActions.loadCurrioSubmissionsSuccess({ submissions });
           }),
-          catchError(err => { // Opzionale: gestione errori
+          catchError(err => {
             this.store.dispatch(setLoadingSpinner({ status: false }));
             this.store.dispatch(setErrorMessage({ message: 'Errore nel caricamento delle richieste Curriò' }));
-            return of(); // O un'azione di fallimento specifica
+            return of();
           })
         );
       })
     );
   });
-
-  // Aggiungere qui effetti per deleteCurrioSubmission se implementato
 }

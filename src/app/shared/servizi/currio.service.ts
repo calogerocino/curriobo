@@ -1,5 +1,7 @@
-import { Event } from '../models/currio.model';
-import { CurrioSubmission } from '../models/currio-submission.model'; // << AGGIUNGI QUESTO
+// Rinomina il file in currio.service.ts e la classe in CurrioService
+// src/app/shared/servizi/currio.service.ts
+import { Currio } from '../models/currio.model'; // Usa il modello corretto
+import { CurrioSubmission } from '../models/currio-submission.model';
 import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
@@ -9,60 +11,71 @@ import { environment } from 'src/environments/environment';
 @Injectable({
   providedIn: 'root',
 })
-export class EventsService {
+export class CurrioService { // Rinomina da EventsService
+  private currioDbPath = 'currios'; // Path in Firebase per i Currio
+
   constructor(private readonly http: HttpClient) {}
 
-  getEvents(): Observable<Event[]> {
+  // Metodi CRUD per i Currio
+  getCurrios(): Observable<Currio[]> {
     return this.http
-      .get<{ [key: string]: Omit<Event, 'id'> }>( // Migliorata tipizzazione per Firebase
-        `${environment.firebase.databaseURL}/currio.json`
+      .get<{ [key: string]: Omit<Currio, 'id'> }>(
+        `${environment.firebase.databaseURL}/${this.currioDbPath}.json`
       )
       .pipe(
         map((data) => {
-          const events: Event[] = [];
-          if (data) { // Controllo se data non è null
+          const currios: Currio[] = [];
+          if (data) {
             for (const key in data) {
               if (data.hasOwnProperty(key)) {
-                events.push({ ...data[key], id: key });
+                currios.push({ ...data[key], id: key } as Currio); // Cast a Currio
               }
             }
           }
-          return events;
+          return currios;
         })
       );
   }
 
-  addEvent(event: Event): Observable<{ name: string }> {
+  getCurrioById(id: string): Observable<Currio> { // Nuovo metodo
+    return this.http
+      .get<Omit<Currio, 'id'>>(`${environment.firebase.databaseURL}/${this.currioDbPath}/${id}.json`)
+      .pipe(
+        map(data => ({ ...data, id } as Currio))
+      );
+  }
+
+  createCurrio(currioData: Omit<Currio, 'id'>): Observable<{ name: string }> { // Per Firebase che restituisce l'ID in 'name'
     return this.http.post<{ name: string }>(
-      `${environment.firebase.databaseURL}/currio.json`,
-      event
+      `${environment.firebase.databaseURL}/${this.currioDbPath}.json`,
+      currioData
     );
   }
 
-  updateEvent(event: Event) {
-    const eventData = { title: event.title, description: event.description };
+  updateCurrio(currio: Currio): Observable<any> { // Firebase patch non restituisce il corpo
+    const { id, ...currioData } = currio; // Separa l'ID dal resto dei dati
     return this.http.patch(
-      `${environment.firebase.databaseURL}/currio/${event.id}.json`, // Patch sull'ID specifico
-      eventData
+      `${environment.firebase.databaseURL}/${this.currioDbPath}/${id}.json`,
+      currioData
     );
   }
 
-  deleteEvent(id: string) {
+  deleteCurrio(id: string): Observable<any> {
     return this.http.delete(
-      `${environment.firebase.databaseURL}/currio/${id}.json`
+      `${environment.firebase.databaseURL}/${this.currioDbPath}/${id}.json`
     );
   }
 
-  // NUOVO METODO PER LE RICHIESTE CURRIO
+  // Metodo per CurrioSubmissions (esistente, verifica path se necessario)
   getCurrioSubmissions(): Observable<CurrioSubmission[]> {
     return this.http
-      .get<{ [key: string]: Omit<CurrioSubmission, 'id'> }>( // Tipizzazione per Firebase
-        `${environment.firebase.databaseURL}/currioSubmissions.json`
+      .get<{ [key: string]: Omit<CurrioSubmission, 'id'> }>(
+        `${environment.firebase.databaseURL}/currioSubmissions.json` // Path corretto
       )
       .pipe(
         map((data) => {
           const submissions: CurrioSubmission[] = [];
-          if (data) { // Controllo se data non è null
+          if (data) {
             for (const key in data) {
               if (data.hasOwnProperty(key)) {
                 submissions.push({ ...data[key], id: key });

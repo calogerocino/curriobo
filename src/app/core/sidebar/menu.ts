@@ -27,8 +27,9 @@ export const MENU: MenuItem[] = [
         label: 'generale.layout.menu.richieste.listarichieste',
         link: '/admin/currio/listacurrio',
       },{
-        label: 'generale.layout.menu.richieste.listacurrio',
-        link: '/admin/currio/listacurrio',
+        label: 'generale.layout.menu.richieste.listacurrio', // 'Lista Curriò'
+    icon: 'file-text', // O un'icona più adatta per i curriculum
+    link: '/admin/currio/listacurrio', // Corretto link
       }
     ]
   },

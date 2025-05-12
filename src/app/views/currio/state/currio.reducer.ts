@@ -1,53 +1,66 @@
-import {
-  loadEventsSuccess,
-  loadCurrioSubmissionsSuccess, // << AGGIUNGI
-} from './currio.action';
 import { createReducer, on } from '@ngrx/store';
-import { initialState } from './currio.state';
+import { initialState, CurrioState } from './currio.state';
+import * as CurrioActions from './currio.action'; // Importa tutte le azioni
+import { Currio } from 'src/app/shared/models/currio.model';
 
-const _productsReducer = createReducer(
+const _currioReducer = createReducer( // Rinomina
   initialState,
-  // on(addEventSuccess, (state, action) => {
-  //   let event = { ...action.event };
-  //   return {
-  //     ...state,
-  //     events: [...state.events, event],
-  //   };
-  // }),
-  // on(updateEventSuccess, (state, action) => {
-  //   const updatedEvents = state.events.map((event) => {
-  //     return action.event.id === event.id ? action.event : event;
-  //   });
-  //   return {
-  //     ...state,
-  //     events: updatedEvents,
-  //   };
-  // }),
-  // on(deleteEventSuccess, (state, { id }) => {
-  //   const updatedEvents = state.events.filter((event) => {
-  //     return event.id !== id;
-  //   });
-  //   return {
-  //     ...state,
-  //     events: updatedEvents,
-  //   };
-  // }),
-  on(loadEventsSuccess, (state, action) => {
-    return {
+  on(CurrioActions.loadCurrios, CurrioActions.loadCurrioById, CurrioActions.createCurrio, CurrioActions.updateCurrio, CurrioActions.deleteCurrio, (state) => ({
+    ...state,
+    loading: true,
+    error: null,
+  })),
+
+  on(CurrioActions.loadCurriosSuccess, (state, { currios }) => ({
+    ...state,
+    currios: currios,
+    loading: false,
+  })),
+  on(CurrioActions.loadCurrioByIdSuccess, (state, { currio }) => ({
+    ...state,
+    selectedCurrio: currio, // Salva il currio selezionato
+    currios: state.currios.find(c => c.id === currio.id) ? state.currios.map(c => c.id === currio.id ? currio : c) : [...state.currios, currio], // Aggiorna o aggiungi alla lista
+    loading: false,
+  })),
+  on(CurrioActions.createCurrioSuccess, (state, { currio }) => ({
+    ...state,
+    currios: [...state.currios, currio],
+    loading: false,
+  })),
+  on(CurrioActions.updateCurrioSuccess, (state, { currio }) => ({
+    ...state,
+    currios: state.currios.map((c) => (c.id === currio.id ? { ...c, ...currio.changes } : c)),
+    selectedCurrio: state.selectedCurrio?.id === currio.id ? { ...state.selectedCurrio, ...currio.changes } as Currio : state.selectedCurrio,
+    loading: false,
+  })),
+  on(CurrioActions.deleteCurrioSuccess, (state, { id }) => ({
+    ...state,
+    currios: state.currios.filter((c) => c.id !== id),
+    loading: false,
+  })),
+
+  on(
+    CurrioActions.loadCurriosFailure,
+    CurrioActions.loadCurrioByIdFailure,
+    CurrioActions.createCurrioFailure,
+    CurrioActions.updateCurrioFailure,
+    CurrioActions.deleteCurrioFailure,
+    (state, { error }) => ({
       ...state,
-      events: action.events,
-    };
-  }),
-  // << NUOVO REDUCER PER CURRIO SUBMISSIONS >>
-  on(loadCurrioSubmissionsSuccess, (state, action) => {
+      loading: false,
+      error: error,
+    })
+  ),
+
+  // Reducer per CurrioSubmissions (già esistente)
+  on(CurrioActions.loadCurrioSubmissionsSuccess, (state, action) => {
     return {
       ...state,
       currioSubmissions: action.submissions,
     };
   })
-  // Aggiungere qui altri reducer per deleteCurrioSubmissionSuccess se implementato
 );
 
-export function productsReducer(state: any, action: any) { // Mantieni any per ora se non vuoi definire un tipo unione complesso
-  return _productsReducer(state, action);
+export function currioReducer(state: CurrioState | undefined, action: any) { // Rinomina
+  return _currioReducer(state, action);
 }

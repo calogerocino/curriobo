@@ -1,66 +1,41 @@
 <div class="row">
-  <div class="col-md-12">
-    <h3>{{"generale.layout.menu.richieste" | translate}}</h3>
-
-    <div>
-      <a routerLink="/admin/currio/currio" class="btn btn-primary"> {{"generale.shared.modifica" | translate}} </a>
+  <div class="col-md-12 mt-5">
+    <h4>{{"generale.layout.menu.richieste.listacurrio" | translate}}</h4>
+    <div class="mb-3 text-right">
+      <button type="button" class="btn btn-primary" (click)="navigateToCreate()">
+        <i class="feather icon-plus"></i> Crea Nuovo Curriò
+      </button>
     </div>
-
-    <h4 class="mt-4">Currio Registrati</h4>
-    <table class="table table-striped" *ngIf="events$ | async as eventsData else loadingEvents">
+    <table class="table table-striped" *ngIf="currios$ | async as currioData else loadingCurrios">
       <thead>
         <tr>
-          <th>Id</th>
-          <th>{{"tabella.head.stato"|translate}}</th> <th>{{"tabella.head.descrizione"|translate}}</th>
-          <th>{{"tabella.head.Azioni"|translate}}</th>
+          <th>ID</th>
+          <th>{{"tabella.head.nome" | translate}} Portfolio</th>
+          <th>{{"generale.layout.menu.dashboard" | translate}} Titolo</th>
+          <th class="text-center">{{"tabella.head.Azioni"|translate}}</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let event of eventsData">
-          <td>{{ event.id }}</td>
-          <td>{{ event.title }}</td>
-          <td>{{ event.description }}</td>
-          <td>
-            <a [routerLink]="['/admin/currio/edit', event.id]" class="btn btn-sm btn-primary mr-2"> {{"generale.shared.aggiorna" | translate}}
-            </a>
-            <button class="btn btn-sm btn-info mr-2"> Slot
+        <tr *ngFor="let currio of currioData">
+          <td>{{ currio.id }}</td>
+          <td>{{ currio.nomePortfolio }}</td>
+          <td>{{ currio.heroTitle }}</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-icon btn-outline-primary btn-sm me-1" (click)="navigateToEdit(currio.id)" title="{{'generale.shared.modifica' | translate}}">
+              <i class="feather icon-eye"></i>
             </button>
-            <button class="btn btn-sm btn-danger" (click)="onDeleteEvent(event.id)">
-              {{"generale.shared.elimina" | translate}}
+            <button type="button" class="btn btn-icon btn-outline-danger btn-sm" (click)="onDeleteCurrio(currio.id)" title="{{'generale.shared.elimina' | translate}}">
+              <i class="feather icon-trash"></i>
             </button>
           </td>
         </tr>
-        <tr *ngIf="eventsData.length === 0">
-            <td colspan="4" class="text-center">Nessun currio trovato.</td>
+        <tr *ngIf="currioData.length === 0">
+          <td colspan="4" class="text-center">Nessun Curriò trovato.</td>
         </tr>
       </tbody>
     </table>
-    <ng-template #loadingEvents><p>Caricamento currio...</p></ng-template>
-  </div>
-
-  <div class="col-md-12 mt-5">
-    <h4>Richieste dalla Landing Page (Curriò)</h4>
-    <table class="table table-striped" *ngIf="currioSubmissions$ | async as submissionsData else loadingSubmissions">
-      <thead>
-        <tr>
-          <th>ID Richiesta</th>
-          <th>Nome</th>
-          <th>Email</th>
-          <th>Esperienze</th>
-          </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let submission of submissionsData">
-          <td>{{ submission.id }}</td>
-          <td>{{ submission.nome }}</td>
-          <td>{{ submission.email }}</td>
-          <td>{{ submission.esperienze }}</td>
-          </tr>
-        <tr *ngIf="submissionsData.length === 0">
-            <td colspan="4" class="text-center">Nessuna richiesta dalla landing page trovata.</td>
-        </tr>
-      </tbody>
-    </table>
-    <ng-template #loadingSubmissions><p>Caricamento richieste Curriò...</p></ng-template>
+    <ng-template #loadingCurrios>
+      <p>Caricamento lista Curriò...</p>
+    </ng-template>
   </div>
 </div>

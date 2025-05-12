@@ -1,12 +1,18 @@
-import { Event } from "src/app/shared/models/currio.model";
-import { CurrioSubmission } from "src/app/shared/models/currio-submission.model"; // << AGGIUNGI
+import { Currio } from "src/app/shared/models/currio.model"; // Usa il modello Currio
+import { CurrioSubmission } from "src/app/shared/models/currio-submission.model";
 
-export interface EventsState {
-  events: Event[];
-  currioSubmissions: CurrioSubmission[]; // << AGGIUNGI
+export interface CurrioState { // Rinomina da EventsState
+  currios: Currio[]; // Rinomina da events
+  selectedCurrio: Currio | null; // Opzionale: per il currio caricato nella pagina di modifica
+  currioSubmissions: CurrioSubmission[];
+  loading: boolean;
+  error: string | null;
 }
 
-export const initialState: EventsState = {
-  events: [],
-  currioSubmissions: [], // << AGGIUNGI
+export const initialState: CurrioState = {
+  currios: [],
+  selectedCurrio: null,
+  currioSubmissions: [],
+  loading: false,
+  error: null,
 };

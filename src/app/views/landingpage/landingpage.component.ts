@@ -1,76 +1,103 @@
-// landingpage.component.ts
-
+// src/app/views/landingpage/landingpage.component.ts
 import { Component } from '@angular/core';
-import { AngularFireDatabase } from '@angular/fire/compat/database'; // Import Firebase Realtime Database service
-import { NgForm } from '@angular/forms'; // Import NgForm for template-driven forms
+import { NgForm } from '@angular/forms';
+// Importa il servizio CurrioService e il modello Currio
+import { CurrioService } from 'src/app/shared/servizi/currio.service'; // Aggiorna il path se necessario
+import { Currio, CurrioContatti } from 'src/app/shared/models/currio.model'; // Aggiorna il path se necessario
+import { Store } from '@ngrx/store';
+import { AppState } from 'src/app/shared/app.state';
+import { createCurrio } from 'src/app/views/currio/state/currio.action'; // Importa l'azione NGRX
+import Swal from 'sweetalert2'; // Per notifiche più carine
 
 @Component({
-  selector: 'app-landingpage', // Assicurati che questo selettore sia corretto per il tuo progetto
+  selector: 'app-landingpage',
   templateUrl: './landingpage.component.html',
   styleUrls: ['./landingpage.component.css'],
 })
 export class LandingpageComponent {
-  // Property to control modal visibility
   isModalOpen = false;
-
-  // Object to hold form data using ngModel
   formData = {
     nome: '',
     email: '',
-    esperienze: '',
-    // Aggiungi qui altri campi se necessario
+    esperienze: '', // Questo campo verrà usato per heroSubtitle o una descrizione iniziale
   };
 
-  // Inject AngularFireDatabase
-  constructor(private db: AngularFireDatabase) {}
+  // Inietta CurrioService e Store
+  constructor(
+    private readonly currioService: CurrioService,
+    private readonly store: Store<AppState>
+    ) {}
 
-  // Method to open the modal
   openModal(): void {
     this.isModalOpen = true;
-    // Optional: disable body scroll when modal is open
     document.body.style.overflow = 'hidden';
   }
 
-  // Method to close the modal
   closeModal(): void {
     this.isModalOpen = false;
-    // Optional: restore body scroll when modal is closed
     document.body.style.overflow = 'auto';
   }
 
-  // Method to handle form submission
   onSubmit(form: NgForm): void {
-    // Check if the form is valid
     if (form.valid) {
       console.log('Dati del form raccolti:', this.formData);
 
-      // --- Firebase Integration ---
-      // Get a reference to the Firebase Realtime Database list/node where you want to store the data
-      // Sostituisci 'currioSubmissions' con il nome desiderato per il nodo nel tuo database
-      const itemsRef = this.db.list('currioSubmissions');
+      // Trasforma formData in un oggetto Currio (parziale, omettendo l'id)
+      const newCurrioData: Omit<Currio, 'id'> = {
+        nomePortfolio: `Curriò di ${this.formData.nome}`,
+        heroTitle: `Ciao, sono ${this.formData.nome}!`,
+        heroSubtitle: this.formData.esperienze, // Usiamo 'esperienze' come sottotitolo iniziale
+        contatti: {
+          email: this.formData.email,
+        } as CurrioContatti,
+        // Inizializza gli altri campi array/oggetti come vuoti o con valori di default
+        progetti: [],
+        esperienze: [], // Potresti voler aggiungere this.formData.esperienze qui come prima esperienza testuale
+        competenze: [],
+        chiSonoDescrizione1: `Una breve introduzione su ${this.formData.nome}.`, // Placeholder
+        linguaDefault: 'it', // Default
+        // userId: '', // Se hai un sistema di autenticazione per chi sottomette, potresti volerlo associare
+      };
 
-      // Push the form data to Firebase
-      itemsRef
-        .push(this.formData)
-        .then((response) => {
-          // Success handling
-          console.log('Dati inviati a Firebase con successo!', response);
-          alert('Dati inviati con successo! Grazie.'); // User feedback
-          this.closeModal(); // Close the modal
-          form.resetForm(); // Reset the form fields
-        })
-        .catch((error) => {
-          // Error handling
-          console.error("Errore durante l'invio dei dati a Firebase:", error);
-          alert(
-            "Si è verificato un errore durante l'invio dei dati. Riprova più tardi."
-          ); // User feedback
-        });
-      // --- End of Firebase Integration ---
+      // Dispatch dell'azione NGRX per creare il Currio
+      this.store.dispatch(createCurrio({ currio: newCurrioData }));
+
+      // Gestione del feedback all'utente (puoi iscriverti agli effetti NGRX per success/failure)
+      // Per semplicità, mostriamo un alert di successo immediato,
+      // ma in un'app reale, aspetteresti la conferma dall'effetto.
+      Swal.fire({
+        title: 'Richiesta Inviata!',
+        text: 'I tuoi dati sono stati inviati. Verrai contattato a breve o potrai modificare il tuo Curriò dopo il login.',
+        icon: 'success',
+        confirmButtonText: 'Ok'
+      });
+
+      this.closeModal();
+      form.resetForm();
+
+      // COMMENTATO: Vecchio metodo di salvataggio diretto con AngularFireDatabase
+      // const itemsRef = this.db.list('currioSubmissions'); // Nodo originale
+      // itemsRef
+      //   .push(this.formData) // Salvataggio dei dati grezzi del form
+      //   .then((response) => {
+      //     console.log('Dati inviati a Firebase (currioSubmissions) con successo!', response);
+      //     alert('Dati inviati con successo! Grazie.');
+      //     this.closeModal();
+      //     form.resetForm();
+      //   })
+      //   .catch((error) => {
+      //     console.error("Errore durante l'invio dei dati a Firebase (currioSubmissions):", error);
+      //     alert("Si è verificato un errore durante l'invio dei dati. Riprova più tardi.");
+      //   });
+
     } else {
-      // Form is invalid, show an error or highlight fields
       console.error('Il form non è valido.');
-      alert('Per favore, compila tutti i campi obbligatori.');
+      Swal.fire({
+        title: 'Errore!',
+        text: 'Per favore, compila tutti i campi obbligatori.',
+        icon: 'error',
+        confirmButtonText: 'Ok'
+      });
     }
   }
 }

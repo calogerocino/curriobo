@@ -1,23 +1,44 @@
-import { EventsState } from './currio.state';
+import { CurrioState } from './currio.state';
 import { createFeatureSelector, createSelector } from '@ngrx/store';
-// import { CurrioSubmission } from 'src/app/shared/models/currio-submission.model'; // Non necessario qui se non si filtra per ID
+import { Currio } from 'src/app/shared/models/currio.model';
 
-export const PRODUCT_STATE_NAME = 'events'; // Considera di rinominare se gestisce più di 'products'
-const getEventsState = createFeatureSelector<EventsState>(PRODUCT_STATE_NAME);
+export const CURRIO_STATE_NAME = 'currioState'; // Rinomina da PRODUCT_STATE_NAME o events
+const getCurrioFeatureState = createFeatureSelector<CurrioState>(CURRIO_STATE_NAME);
 
-export const getEvents = createSelector(getEventsState, (state) => {
-  return state.events;
-});
-
-export const getEventById = createSelector(
-    getEventsState,
-    (state: EventsState, props: { id: string | null }) => { // props.id può essere null
-        if (!props.id) return undefined; // Gestisci il caso di ID nullo
-        return state.events.find((event) => event.id === props.id);
-    }
+export const getCurrios = createSelector(
+  getCurrioFeatureState,
+  (state) => state.currios
 );
 
-// << NUOVO SELETTORE PER CURRIO SUBMISSIONS >>
-export const getCurrioSubmissions = createSelector(getEventsState, (state) => { // Nome cambiato per chiarezza
-  return state.currioSubmissions;
-});
+export const getCurrioById = createSelector(
+  getCurrioFeatureState,
+  (state: CurrioState, props: { id: string | null }) => {
+    if (!props.id) return undefined;
+    // Cerca prima nel selectedCurrio, poi nella lista
+    if (state.selectedCurrio && state.selectedCurrio.id === props.id) {
+        return state.selectedCurrio;
+    }
+    return state.currios.find((currio) => currio.id === props.id);
+  }
+);
+
+export const getSelectedCurrio = createSelector( // Selettore per il currio attualmente in modifica
+    getCurrioFeatureState,
+    state => state.selectedCurrio
+);
+
+export const getCurrioLoading = createSelector(
+    getCurrioFeatureState,
+    state => state.loading
+);
+
+export const getCurrioError = createSelector(
+    getCurrioFeatureState,
+    state => state.error
+);
+
+// Selettore per Currio Submissions (già esistente, verifica nomi)
+export const getCurrioSubmissions = createSelector(
+    getCurrioFeatureState,
+    (state) => state.currioSubmissions
+);
