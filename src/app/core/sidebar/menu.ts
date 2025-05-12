@@ -16,32 +16,20 @@ export const MENU: MenuItem[] = [
     link: ''
   },
   {
-    label: 'generale.layout.menu.eventi',
+    label: 'generale.layout.menu.richieste',
     isTitle: true
   },
   {
-    label: 'generale.layout.menu.eventi',
+    label: 'generale.layout.menu.richieste',
     icon: 'coffee',
     subItems: [
       {
-        label: 'generale.layout.menu.eventi.listaeventi',
+        label: 'generale.layout.menu.richieste.listarichieste',
         link: '/admin/eventi/listaeventi',
+      },{
+        label: 'generale.layout.menu.richieste.listacurrio',
+        link: '/admin/eventi/listacurrio',
       }
-    ]
-  },
-  {
-    label: 'generale.layout.menu.discord',
-    icon: 'speaker',
-    subItems: [
-      {
-        // label: 'generale.layout.menu.eventi.listaeventi',
-        label:'Landing',
-        link: '/landing',
-      },
-      {
-        label:'Test',
-        link: '/admin/eventi/interni',
-      },
     ]
   },
   {

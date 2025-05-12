@@ -17,9 +17,9 @@
 	"generale.layout.menu.clienti.indirizzi": "Indirizzi",
 	"generale.layout.menu.contabilita.utenti": "Utenti",
 	"generale.layout.menu.dashboard": "Dashboard",
-	"generale.layout.menu.eventi": "Eventi",
-	"generale.layout.menu.eventi.listaeventi": "Lista eventi",
-	"generale.layout.menu.eventi.esterni": "Esterni",
+	"generale.layout.menu.richieste": "Richieste",
+	"generale.layout.menu.richieste.listarichieste": "Lista richieste",
+	"generale.layout.menu.richieste.listacurrio": "Lista Curriò",
 	"generale.layout.menu.listautenti": "Lista Utenti",
 	"generale.layout.menu.main": "Main",
 	"generale.layout.menu.sito": "Sito",
@@ -62,7 +62,7 @@
 	"tabella.head.immagine": "Immagine",
 	"tabella.head.mailverificata": "Mail verificata",
 	"tabella.head.nome": "Nome",
-  "tabella.head.titolo": "Titolo",
+  "tabella.head.stato": "Stato",
 "tabella.head.descrizione": "Descrizioni",
 
 
