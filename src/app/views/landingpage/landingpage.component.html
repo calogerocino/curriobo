@@ -1,10 +1,12 @@
 <header class="header">
-  <img src="assets/images/logo.png" alt="Curriò Logo" class="logo" routerLink="auth/login"> </header>
+  <img src="assets/images/logo.png" alt="Curriò Logo" class="logo" routerLink="auth/login">
+</header>
 
 <main class="main-content">
   <h1>Curriò: Il tuo Curriculum del futuro, creato come un portfolio.</h1>
   <p class="subheadline">
-    Smetti di perdere tempo con layout complicati. Lascia che la nostra tecnologia crei per te un curriculum/portfolio automatico, visivamente sorprendente e personalizzato.
+    Smetti di perdere tempo con layout complicati. Lascia che la nostra tecnologia crei per te un curriculum/portfolio
+    automatico, visivamente sorprendente e personalizzato.
   </p>
   <button (click)="openModal()" class="cta-button">Inizia Ora: Crea il Tuo Curriò</button>
 </main>
@@ -27,18 +29,29 @@
       <div class="form-group">
         <label for="email">Email:</label>
         <input type="email" id="email" name="email" [(ngModel)]="formData.email" required email #emailInput="ngModel">
-         <div *ngIf="emailInput.invalid && (emailInput.dirty || emailInput.touched)" class="error-message">
-           <span *ngIf="emailInput.errors?.['required']">Email è obbligatoria.</span>
-           <span *ngIf="emailInput.errors?.['email']">Inserisci un indirizzo email valido.</span>
-         </div>
+        <div *ngIf="emailInput.invalid && (emailInput.dirty || emailInput.touched)" class="error-message">
+          <span *ngIf="emailInput.errors?.['required']">Email è obbligatoria.</span>
+          <span *ngIf="emailInput.errors?.['email']">Inserisci un indirizzo email valido.</span>
+        </div>
       </div>
 
       <div class="form-group">
         <label for="esperienze">Breve descrizione esperienze (o link profilo LinkedIn):</label>
-        <textarea id="esperienze" name="esperienze" rows="4" [(ngModel)]="formData.esperienze" required #esperienzeInput="ngModel"></textarea>
-         <div *ngIf="esperienzeInput.invalid && (esperienzeInput.dirty || esperienzeInput.touched)" class="error-message">
-           Descrizione esperienze è obbligatoria.
-         </div>
+        <textarea id="esperienze" name="esperienze" rows="4" [(ngModel)]="formData.esperienze" required
+          #esperienzeInput="ngModel"></textarea>
+        <div *ngIf="esperienzeInput.invalid && (esperienzeInput.dirty || esperienzeInput.touched)"
+          class="error-message">
+          Descrizione esperienze è obbligatoria.
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="curriculumFile">Allega Curriculum (PDF, JPG, PNG):</label>
+        <input type="file" id="curriculumFile" name="curriculumFile" (change)="onFileSelected($event)"
+          accept=".pdf,.jpg,.jpeg,.png">
+        <div *ngIf="selectedFileName" class="mt-2">
+          File selezionato: {{ selectedFileName }}
+        </div>
       </div>
 
       <button type="submit" class="submit-button" [disabled]="!currioForm.valid">Invia Dati</button>

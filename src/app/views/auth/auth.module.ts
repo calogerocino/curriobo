@@ -1,3 +1,5 @@
+// src/app/views/auth/auth.module.ts
+
 import { NgModule } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { LoginComponent } from "./login/login.component";
@@ -10,6 +12,9 @@ import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { VerifyemailComponent } from './verifyemail/verifyemail.component';
 import { EffectsModule } from "@ngrx/effects";
 import { AuthEffects } from "./state/auth.effects";
+
+// --- NUOVO IMPORT ---
+import { CompletaRegistrazioneComponent } from './completa-registrazione/completa-registrazione.component';
 
 const routes: Routes = [
   {
@@ -27,7 +32,7 @@ const routes: Routes = [
         data: { title: "Login" },
       },
       {
-        path: "register",
+        path: "register", // Registrazione standard, se ancora la usi
         component: RegisterComponent,
         data: { title: "Registrazione" },
       },
@@ -41,6 +46,12 @@ const routes: Routes = [
         component: VerifyemailComponent,
         data: { title: "Verifica mail" },
       },
+      // --- NUOVA ROTTA ---
+      {
+        path: "completa-registrazione",
+        component: CompletaRegistrazioneComponent,
+        data: { title: "Completa Registrazione Account" },
+      },
     ],
   },
 ];
@@ -51,7 +62,8 @@ const routes: Routes = [
     RegisterComponent,
     AuthComponent,
     ResetpasswordComponent,
-    VerifyemailComponent
+    VerifyemailComponent,
+    CompletaRegistrazioneComponent, // --- AGGIUNGI QUI ---
   ],
   imports: [
     CommonModule,

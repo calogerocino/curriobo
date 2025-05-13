@@ -50,7 +50,7 @@ export class UserService {
   }
 
   updateUserInfo(_id: string, value: User) {
-   return from(this.afs.doc(`users/${_id}`).update(value));
+    return from(this.afs.doc(`users/${_id}`).update(value));
   }
 
   // formatUser(data: User): User {

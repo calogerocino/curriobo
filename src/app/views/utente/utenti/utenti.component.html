@@ -1,33 +1,41 @@
 <div class="row">
   <div class="col-md-12">
-    <h3>Lista utenti</h3>
+    <h3>{{'generale.layout.menu.listautenti' | translate}}</h3>
 
     <table class="table table-striped">
       <thead>
         <tr>
           <th>{{'tabella.head.immagine' | translate}}</th>
-          <th>{{'tabella.head.idlocale' | translate}}</th>
+          <th>{{'profiloUtente.email' | translate}}</th>
           <th>{{'tabella.head.nome' | translate}}</th>
+          <th>{{'tabella.head.idlocale' | translate}}</th>
           <th>{{'tabella.head.mailverificata' | translate}}</th>
           <th>{{'tabella.head.Azioni' | translate}}</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let ffl of fflist">
-          <td> <img [src]="ffl.ffdata.photoURL" alt=""></td>
-          <td>{{ ffl.id }}</td>
-          <td>{{ ffl.ffdata.displayName }}</td>
-          <td>{{ ffl.ffdata.emailVerified }}</td>
           <td>
-            <a href="" class="btn btn-primary" [routerLink]="['/admin/utente/profilo' , ffl.id]">{{'generale.shared.modifica'
-              | translate}}</a>&nbsp;
+            <img [src]="ffl.ffdata?.photoURL || 'assets/images/default-avatar.png'" alt="User image" style="width: 40px; height: 40px; border-radius: 50%;">
           </td>
+          <td>{{ ffl.ffdata?.email }}</td>
+          <td>{{ ffl.ffdata?.displayName || 'N/D' }}</td>
+          <td>{{ ffl.ffdata?.localId }}</td>
+          <td>
+            <span class="badge" [ngClass]="ffl.ffdata?.emailVerified ? 'badge-success' : 'badge-danger'">
+              {{ (ffl.ffdata?.emailVerified ? 'generale.shared.si' : 'generale.shared.no') | translate }}
+            </span>
+          </td>
+          <td>
+            <a *ngIf="ffl.ffdata?.localId" class="btn btn-primary btn-sm" [routerLink]="['/admin/utente/profilo', ffl.ffdata.localId]">
+              {{'generale.shared.modifica' | translate}}
+            </a>
+          </td>
+        </tr>
+        <tr *ngIf="!fflist || fflist.length === 0">
+          <td colspan="6" class="text-center">Nessun utente trovato.</td>
         </tr>
       </tbody>
     </table>
-  </div>
-
-  <div class="col-md-4">
-    <router-outlet></router-outlet>
   </div>
 </div>

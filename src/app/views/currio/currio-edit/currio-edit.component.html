@@ -2,6 +2,7 @@
   <div class="col-md-12">
     <h3 *ngIf="isEditMode && currioForm.get('nomePortfolio')?.value">
       {{'generale.shared.modifica' | translate}} Curriò: {{ currioForm.get('nomePortfolio').value }}
+      <span *ngIf="currio?.status" class="badge bg-info text-white ms-2 text-capitalize">{{ currio.status.replace('_', ' ') }}</span>
     </h3>
     <h3 *ngIf="!isEditMode">Crea Nuovo Curriò</h3>
     <hr />
@@ -33,6 +34,16 @@
              <p *ngIf="formData.contatti.github"><small>GitHub: {{ formData.contatti.github }}</small></p>
              <p *ngIf="formData.contatti.linkedin"><small>LinkedIn: {{ formData.contatti.linkedin }}</small></p>
           </div>
+
+          <div *ngIf="currio?.curriculumUrl" class="mb-3">
+            <h6>Curriculum Allegato:</h6>
+            <p>
+              <a [href]="currio.curriculumUrl" target="_blank" class="btn btn-sm btn-outline-primary">
+                <i class="feather icon-file-text me-1"></i> Visualizza/Scarica CV
+              </a>
+            </p>
+          </div>
+
         </ng-container>
         <em *ngIf="!currioForm.value.nomePortfolio">(L'anteprima si aggiornerà con i dati del form)</em>
       </div>
@@ -43,6 +54,44 @@
   </div>
 
   <div class="col-md-7">
+    <div *ngIf="isEditMode && currio && currio.datiCliente" class="card my-3 shadow-sm">
+      <div class="card-header bg-light fw-bold">
+        Gestione Account Cliente
+        <span *ngIf="currio.status === 'nuova_richiesta'" class="badge bg-warning text-dark ms-2">Nuova Richiesta</span>
+        <span *ngIf="currio.status === 'invito_inviato'" class="badge bg-info text-white ms-2">Invito Inviato</span>
+        <span *ngIf="currio.status === 'attivo'" class="badge bg-success text-white ms-2">Account Attivo</span>
+      </div>
+      <div class="card-body">
+        <p>Richiesta da: <strong>{{ currio.datiCliente.nome }}</strong> (<code>{{ currio.datiCliente.email }}</code>)</p>
+
+        <div *ngIf="currio.status === 'nuova_richiesta'">
+          <button type="button" class="btn btn-info btn-sm" (click)="preparaEInviaInvito()">
+            <i class="feather icon-user-plus me-1"></i> Crea Account e Invia Istruzioni
+          </button>
+        </div>
+
+        <div *ngIf="linkRegistrazione && currio.status === 'invito_inviato'" class="mt-3 alert alert-info">
+          <p class="mb-1"><strong>Istruzioni per l'admin:</strong></p>
+          <p class="small">Per favore, invia manualmente il seguente link di registrazione al cliente ({{currio.datiCliente.email}}). Il link scadrà tra 24 ore.</p>
+          <div class="input-group input-group-sm mb-2">
+            <input type="text" class="form-control form-control-sm" [value]="linkRegistrazione" readonly #registrationLinkInput>
+            <button class="btn btn-outline-secondary btn-sm" type="button" (click)="copyToClipboard(registrationLinkInput)">
+              <i class="feather icon-copy"></i> Copia
+            </button>
+          </div>
+          <a href="mailto:{{ currio.datiCliente.email }}?subject=Completa la creazione del tuo Curriò&body=Ciao {{ currio.datiCliente.nome }},%0D%0A%0D%0Acompleta la creazione del tuo account per Curriò al seguente link: {{ encodedLinkRegistrazione }}%0D%0A%0D%0AIl link scadrà tra 24 ore."
+             class="btn btn-sm btn-outline-primary mt-1">
+            <i class="feather icon-mail me-1"></i> Apri bozza email
+          </a>
+        </div>
+
+        <div *ngIf="currio.status === 'attivo' && currio.userId" class="mt-3 alert alert-success small">
+          L'account per <strong>{{ currio.datiCliente.nome }}</strong> è attivo.
+          ID Utente Firebase: <code>{{ currio.userId }}</code>.
+          Il cliente può ora accedere e modificare il suo Curriò.
+        </div>
+      </div>
+    </div>
     <h4>Dati Curriò</h4>
     <form [formGroup]="currioForm" (ngSubmit)="onSubmit()">
       <div class="card mb-3">
@@ -97,10 +146,10 @@
       </div>
 
       <div formGroupName="contatti" class="card mb-3">
-        <div class="card-header">Contatti</div>
+        <div class="card-header">Contatti Pubblici del Curriò</div>
         <div class="card-body">
           <div class="mb-3">
-            <label for="contattiEmail" class="form-label">Email</label>
+            <label for="contattiEmail" class="form-label">Email Pubblica</label>
             <input type="email" id="contattiEmail" class="form-control" formControlName="email" />
              <div *ngIf="currioForm.get('contatti.email')?.invalid && currioForm.get('contatti.email')?.touched" class="text-danger small">
               Inserisci un'email valida.
