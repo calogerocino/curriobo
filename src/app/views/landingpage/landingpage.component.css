@@ -1,3 +1,5 @@
+/* src/app/views/landingpage/landingpage.component.css */
+
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
 
 :host {
@@ -93,7 +95,7 @@ h1 {
   top: 0;
   width: 100%;
   height: 100%;
-  overflow: hidden;
+  overflow: hidden; /* Prevents scrolling of the page behind the modal */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -106,8 +108,8 @@ h1 {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.7);
-    z-index: 1001;
+    background-color: rgba(0, 0, 0, 0.7); /* Sfondo scuro semi-trasparente */
+    z-index: 1001; /* Sotto il contenuto del modal ma sopra il resto della pagina */
 }
 
 @keyframes fadeIn {
@@ -116,18 +118,18 @@ h1 {
 }
 
 .modal-content {
-  background-color: #f8f9fa;
-  color: #333;
+  background-color: #f8f9fa; /* Un colore di sfondo chiaro per il modal */
+  color: #333; /* Colore del testo scuro per leggibilità */
   padding: 35px 45px;
   border-radius: 12px;
   width: 90%;
   max-width: 650px;
-  position: relative;
-  z-index: 1002;
+  position: relative; /* Per posizionare il pulsante di chiusura */
+  z-index: 1002; /* Sopra l'overlay */
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
   animation: slideIn 0.4s ease-in-out;
-  max-height: 90vh;
-  overflow-y: auto;
+  max-height: 90vh; /* Limita l'altezza massima */
+  overflow-y: auto; /* Abilita lo scroll verticale se il contenuto è troppo lungo */
 }
 
 
@@ -145,7 +147,7 @@ h1 {
   font-weight: bold;
   cursor: pointer;
   transition: color 0.2s ease;
-  z-index: 1003;
+  z-index: 1003; /* Assicura che sia sopra altri elementi nel modal-content */
 }
 
 .close-button:hover,
@@ -160,7 +162,7 @@ h1 {
   text-align: center;
 }
 
-.modal-content p {
+.modal-content p { /* Stile per i paragrafi dentro il modal */
   margin-bottom: 25px;
   text-align: center;
   color: #555;
@@ -169,7 +171,7 @@ h1 {
 #currioForm {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 18px; /* Spazio tra i gruppi di form */
 }
 
 .form-group {
@@ -192,13 +194,14 @@ h1 {
   border: 1px solid #ccc;
   border-radius: 6px;
   font-size: 1rem;
+  box-sizing: border-box; /* Importante per padding e border */
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 #currioForm input[type="text"]:focus,
 #currioForm input[type="email"]:focus,
 #currioForm textarea:focus {
-  border-color: #4285F4;
+  border-color: #4285F4; /* Colore primario al focus */
   box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.2);
   outline: none;
 }
@@ -209,7 +212,7 @@ h1 {
 }
 
 .submit-button {
-  background-color: #4285F4;
+  background-color: #4285F4; /* Colore primario */
   color: white;
   padding: 14px 25px;
   border: none;
@@ -219,12 +222,12 @@ h1 {
   font-weight: bold;
   transition: background-color 0.2s ease, transform 0.1s ease, opacity 0.2s ease;
   margin-top: 15px;
-  align-self: center;
-  width: fit-content;
+  align-self: center; /* Centra il pulsante se il form è flex */
+  width: fit-content; /* Adatta la larghezza al contenuto */
 }
 
 .submit-button:hover:not(:disabled) {
-  background-color: #357ae8;
+  background-color: #357ae8; /* Un blu leggermente più scuro per l'hover */
 }
 
 .submit-button:active:not(:disabled) {
@@ -237,16 +240,77 @@ h1 {
     opacity: 0.7;
 }
 
-.error-message {
-    color: #dc3545;
+/* Stili per i messaggi di errore dei campi del form */
+.form-group .error-message {
+    color: #dc3545; /* Rosso per gli errori */
     font-size: 0.85rem;
     margin-top: 4px;
 }
+/* Stile per i bordi rossi sui campi invalidi e toccati */
 input.ng-invalid.ng-touched,
 textarea.ng-invalid.ng-touched {
     border-color: #dc3545;
 }
 
+
+/* Stili per la Drop Zone */
+.drop-zone {
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+  padding: 25px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.3s ease, background-color 0.3s ease;
+  background-color: #f9f9f9;
+  margin-top: 8px;
+}
+
+.drop-zone.drag-over {
+  border-color: #4285F4;
+  background-color: #e9f2ff;
+}
+
+.drop-zone-prompt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #555;
+}
+
+.drop-zone-prompt p {
+  margin-bottom: 10px;
+  font-size: 0.95rem;
+  color: #555;
+}
+.drop-zone-prompt p.file-selected-text {
+    color: #333;
+}
+.drop-zone-prompt p.file-selected-text small {
+    color: #777;
+    font-size: 0.8em;
+}
+
+.drop-zone-icon.feather { /* Rendi più specifico per le icone feather */
+  width: 48px; /* Dimensione icona */
+  height: 48px;
+  stroke: #aaa; /* Colore di default per l'icona */
+  stroke-width: 1.5; /* Spessore linea icona */
+  fill: none;
+  margin-top: 10px;
+  transition: stroke 0.3s ease;
+}
+
+.drop-zone.drag-over .drop-zone-icon.feather {
+  stroke: #4285F4; /* Colore quando si trascina sopra */
+}
+
+.drop-zone:hover {
+  border-color: #aaa;
+}
+
+
+/* Responsive adjustments */
 @media (max-width: 768px) {
   .header { padding: 15px 20px; }
   .logo { height: 35px; }
@@ -265,4 +329,7 @@ textarea.ng-invalid.ng-touched {
   #currioForm input[type="email"],
   #currioForm textarea { padding: 12px; }
   .submit-button { width: 100%; padding: 12px; }
+  .drop-zone { padding: 20px; }
+  .drop-zone-icon.feather { width: 40px; height: 40px; }
 }
+

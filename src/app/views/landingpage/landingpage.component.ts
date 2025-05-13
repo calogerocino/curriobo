@@ -1,6 +1,4 @@
-// src/app/views/landingpage/landingpage.component.ts
-
-import { Component } from '@angular/core';
+import { Component, ViewChild, ElementRef } from '@angular/core'; // Aggiungi ViewChild, ElementRef
 import { NgForm } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { AppState } from 'src/app/shared/app.state';
@@ -12,7 +10,7 @@ import { Currio, DatiClienteCurrio, CurrioContatti } from 'src/app/shared/models
 @Component({
   selector: 'app-landingpage',
   templateUrl: './landingpage.component.html',
-  styleUrls: ['./landingpage.component.css'],
+  styleUrls: ['./landingpage.component.css'], // Assicurati che il CSS sia linkato
 })
 export class LandingpageComponent {
   isModalOpen = false;
@@ -23,6 +21,12 @@ export class LandingpageComponent {
   };
   selectedFile: File | null = null;
   selectedFileName: string | null = null;
+  isDraggingOver = false; // Nuovo stato per l'effetto drag over
+  fileError: string | null = null; // Per messaggi di errore relativi al file
+
+  // Riferimento all'input file nascosto
+  @ViewChild('fileInput') fileInputRef!: ElementRef<HTMLInputElement>;
+
 
   constructor(
     private readonly store: Store<AppState>,
@@ -36,37 +40,78 @@ export class LandingpageComponent {
 
   closeModal(): void {
     this.isModalOpen = false;
-    this.selectedFile = null;
-    this.selectedFileName = null;
+    this.resetFileState();
     document.body.style.overflow = 'auto';
-    // Potresti voler resettare il form qui se non lo fai già
-    // this.currioForm.resetForm(); // Se hai un riferimento al NgForm
+    // Considera di resettare il form se necessario
+    // if (this.currioForm) { this.currioForm.resetForm(); }
   }
 
+  private resetFileState(): void {
+    this.selectedFile = null;
+    this.selectedFileName = null;
+    this.isDraggingOver = false;
+    this.fileError = null;
+    if (this.fileInputRef && this.fileInputRef.nativeElement) {
+      this.fileInputRef.nativeElement.value = ''; // Resetta l'input file
+    }
+  }
+
+  // --- Metodi per Drag & Drop ---
+  onDragOver(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDraggingOver = true;
+    this.fileError = null; // Pulisce errori precedenti
+  }
+
+  onDragLeave(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDraggingOver = false;
+  }
+
+  onDrop(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDraggingOver = false;
+
+    const files = event.dataTransfer?.files;
+    if (files && files.length) {
+      this.handleFile(files[0]);
+    }
+  }
+
+  // Chiamato sia dal change dell'input che dal drop
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length) {
-      const file = input.files[0];
-      const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'];
-      const maxSize = 5 * 1024 * 1024; // 5MB
-
-      if (allowedTypes.includes(file.type) && file.size <= maxSize) {
-        this.selectedFile = file;
-        this.selectedFileName = file.name;
-      } else {
-        this.selectedFile = null;
-        this.selectedFileName = null;
-        let errorMessage = 'Formato file non supportato o file troppo grande (max 5MB).';
-        if (!allowedTypes.includes(file.type)) {
-            errorMessage = `Formato file non supportato. Accettati: PDF, JPG, PNG. Hai fornito: ${file.type}`;
-        } else if (file.size > maxSize) {
-            errorMessage = `File troppo grande (max 5MB). Dimensione attuale: ${(file.size / 1024 / 1024).toFixed(2)}MB`;
-        }
-        Swal.fire('Errore File', errorMessage, 'error');
-        input.value = ''; // Resetta l'input file
-      }
+      this.handleFile(input.files[0]);
     }
   }
+
+  private handleFile(file: File): void {
+    this.fileError = null; // Resetta l'errore
+    const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'];
+    const maxSize = 5 * 1024 * 1024; // 5MB
+
+    if (!file) return;
+
+    if (!allowedTypes.includes(file.type)) {
+      this.fileError = `Formato file non supportato. Accettati: PDF, JPG, PNG. (Fornito: ${file.type || 'sconosciuto'})`;
+      this.resetFileState(); // Resetta lo stato del file
+      return;
+    }
+
+    if (file.size > maxSize) {
+      this.fileError = `File troppo grande (max 5MB). Dimensione attuale: ${(file.size / 1024 / 1024).toFixed(2)}MB`;
+      this.resetFileState(); // Resetta lo stato del file
+      return;
+    }
+
+    this.selectedFile = file;
+    this.selectedFileName = file.name;
+  }
+
 
   async onSubmit(form: NgForm): Promise<void> {
     if (!form.valid) {
@@ -76,13 +121,19 @@ export class LandingpageComponent {
         icon: 'error',
         confirmButtonText: 'Ok'
       });
-      // Evidenzia i campi non validi se necessario
       Object.keys(form.controls).forEach(field => {
         const control = form.controls[field];
         control.markAsTouched({ onlySelf: true });
       });
       return;
     }
+
+    // Opzionale: verifica se il file è obbligatorio
+    // if (!this.selectedFile) {
+    //   this.fileError = 'Il caricamento del curriculum è obbligatorio.';
+    //   Swal.fire('Attenzione', 'Per favore, allega il tuo curriculum.', 'warning');
+    //   return;
+    // }
 
     let curriculumUrl: string | undefined = undefined;
 
@@ -103,7 +154,7 @@ export class LandingpageComponent {
 
         await uploadTask;
         curriculumUrl = await getDownloadURL(storageRef);
-        Swal.close(); // Chiudi il popup di caricamento solo se l'upload ha successo
+        Swal.close();
       } catch (error) {
         Swal.close();
         console.error("Errore durante l'upload del curriculum:", error);
@@ -118,11 +169,11 @@ export class LandingpageComponent {
     };
 
     const newCurrioData: Omit<Currio, 'id'> = {
-      nomePortfolio: `Curriò Iniziale per ${this.formData.nome}`, // Sarà modificabile dall'admin/utente
+      nomePortfolio: `Curriò Iniziale per ${this.formData.nome}`,
       heroTitle: `Benvenuto ${this.formData.nome}!`,
       heroSubtitle: this.formData.esperienze,
       contatti: {
-        email: this.formData.email, // Email pubblica del Curriò
+        email: this.formData.email,
       } as CurrioContatti,
       progetti: [],
       esperienze: [],
@@ -130,8 +181,7 @@ export class LandingpageComponent {
       chiSonoDescrizione1: `Profilo di ${this.formData.nome}. Inserisci qui una tua descrizione.`,
       linguaDefault: 'it',
       curriculumUrl: curriculumUrl,
-      // --- CAMPI PER FLUSSO REGISTRAZIONE ---
-      datiCliente: datiClienteForm, // Dati usati per l'invito alla registrazione
+      datiCliente: datiClienteForm,
       status: 'nuova_richiesta',
       userId: undefined,
       tokenRegistrazione: undefined,
@@ -147,9 +197,8 @@ export class LandingpageComponent {
       confirmButtonText: 'Fantastico!'
     });
 
-    this.closeModal();
-    form.resetForm(); // Resetta i valori del form
-    this.selectedFile = null; // Resetta anche i file selezionati
-    this.selectedFileName = null;
+    this.closeModal(); // Chiude il modal
+    form.resetForm(); // Resetta i campi del form
+    this.resetFileState(); // Resetta lo stato del file
   }
 }

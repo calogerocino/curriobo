@@ -45,14 +45,33 @@
         </div>
       </div>
 
-      <div class="form-group">
+      <!-- <div class="form-group">
         <label for="curriculumFile">Allega Curriculum (PDF, JPG, PNG):</label>
         <input type="file" id="curriculumFile" name="curriculumFile" (change)="onFileSelected($event)"
           accept=".pdf,.jpg,.jpeg,.png">
         <div *ngIf="selectedFileName" class="mt-2">
           File selezionato: {{ selectedFileName }}
         </div>
+      </div> -->
+      <div class="form-group">
+        <label for="curriculumFileDropZone">Allega Curriculum (PDF, JPG, PNG - Max 5MB):</label>
+        <div id="curriculumFileDropZone" class="drop-zone" (click)="fileInput.click()" (dragover)="onDragOver($event)"
+          (dragleave)="onDragLeave($event)" (drop)="onDrop($event)" [class.drag-over]="isDraggingOver">
+          <input type="file" #fileInput id="curriculumFile" name="curriculumFile" (change)="onFileSelected($event)"
+            accept=".pdf,.jpg,.jpeg,.png" style="display: none" />
+          <div class="drop-zone-prompt">
+            <p *ngIf="!selectedFileName">Trascina il tuo file qui o clicca per selezionare.</p>
+            <p *ngIf="selectedFileName" class="file-selected-text">
+              File Selezionato: <strong>{{ selectedFileName }}</strong>
+              <br>
+              <small>(Clicca o trascina un altro file per sostituire)</small>
+            </p>
+            <span class="drop-zone-icon feather icon-upload-cloud"></span>
+          </div>
+        </div>
+        <div *ngIf="fileError" class="error-message mt-1">{{ fileError }}</div>
       </div>
+
 
       <button type="submit" class="submit-button" [disabled]="!currioForm.valid">Invia Dati</button>
     </form>
