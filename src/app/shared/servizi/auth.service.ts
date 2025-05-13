@@ -1,6 +1,6 @@
 // src/app/shared/servizi/auth.service.ts
 import { Injectable, NgZone } from '@angular/core';
-import * as auth from 'firebase/auth'; // Per GoogleAuthProvider e altre operazioni auth
+import * as auth from 'firebase/auth';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import {
   AngularFirestore,
@@ -12,13 +12,11 @@ import { Store } from '@ngrx/store';
 import { AppState } from 'src/app/shared/app.state';
 import { AuthResponseData } from '../models/AuthResponseData';
 import { ChangePasswordResponseData } from '../models/ChangePasswordResponseData';
-import { User } from '../models/user.interface'; // La tua interfaccia User
+import { User } from '../models/user.interface';
 import { environment } from 'src/environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { Observable, from } from 'rxjs';
-// --- IMPORT CORRETTO PER LE AZIONI NGRX ---
 import { autologout, loginSuccess } from 'src/app/views/auth/state/auth.action';
-// Importa il tipo User da Firebase Auth se necessario per type hinting più preciso
 import { User as FirebaseAuthUserType } from '@firebase/auth-types';
 
 
@@ -36,8 +34,8 @@ export class AuthService {
   });
 
   constructor(
-    public afs: AngularFirestore, // AngularFirestore per interagire con Firestore
-    public afAuth: AngularFireAuth, // AngularFireAuth per operazioni di autenticazione
+    public afs: AngularFirestore,
+    public afAuth: AngularFireAuth,
     public router: Router,
     public ngZone: NgZone,
     private store: Store<AppState>,
@@ -61,10 +59,10 @@ export class AuthService {
   }
 
   // Metodo per cambiare le informazioni dell'utente (es. displayName, photoURL)
-  ChangeInfo(idToken: string, displayName: string, photoURL: string): Observable<any> { // Potresti definire un'interfaccia specifica per la risposta
+  ChangeInfo(idToken: string, displayName: string, photoURL: string): Observable<any> {
     return this.http.post(
       `https://identitytoolkit.googleapis.com/v1/accounts:update?key=${environment.firebase.apiKey}`,
-      { idToken: idToken, displayName: displayName, photoUrl: photoURL, returnSecureToken: false } // returnSecureToken può essere false se non serve un nuovo token
+      { idToken: idToken, displayName: displayName, photoUrl: photoURL, returnSecureToken: false }
     );
   }
 
@@ -75,8 +73,11 @@ export class AuthService {
       .createUserWithEmailAndPassword(email, password)
       .then((result) => {
         if (result.user) {
-          this.SetUserData(result.user);
-          this.SendVerificationMail();
+          // Passa l'oggetto user di Firebase Auth a SetUserData
+          // e attendi il completamento prima di inviare l'email di verifica.
+          return this.SetUserData(result.user).then(() => {
+            this.SendVerificationMail();
+          });
         } else {
           throw new Error("User object is null after registration.");
         }
@@ -88,30 +89,50 @@ export class AuthService {
   }
 
   // Salva/Aggiorna i dati dell'utente in Firestore
-  SetUserData(firebaseUser: FirebaseAuthUserType | any) {
+  SetUserData(firebaseUser: FirebaseAuthUserType | any): Promise<void> {
     if (!firebaseUser || !firebaseUser.uid) {
-      console.error('SetUserData chiamato con un oggetto utente non valido:', firebaseUser);
-      return Promise.reject('Oggetto utente non valido per SetUserData');
+      console.error('[AuthService.SetUserData] Chiamato con un oggetto utente non valido:', firebaseUser);
+      return Promise.reject(new Error('Oggetto utente non valido per SetUserData'));
     }
 
-    const userRef: AngularFirestoreDocument<User> = this.afs.doc(
+    const userRef: AngularFirestoreDocument<User> = this.afs.doc<User>(
       `users/${firebaseUser.uid}`
     );
 
-    const userData: Partial<User> = {
+    // L'oggetto firebaseUser fornito da createUserWithEmailAndPassword o da signInWithPopup
+    // contiene solo le proprietà standard di Firebase Auth (uid, email, displayName, photoURL, emailVerified).
+    // Gli altri campi della tua interfaccia User (ruolo, cellulare, token, expirationDate)
+    // non saranno presenti su questo oggetto `firebaseUser` a meno che non li aggiungi tu
+    // da qualche altra fonte prima di chiamare SetUserData.
+
+    // Se `firebaseUser.ruolo` è passato (es. da CompletaRegistrazioneComponent), usalo, altrimenti default.
+    const ruoloDaUsare = firebaseUser.ruolo || 'cliente';
+
+    // Costruisci l'oggetto da salvare, assicurandoti che i campi opzionali
+    // della tua interfaccia User siano null se non forniti.
+    const dataToSet: User = {
       localId: firebaseUser.uid,
-      email: firebaseUser.email || '',
-      displayName: firebaseUser.displayName || '',
-      photoURL: firebaseUser.photoURL || '',
+      email: firebaseUser.email || '', // Default a stringa vuota se null/undefined da Auth
+      displayName: firebaseUser.displayName || '', // Default a stringa vuota
+      photoURL: firebaseUser.photoURL || '',   // Default a stringa vuota
       emailVerified: firebaseUser.emailVerified || false,
+      ruolo: ruoloDaUsare,
+      // Per i campi non standard di Firebase Auth, se non sono nell'oggetto `firebaseUser` passato,
+      // verranno impostati a null.
+      cellulare: firebaseUser.cellulare !== undefined ? firebaseUser.cellulare : null,
+      token: firebaseUser.token !== undefined ? firebaseUser.token : null, // Solitamente l'idToken non si salva qui.
+      expirationDate: firebaseUser.expirationDate !== undefined ? new Date(firebaseUser.expirationDate) : null, // Anche questo è insolito qui.
     };
 
-    return userRef.set(userData as User, { merge: true })
+    console.log(`[AuthService.SetUserData] Scrittura su Firestore per users/${firebaseUser.uid} con payload:`, JSON.parse(JSON.stringify(dataToSet)));
+
+    return userRef.set(dataToSet, { merge: true })
       .then(() => {
-        console.log(`Dati utente per ${firebaseUser.uid} salvati/aggiornati in Firestore.`);
+        console.log(`[AuthService.SetUserData] Dati utente per ${firebaseUser.uid} salvati/aggiornati in Firestore.`);
       })
       .catch(error => {
-        console.error(`Errore nel salvare i dati utente ${firebaseUser.uid} in Firestore:`, error);
+        console.error(`[AuthService.SetUserData] Errore nel salvare i dati utente ${firebaseUser.uid} in Firestore:`, error);
+        throw error; // Rilancia l'errore per permettere al chiamante di gestirlo
       });
   }
 
@@ -126,7 +147,6 @@ export class AuthService {
       })
       .then(() => {
         console.log("Email di verifica inviata.");
-        // Non reindirizzare qui, lascia che sia il chiamante a gestire il routing
       })
       .catch(error => {
         console.error("Errore invio email di verifica:", error);
@@ -140,15 +160,20 @@ export class AuthService {
     const expiresInMilliseconds = Number(data.expiresIn) * 1000;
     const expirationDate = new Date(now.getTime() + expiresInMilliseconds);
 
+    // Questo oggetto è usato per lo stato NGRX.
+    // I campi come displayName, photoURL, ruolo, cellulare verranno popolati
+    // dallo store NGRX dopo aver letto i dati da Firestore (tramite un effect come updateLogin$).
     return {
       email: data.email,
-      token: data.idToken,
-      localId: data.localId,
+      token: data.idToken, // idToken per le chiamate API
+      localId: data.localId, // Auth UID
       expirationDate: expirationDate,
       displayName: undefined,
       photoURL: undefined,
-      emailVerified: data.registered, // Considera se questo è il campo corretto per emailVerified
-                                      // FirebaseUser.emailVerified è più diretto.
+      // 'data.registered' indica se l'utente è nuovo o esistente all'API signInWithPassword,
+      // non è direttamente 'emailVerified'. emailVerified viene dall'oggetto FirebaseUser.
+      // Per coerenza, emailVerified nello store NGRX dovrebbe riflettere lo stato reale.
+      emailVerified: undefined, // Sarà popolato da Firestore/FirebaseUser
       ruolo: undefined,
       cellulare: undefined,
     };
@@ -187,14 +212,11 @@ export class AuthService {
     const userDataString = localStorage.getItem('userData');
     if (userDataString) {
       const userData = JSON.parse(userDataString);
-      // Ricostruisci l'oggetto Date per expirationDate
       const expirationDate = new Date(userData.expirationDate);
       const user: User = {
         ...userData,
         expirationDate: expirationDate,
       };
-      // Non avviare il timeout qui, dovrebbe essere fatto quando l'utente viene impostato (es. autoLogin)
-      // this.runTimeoutInterval(user);
       return user;
     }
     return null;
@@ -216,27 +238,30 @@ export class AuthService {
       case 'auth/weak-password':
         return 'La password è troppo debole. Deve essere di almeno 6 caratteri.';
       case 'NOT_MATCHES_PASSWORD':
-        return 'Le password non corrispondono.';
+        return 'Le password non coincidono.';
       case 'MISSING_PASSWORD':
         return 'Inserisci una password.';
       case 'INVALID_ID_TOKEN':
+      case 'auth/invalid-id-token':
         return 'Token non valido, rieffetua il login';
-      case 'WEAK_PASSWORD': // Già presente sopra come auth/weak-password
+      case 'WEAK_PASSWORD':
         return 'La password è troppo debole';
       case 'INVALID_REQ_TYPE':
         return 'Richiesta non valida';
+      case 'auth/invalid-argument':
+        return 'Argomento non valido nella richiesta. Controlla i dati inviati a Firebase.';
       default:
-        console.error("Firebase Auth Error Code:", message); // Logga l'errore originale
+        console.error("Firebase Auth Error Code non mappato o errore generico:", message);
         return 'Si è verificato un errore sconosciuto. Riprova.';
     }
   }
 
   // Logout dell'utente
-  SignOut(event?: Event) { // Aggiunto parametro opzionale event
+  SignOut(event?: Event) {
     if (event) {
       event.preventDefault();
     }
-    this.store.dispatch(autologout()); // L'effect di logout gestirà la pulizia
+    this.store.dispatch(autologout());
   }
 
   // Logica effettiva di logout (chiamata dall'effect)
@@ -247,12 +272,9 @@ export class AuthService {
         clearTimeout(this.timeoutInterval);
         this.timeoutInterval = null;
       }
-      // Il reindirizzamento viene gestito dall'effect di logout
-      // this.router.navigate(['auth/login']);
       console.log('Utente disconnesso e localStorage pulito.');
     }).catch(error => {
       console.error("Errore durante il logout da Firebase:", error);
-      // Gestisci l'errore se necessario
     });
   }
 
@@ -268,25 +290,20 @@ export class AuthService {
       .signInWithPopup(provider)
       .then((result) => {
         if (result.user) {
-          // Dopo il login con provider, assicurati che i dati siano in Firestore
-          this.SetUserData(result.user).then(() => {
-            // Dispatch un'azione di login success per aggiornare lo store NGRX
-            // Questo dovrebbe essere gestito da un effect apposito per il social login
-            // o integrato nel flusso di login esistente.
-            // Per ora, reindirizziamo e assumiamo che lo stato NGRX venga aggiornato.
+          return this.SetUserData(result.user).then(() => {
             const authData: AuthResponseData = {
                 idToken: (result.user as any).stsTokenManager.accessToken,
                 email: result.user.email || '',
                 refreshToken: (result.user as any).stsTokenManager.refreshToken,
                 expiresIn: ((result.user as any).stsTokenManager.expirationTime / 1000).toString(),
                 localId: result.user.uid,
-                registered: true, // o false se è il primo login
+                registered: true,
             };
             const user = this.formatUser(authData);
-            this.store.dispatch(loginSuccess({ user, redirect: true })); // Dispatch loginSuccess
-            // this.router.navigate(['admin']); // Il redirect è gestito dall'effect di loginSuccess
+            this.store.dispatch(loginSuccess({ user, redirect: true }));
           });
         }
+        return Promise.reject(new Error("User object is null after social login."));
       })
       .catch((error) => {
         this.Toast.fire(this.getErrorMessage(error.code || error.message), '', 'error');
@@ -306,5 +323,4 @@ export class AuthService {
         this.Toast.fire(this.getErrorMessage(error.code || error.message), '', 'error');
       });
   }
-
 }

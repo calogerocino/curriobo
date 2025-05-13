@@ -8,6 +8,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { CurrioComponent } from './currio.component';
 import { ListaCurrioComponent } from './listacurrio/listacurrio.component';
 import { CurrioEditComponent } from './currio-edit/currio-edit.component';
+import { CurrioPreviewComponent } from './currio-preview/currio-preview.component'; // << IMPORTA QUI
 
 import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
@@ -19,7 +20,7 @@ import { TranslateModule } from '@ngx-translate/core';
 
 const routes: Routes = [
   {
-    path: '',
+    path: '', // Questo path è relativo a 'admin/currio' a causa del lazy loading
     component: CurrioComponent,
     children: [
       {
@@ -28,15 +29,20 @@ const routes: Routes = [
         pathMatch: 'full',
       },
       {
-        path: 'listacurrio',
+        path: 'listacurrio', // -> admin/currio/listacurrio
         component: ListaCurrioComponent,
         data: { title: 'Lista Curriò' },
       },
       {
-        path: 'edit/:id',
+        path: 'edit/:id', // -> admin/currio/edit/:id
         component: CurrioEditComponent,
         data: { title: 'Gestisci Curriò' },
       },
+      {
+        path: 'preview/:id', // -> admin/currio/preview/:id  << NUOVA ROTTA SPOSTATA QUI
+        component: CurrioPreviewComponent,
+        data: { title: 'Anteprima Curriò' }
+      }
     ],
   },
 ];
@@ -46,6 +52,7 @@ const routes: Routes = [
     CurrioComponent,
     ListaCurrioComponent,
     CurrioEditComponent,
+    CurrioPreviewComponent, // << DICHIARA QUI
   ],
   imports: [
     CommonModule,

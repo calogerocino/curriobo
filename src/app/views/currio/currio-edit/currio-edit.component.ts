@@ -1,14 +1,28 @@
 // src/app/views/currio/currio-edit/currio-edit.component.ts
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { FormGroup, FormControl, Validators, FormArray, FormBuilder } from '@angular/forms';
-import { Currio, CurrioContatti, DatiClienteCurrio } from 'src/app/shared/models/currio.model'; // Aggiorna import
+import {
+  FormGroup,
+  FormControl,
+  Validators,
+  FormArray,
+  FormBuilder,
+} from '@angular/forms';
+import {
+  Currio,
+  CurrioContatti,
+  DatiClienteCurrio,
+} from 'src/app/shared/models/currio.model'; // Aggiorna import
 import { getCurrioById } from '../state/currio.selector';
 import { AppState } from 'src/app/shared/app.state';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Subscription, filter } from 'rxjs';
-import { createCurrio, updateCurrio, loadCurrios } from '../state/currio.action';
+import {
+  createCurrio,
+  updateCurrio,
+  loadCurrios,
+} from '../state/currio.action';
 import { v4 as uuidv4 } from 'uuid'; // Per generare token
 import Swal from 'sweetalert2'; // Per notifiche
 
@@ -36,23 +50,23 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
   ) {
     // Inizializza il form qui o in ngOnInit per evitare 'currioForm' is possibly 'undefined'
     this.currioForm = this.fb.group({
-        nomePortfolio: ['', Validators.required],
-        heroTitle: ['', Validators.required],
-        heroSubtitle: [''],
-        linguaDefault: ['it', Validators.required],
-        chiSonoFotoUrl: [''],
-        chiSonoDescrizione1: [''],
-        chiSonoDescrizione2: [''],
-        contatti: this.fb.group({
-          email: ['', [Validators.required, Validators.email]],
-          github: [''],
-          linkedin: [''],
-          instagram: [''],
-        }),
-        // Inizializza qui anche i FormArray se li usi
-        // progetti: this.fb.array([]),
-        // esperienze: this.fb.array([]),
-      });
+      nomePortfolio: ['', Validators.required],
+      heroTitle: ['', Validators.required],
+      heroSubtitle: [''],
+      linguaDefault: ['it', Validators.required],
+      chiSonoFotoUrl: [''],
+      chiSonoDescrizione1: [''],
+      chiSonoDescrizione2: [''],
+      contatti: this.fb.group({
+        email: ['', [Validators.required, Validators.email]],
+        github: [''],
+        linkedin: [''],
+        instagram: [''],
+      }),
+      // Inizializza qui anche i FormArray se li usi
+      // progetti: this.fb.array([]),
+      // esperienze: this.fb.array([]),
+    });
   }
 
   ngOnInit(): void {
@@ -62,22 +76,27 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
         this.isEditMode = true;
         this.store.dispatch(loadCurrios()); // Assicurati che i currio siano caricati
         if (this.currioSubscription) {
-            this.currioSubscription.unsubscribe(); // Annulla sottoscrizione precedente
+          this.currioSubscription.unsubscribe(); // Annulla sottoscrizione precedente
         }
         this.currioSubscription = this.store
           .select(getCurrioById, { id: this.currioId })
-          .pipe(filter(data => !!data)) // Filtra undefined o null
+          .pipe(filter((data) => !!data)) // Filtra undefined o null
           .subscribe((data) => {
             this.currio = data as Currio; // Cast sicuro dopo il filter
             this.initializeForm();
             // Se l'invito era già stato inviato, ricostruisci il link per visualizzarlo
-            if (this.currio.status === 'invito_inviato' && this.currio.tokenRegistrazione) {
-                const baseUrl = window.location.origin;
-                this.linkRegistrazione = `${baseUrl}/auth/completa-registrazione?token=${this.currio.tokenRegistrazione}`;
-                this.encodedLinkRegistrazione = encodeURIComponent(this.linkRegistrazione);
+            if (
+              this.currio.status === 'invito_inviato' &&
+              this.currio.tokenRegistrazione
+            ) {
+              const baseUrl = window.location.origin;
+              this.linkRegistrazione = `${baseUrl}/auth/completa-registrazione?token=${this.currio.tokenRegistrazione}`;
+              this.encodedLinkRegistrazione = encodeURIComponent(
+                this.linkRegistrazione
+              );
             } else {
-                this.linkRegistrazione = null;
-                this.encodedLinkRegistrazione = null;
+              this.linkRegistrazione = null;
+              this.encodedLinkRegistrazione = null;
             }
           });
       } else {
@@ -126,14 +145,18 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
         github: this.currio.contatti?.github || '',
         linkedin: this.currio.contatti?.linkedin || '',
         instagram: this.currio.contatti?.instagram || '',
-      }
+      },
     });
     // Logica per patchare FormArray se li usi
   }
 
   preparaEInviaInvito(): void {
     if (!this.currio || !this.currio.id || !this.currio.datiCliente?.email) {
-      Swal.fire('Errore', 'Dati del curriò o email del cliente per l\'invito mancanti.', 'error');
+      Swal.fire(
+        'Errore',
+        "Dati del curriò o email del cliente per l'invito mancanti.",
+        'error'
+      );
       return;
     }
 
@@ -142,7 +165,7 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
     this.linkRegistrazione = `${baseUrl}/auth/completa-registrazione?token=${token}`;
     this.encodedLinkRegistrazione = encodeURIComponent(this.linkRegistrazione);
 
-    const scadenzaTimestamp = Date.now() + (24 * 60 * 60 * 1000); // Token valido per 24 ore
+    const scadenzaTimestamp = Date.now() + 24 * 60 * 60 * 1000; // Token valido per 24 ore
 
     const currioAggiornato: Currio = {
       ...this.currio,
@@ -154,10 +177,10 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
     this.store.dispatch(updateCurrio({ currio: currioAggiornato }));
     // Il template mostrerà il link. Un messaggio Swal può confermare l'azione.
     Swal.fire({
-        title: 'Link di Registrazione Generato!',
-        html: `Per favore, invia il seguente link di registrazione a <strong>${this.currio.datiCliente.email}</strong>:<br><br><div class="input-group input-group-sm"><input type="text" class="form-control form-control-sm" value="${this.linkRegistrazione}" readonly><button class="btn btn-outline-secondary btn-sm" type="button" onclick="navigator.clipboard.writeText('${this.linkRegistrazione}')"><i class="feather icon-copy"></i> Copia</button></div><br>Il link scadrà tra 24 ore.`,
-        icon: 'info',
-        confirmButtonText: 'Ok, ho capito'
+      title: 'Link di Registrazione Generato!',
+      html: `Per favore, invia il seguente link di registrazione a <strong>${this.currio.datiCliente.email}</strong>:<br><br><div class="input-group input-group-sm"><input type="text" class="form-control form-control-sm" value="${this.linkRegistrazione}" readonly><button class="btn btn-outline-secondary btn-sm" type="button" onclick="navigator.clipboard.writeText('${this.linkRegistrazione}')"><i class="feather icon-copy"></i> Copia</button></div><br>Il link scadrà tra 24 ore.`,
+      icon: 'info',
+      confirmButtonText: 'Ok, ho capito',
     });
   }
 
@@ -166,25 +189,29 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
     document.execCommand('copy');
     // Fornisci un feedback all'utente, es. con un toast o cambiando l'icona del pulsante
     Swal.fire({
-        toast: true,
-        position: 'top-end',
-        icon: 'success',
-        title: 'Link copiato!',
-        showConfirmButton: false,
-        timer: 1500
+      toast: true,
+      position: 'top-end',
+      icon: 'success',
+      title: 'Link copiato!',
+      showConfirmButton: false,
+      timer: 1500,
     });
   }
-
 
   onSubmit(): void {
     if (!this.currioForm.valid) {
       this.currioForm.markAllAsTouched();
-      Swal.fire('Attenzione', 'Per favore, correggi gli errori nel form.', 'warning');
+      Swal.fire(
+        'Attenzione',
+        'Per favore, correggi gli errori nel form.',
+        'warning'
+      );
       return;
     }
 
     // Assicurati che this.currio sia definito, specialmente in modalità creazione
-    const baseCurrio = this.isEditMode && this.currio ? this.currio : this.getEmptyCurrio();
+    const baseCurrio =
+      this.isEditMode && this.currio ? this.currio : this.getEmptyCurrio();
 
     const formValue = this.currioForm.value;
     const currioToSave: Currio = {
@@ -201,7 +228,6 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
       // ... (gestisci FormArray se presenti)
     };
 
-
     if (this.isEditMode && currioToSave.id) {
       this.store.dispatch(updateCurrio({ currio: currioToSave as Currio }));
     } else {
@@ -211,15 +237,21 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
       // Se l'admin crea un currio da zero, non ci sarà un 'datiCliente' o uno status 'nuova_richiesta'
       // a meno che non li imposti esplicitamente.
       const { id, ...currioDataToCreate } = currioToSave; // Rimuovi l'ID se è vuoto
-      this.store.dispatch(createCurrio({ currio: currioDataToCreate as Omit<Currio, 'id'> }));
+      this.store.dispatch(
+        createCurrio({ currio: currioDataToCreate as Omit<Currio, 'id'> })
+      );
     }
 
     // Non reindirizzare immediatamente se è stata appena generata un'email di invito
     if (!this.linkRegistrazione || this.currio?.status !== 'invito_inviato') {
-        this.router.navigate(['/admin/currio/listacurrio']);
+      this.router.navigate(['/admin/currio/listacurrio']);
     } else {
-        // Se il link è stato appena generato, l'admin potrebbe volerlo copiare prima di navigare via
-        Swal.fire('Curriò Aggiornato', 'Le modifiche al curriò sono state salvate.', 'success');
+      // Se il link è stato appena generato, l'admin potrebbe volerlo copiare prima di navigare via
+      Swal.fire(
+        'Curriò Aggiornato',
+        'Le modifiche al curriò sono state salvate.',
+        'success'
+      );
     }
   }
 
@@ -229,14 +261,18 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
 
   openPreviewInNewTab(): void {
     if (this.currio && this.currio.id) {
-      // Implementa la logica per l'URL di anteprima se hai una pagina dedicata
-      // const previewUrl = this.router.serializeUrl(this.router.createUrlTree(['/currio/view', this.currio.id]));
-      // window.open(previewUrl, '_blank');
-      Swal.fire("Anteprima", "Funzionalità di anteprima in nuova scheda da implementare.", "info");
-      console.log("Dati del Curriò per l'anteprima:", this.currioForm.value);
+      const url = this.router.serializeUrl(
+        this.router.createUrlTree(['/admin/currio/preview', this.currio.id]) // URL corretto
+      );
+      window.open(url, '_blank');
+    } else {
+      Swal.fire(
+        'Errore',
+        "ID Curriò non disponibile per l'anteprima.",
+        'error'
+      );
     }
   }
-
 
   ngOnDestroy(): void {
     if (this.currioSubscription) {

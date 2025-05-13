@@ -11,7 +11,7 @@ export interface CurrioState {
 
 export const initialState: CurrioState = {
   currios: [],
-  selectedCurrio: null,
+  selectedCurrio: null, 
   currioSubmissions: [],
   loading: false,
   error: null,

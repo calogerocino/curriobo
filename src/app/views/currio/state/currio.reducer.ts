@@ -1,15 +1,22 @@
 import { createReducer, on } from '@ngrx/store';
 import { initialState, CurrioState } from './currio.state';
-import * as CurrioActions from './currio.action'; 
+import * as CurrioActions from './currio.action';
 import { Currio } from 'src/app/shared/models/currio.model';
 
 const _currioReducer = createReducer(
   initialState,
-  on(CurrioActions.loadCurrios, CurrioActions.loadCurrioById, CurrioActions.createCurrio, CurrioActions.updateCurrio, CurrioActions.deleteCurrio, (state) => ({
-    ...state,
-    loading: true,
-    error: null,
-  })),
+  on(
+    CurrioActions.loadCurrios,
+    CurrioActions.loadCurrioById,
+    CurrioActions.createCurrio,
+    CurrioActions.updateCurrio,
+    CurrioActions.deleteCurrio,
+    (state) => ({
+      ...state,
+      loading: true,
+      error: null,
+    })
+  ),
 
   on(CurrioActions.loadCurriosSuccess, (state, { currios }) => ({
     ...state,
@@ -19,7 +26,9 @@ const _currioReducer = createReducer(
   on(CurrioActions.loadCurrioByIdSuccess, (state, { currio }) => ({
     ...state,
     selectedCurrio: currio,
-    currios: state.currios.find(c => c.id === currio.id) ? state.currios.map(c => c.id === currio.id ? currio : c) : [...state.currios, currio],
+    currios: state.currios.find((c) => c.id === currio.id)
+      ? state.currios.map((c) => (c.id === currio.id ? currio : c))
+      : [...state.currios, currio],
     loading: false,
   })),
   on(CurrioActions.createCurrioSuccess, (state, { currio }) => ({
@@ -29,8 +38,13 @@ const _currioReducer = createReducer(
   })),
   on(CurrioActions.updateCurrioSuccess, (state, { currio }) => ({
     ...state,
-    currios: state.currios.map((c) => (c.id === currio.id ? { ...c, ...currio.changes } : c)),
-    selectedCurrio: state.selectedCurrio?.id === currio.id ? { ...state.selectedCurrio, ...currio.changes } as Currio : state.selectedCurrio,
+    currios: state.currios.map((c) =>
+      c.id === currio.id ? { ...c, ...currio.changes } : c
+    ),
+    selectedCurrio:
+      state.selectedCurrio?.id === currio.id
+        ? ({ ...state.selectedCurrio, ...currio.changes } as Currio)
+        : state.selectedCurrio,
     loading: false,
   })),
   on(CurrioActions.deleteCurrioSuccess, (state, { id }) => ({
@@ -60,6 +74,7 @@ const _currioReducer = createReducer(
   })
 );
 
-export function currioReducer(state: CurrioState | undefined, action: any) { // Rinomina
+export function currioReducer(state: CurrioState | undefined, action: any) {
+  // Rinomina
   return _currioReducer(state, action);
 }

@@ -12,12 +12,17 @@ export const getCurrios = createSelector(
 
 export const getCurrioById = createSelector(
   getCurrioFeatureState,
-  (state: CurrioState, props: { id: string | null }) => {
-    if (!props.id) return undefined;
+  (state: CurrioState | undefined, props: { id: string | null }) => {
+    if (!state || !props.id) {
+      return undefined;
+    }
     if (state.selectedCurrio && state.selectedCurrio.id === props.id) {
         return state.selectedCurrio;
     }
-    return state.currios.find((currio) => currio.id === props.id);
+    if (state.currios && Array.isArray(state.currios)) {
+        return state.currios.find((currio) => currio.id === props.id);
+    }
+    return undefined;
   }
 );
 

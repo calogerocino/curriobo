@@ -8,11 +8,12 @@ import { AppState } from 'src/app/shared/app.state';
 import { CurrioService } from 'src/app/shared/servizi/currio.service';
 import { AuthService } from 'src/app/shared/servizi/auth.service';
 import { Currio } from 'src/app/shared/models/currio.model';
-import { updateCurrio } from 'src/app/views/currio/state/currio.action';
+import * as CurrioActions from 'src/app/views/currio/state/currio.action'; // Importa tutte le azioni come namespace
 import Swal from 'sweetalert2';
-import { Subscription } from 'rxjs';
+import { Subscription, firstValueFrom, timeout, catchError, EMPTY, of } from 'rxjs'; // Aggiunto firstValueFrom, timeout, catchError, EMPTY, of
 import { setLoadingSpinner } from 'src/app/shared/store/shared.actions';
-import { User as FirebaseAuthUser } from '@firebase/auth-types'; // Per il tipo utente da Firebase Auth
+import { User as FirebaseAuthUserType } from '@firebase/auth-types';
+import { Actions, ofType } from '@ngrx/effects'; // Per ascoltare il successo di un'azione NGRX
 
 @Component({
   selector: 'app-completa-registrazione',
@@ -25,7 +26,8 @@ export class CompletaRegistrazioneComponent implements OnInit, OnDestroy {
   currioData: Currio | null = null;
   isLoading = true;
   errorMessage: string | null = null;
-  private curriosSub: Subscription | undefined; // Cambiato nome per chiarezza
+  private curriosSub: Subscription | undefined;
+  private actionsSub: Subscription | undefined;
 
   constructor(
     private route: ActivatedRoute,
@@ -33,15 +35,15 @@ export class CompletaRegistrazioneComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private store: Store<AppState>,
     private currioService: CurrioService,
-    private authService: AuthService // Servizio per createUserWithEmailAndPassword
+    private authService: AuthService,
+    private actions$: Actions
   ) {
     this.registrationForm = this.fb.group({
       email: [{ value: '', disabled: true }, [Validators.required, Validators.email]],
       password: ['', [
         Validators.required,
         Validators.minLength(8),
-        // Validators.pattern(/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*#?&^_-]).{8,}/) // Pattern robusto
-        Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}$/) // Alternativa
+        Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*.,;?_=\-+]).{8,}$/) // Aggiornato pattern
       ]],
       confirmPassword: ['', Validators.required],
     }, { validator: this.passwordMatchValidator });
@@ -72,8 +74,6 @@ export class CompletaRegistrazioneComponent implements OnInit, OnDestroy {
     this.errorMessage = null;
     this.store.dispatch(setLoadingSpinner({ status: true }));
 
-    // Nota: getCurrios() carica tutti i currio. Per produzione, considera un metodo più specifico
-    // nel service se la collezione cresce molto (es. getCurrioByToken(token)).
     this.curriosSub = this.currioService.getCurrios().subscribe({
       next: (currios) => {
         const currio = currios.find(c => c.tokenRegistrazione === token && c.status === 'invito_inviato');
@@ -81,7 +81,7 @@ export class CompletaRegistrazioneComponent implements OnInit, OnDestroy {
           if (currio.tokenRegistrazioneScadenza && Date.now() > currio.tokenRegistrazioneScadenza) {
             this.errorMessage = 'Il link di registrazione è scaduto. Contatta l\'amministratore.';
             this.currioData = null;
-            Swal.fire('Errore', this.errorMessage, 'error');
+            Swal.fire('Link Scaduto', this.errorMessage, 'error');
           } else {
             this.currioData = currio;
             this.registrationForm.patchValue({ email: currio.datiCliente.email });
@@ -89,7 +89,7 @@ export class CompletaRegistrazioneComponent implements OnInit, OnDestroy {
         } else {
           this.errorMessage = 'Token non valido, invito già utilizzato o scaduto. Contatta l\'amministratore.';
           this.currioData = null;
-          Swal.fire('Errore', this.errorMessage, 'error');
+          Swal.fire('Token Non Valido', this.errorMessage, 'error');
         }
         this.isLoading = false;
         this.store.dispatch(setLoadingSpinner({ status: false }));
@@ -99,7 +99,7 @@ export class CompletaRegistrazioneComponent implements OnInit, OnDestroy {
         this.errorMessage = 'Errore durante la verifica del token. Riprova più tardi.';
         this.isLoading = false;
         this.store.dispatch(setLoadingSpinner({ status: false }));
-        Swal.fire('Errore', this.errorMessage, 'error');
+        Swal.fire('Errore Server', this.errorMessage, 'error');
       }
     });
   }
@@ -111,83 +111,96 @@ export class CompletaRegistrazioneComponent implements OnInit, OnDestroy {
       return;
     }
     if (!this.currioData || !this.currioData.datiCliente) {
-      Swal.fire('Errore', 'Dati cliente non trovati. Impossibile procedere.', 'error');
+      Swal.fire('Errore Interno', 'Dati del curriò o del cliente mancanti. Impossibile procedere.', 'error');
       return;
     }
 
     this.isLoading = true;
     this.store.dispatch(setLoadingSpinner({ status: true }));
+    this.errorMessage = null;
 
-    const email = this.currioData.datiCliente.email; // Email non modificabile
+    const email = this.currioData.datiCliente.email;
     const password = this.registrationForm.value.password;
     const displayName = this.currioData.datiCliente.nome;
 
     try {
       // 1. Crea utente in Firebase Auth
-      // Usiamo il metodo SignUp del tuo AuthService che dovrebbe già gestire la creazione
-      // e la successiva chiamata a SetUserData per Firestore.
-      // Se SignUp è pensato per NGRX Effects, potresti dover dispatchare un'azione qui.
-      // Per ora, assumiamo che authService.SignUp possa essere chiamato direttamente
-      // e che gestisca la creazione Auth + Firestore.
-      // NOTA: Il tuo `AuthService.SignUp` attuale usa `afAuth.createUserWithEmailAndPassword`
-      // e poi chiama `this.SetUserData(result.user)`. Questo è OK.
-      // `this.SetUserData` nel tuo AuthService usa `user.uid`.
-
       const result = await this.authService.afAuth.createUserWithEmailAndPassword(email, password);
-      const newAuthUser = result.user as FirebaseAuthUser; // Cast al tipo corretto
+      const newAuthUser = result.user as FirebaseAuthUserType;
 
       if (!newAuthUser) {
-        throw new Error('Creazione utente Firebase Auth fallita.');
+        throw new Error('Creazione utente Firebase Auth fallita (newAuthUser è null).');
       }
+      console.log('Utente creato in Firebase Auth:', newAuthUser.uid);
 
       // 2. Aggiorna il profilo Firebase Auth con il displayName
       if (displayName) {
         await newAuthUser.updateProfile({ displayName: displayName });
+        console.log('Profilo Firebase Auth aggiornato con displayName:', displayName);
       }
 
       // 3. Salva/Aggiorna dati utente in Firestore "users" collection
-      // Questa chiamata è cruciale e deve usare newAuthUser.uid
       await this.authService.SetUserData({
-        uid: newAuthUser.uid, // UID da Firebase Auth
+        uid: newAuthUser.uid,
         email: newAuthUser.email,
-        displayName: displayName || newAuthUser.displayName,
-        photoURL: newAuthUser.photoURL, // Sarà null inizialmente
-        emailVerified: newAuthUser.emailVerified, // Sarà false
-        // Aggiungi altri campi di default per la collezione 'users' se necessario
-        ruolo: 'cliente', // Esempio di ruolo di default
+        displayName: displayName || newAuthUser.displayName || '',
+        photoURL: newAuthUser.photoURL || '',
+        emailVerified: newAuthUser.emailVerified,
+        ruolo: 'cliente',
       });
-
+      console.log('Dati utente salvati in Firestore per UID:', newAuthUser.uid);
 
       // 4. Aggiorna il documento Currio in Firestore
       if (this.currioData && this.currioData.id) {
         const updatedCurrio: Currio = {
           ...this.currioData,
-          userId: newAuthUser.uid, // Associa l'Auth UID al Currio
+          userId: newAuthUser.uid,
           status: 'attivo',
-          tokenRegistrazione: undefined, // Rimuovi token
+          tokenRegistrazione: undefined,
           tokenRegistrazioneScadenza: undefined,
         };
-        // Dispatch l'azione per aggiornare il currio
-        this.store.dispatch(updateCurrio({ currio: updatedCurrio }));
+
+        console.log('Tentativo di aggiornamento currio ID:', updatedCurrio.id);
+        this.store.dispatch(CurrioActions.updateCurrio({ currio: updatedCurrio }));
+
+        // Attendi che l'azione di updateCurrio sia completata (successo o fallimento)
+        // con un timeout per evitare attese infinite.
+        await firstValueFrom(
+          this.actions$.pipe(
+            ofType(CurrioActions.updateCurrioSuccess, CurrioActions.updateCurrioFailure),
+            timeout(10000), // Timeout di 10 secondi
+            catchError(err => {
+              console.warn('Timeout o errore nell\'ascolto dell\'azione updateCurrio:', err);
+              // Restituisci un'azione fittizia o un observable vuoto per non rompere la catena
+              return of({ type: 'UPDATE_CURRIO_TIMEOUT_OR_EFFECT_ERROR' });
+            })
+          )
+        );
+        console.log('Azione updateCurrio (success/failure) ricevuta o timeout.');
       }
 
-      this.isLoading = false;
-      this.store.dispatch(setLoadingSpinner({ status: false }));
       Swal.fire('Registrazione Completata!', 'Il tuo account è stato creato con successo. Ora puoi effettuare il login.', 'success');
       this.router.navigate(['/auth/login']);
 
     } catch (error: any) {
+      console.error('Errore dettagliato durante la registrazione (blocco catch principale):', error);
+      const firebaseErrorMsg = this.authService.getErrorMessage(error.code || error.message);
+      this.errorMessage = firebaseErrorMsg || 'Non è stato possibile completare la registrazione.';
+      Swal.fire('Errore Registrazione', this.errorMessage, 'error');
+    } finally {
+      // Questo blocco viene eseguito SEMPRE, sia in caso di successo che di errore
       this.isLoading = false;
       this.store.dispatch(setLoadingSpinner({ status: false }));
-      console.error('Errore durante la registrazione:', error);
-      const firebaseErrorMsg = this.authService.getErrorMessage(error.code || error.message); // Usa il tuo gestore errori
-      Swal.fire('Errore Registrazione', firebaseErrorMsg || 'Non è stato possibile completare la registrazione.', 'error');
+      console.log('Operazione onSubmit completata (finally), spinner disattivato.');
     }
   }
 
   ngOnDestroy(): void {
     if (this.curriosSub) {
       this.curriosSub.unsubscribe();
+    }
+    if (this.actionsSub) {
+        this.actionsSub.unsubscribe();
     }
   }
 }

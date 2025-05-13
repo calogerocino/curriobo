@@ -41,26 +41,32 @@ export class CurrioEffects {
     );
   });
 
-  loadCurrioById$ = createEffect(() => {
-    return this.actions$.pipe(
-      ofType(CurrioActions.loadCurrioById),
-      tap(() => this.store.dispatch(setLoadingSpinner({ status: true }))),
-      mergeMap((action) => {
-        return this.currioService.getCurrioById(action.id).pipe(
-          map((currio) => {
-            this.store.dispatch(setLoadingSpinner({ status: false }));
-            return CurrioActions.loadCurrioByIdSuccess({ currio: currio as Currio });
-          }),
-          catchError(err => {
-            this.store.dispatch(setLoadingSpinner({ status: false }));
-            const message = `Errore nel caricamento del Curriò con ID: ${action.id}`;
-            this.store.dispatch(setErrorMessage({ message }));
-            return of(CurrioActions.loadCurrioByIdFailure({ error: err }));
-          })
-        );
-      })
-    );
-  });
+loadCurrioById$ = createEffect(() => {
+  return this.actions$.pipe(
+    ofType(CurrioActions.loadCurrioById),
+    tap((action) => {
+      console.log('[Effect] loadCurrioById action received:', action); // LOG
+      this.store.dispatch(setLoadingSpinner({ status: true }));
+    }),
+    mergeMap((action) => {
+      console.log('[Effect] Calling currioService.getCurrioById with ID:', action.id); // LOG
+      return this.currioService.getCurrioById(action.id).pipe(
+        map((currio) => {
+          console.log('[Effect] currioService.getCurrioById success, data:', currio); // LOG
+          this.store.dispatch(setLoadingSpinner({ status: false }));
+          return CurrioActions.loadCurrioByIdSuccess({ currio: currio as Currio });
+        }),
+        catchError(err => {
+          console.error('[Effect] currioService.getCurrioById error:', err); // LOG
+          this.store.dispatch(setLoadingSpinner({ status: false }));
+          const message = `Errore nel caricamento del Curriò con ID: ${action.id}`;
+          this.store.dispatch(setErrorMessage({ message }));
+          return of(CurrioActions.loadCurrioByIdFailure({ error: err.message || 'Errore sconosciuto servizio' })); // Assicurati di passare un payload di errore valido
+        })
+      );
+    })
+  );
+});
 
   createCurrio$ = createEffect(() => {
     return this.actions$.pipe(

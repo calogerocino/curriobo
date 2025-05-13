@@ -4,6 +4,8 @@ import { BaseComponent } from './core/base/base.component';
 import { AuthGuard } from './shared/guard/auth.guard';
 import { ErrorPageComponent } from './views/error-page/error-page.component';
 import { LandingpageComponent } from './views/landingpage/landingpage.component';
+import { CurrioPreviewComponent } from './views/currio/currio-preview/currio-preview.component';
+// Rimuovi l'import di CurrioPreviewComponent da qui se era solo per la rotta autonoma
 
 const routes: Routes = [
   {
@@ -41,11 +43,17 @@ const routes: Routes = [
           import('./views/utente/utente.module').then((m) => m.UtenteModule),
       },
       {
-        path: 'currio',
+        path: 'currio', // Il path base per CurrioModule
         loadChildren: () =>
-          import('./views/currio/currio.module').then((m) => m.CurrioModule),
+          import('./views/currio/currio.module').then((m) => m.CurrioModule), // Questo caricherà le rotte definite in CurrioModule
       },
     ],
+  },
+
+  {
+    path: 'currio/preview/:id',
+    component: CurrioPreviewComponent,
+    data: { title: 'Anteprima Curriò' },
   },
   {
     path: 'error',
