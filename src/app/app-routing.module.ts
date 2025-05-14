@@ -32,15 +32,15 @@ const routes: Routes = [
             (m) => m.DashboardModule
           ),
       },
-      {
-        path: 'clienti',
-        loadChildren: () =>
-          import('./views/clienti/clienti.module').then((m) => m.ClientiModule),
-      },
-      {
-        path: 'utente',
+       {
+        path: 'utente', // Gestione utenti admin
         loadChildren: () =>
           import('./views/utente/utente.module').then((m) => m.UtenteModule),
+      },
+      {
+        path: 'currio', // Gestione dei Curriò da parte dell'admin
+        loadChildren: () =>
+          import('./views/currio/currio.module').then((m) => m.CurrioModule),
       },
       {
         path: 'currio', // Il path base per CurrioModule
@@ -50,10 +50,10 @@ const routes: Routes = [
     ],
   },
 {
-  path: 'cliente',
-  loadChildren: () => import('./views/customer/customer.module').then(m => m.CustomerModule),
-  canActivate: [AuthGuard], // AuthGuard protegge l'intera area /cliente
-  data: { title: 'Area Cliente' } // Titolo base per quest'area
+   path: 'cliente', // Area riservata ai clienti
+    loadChildren: () => import('./views/customer/customer.module').then(m => m.CustomerModule),
+    canActivate: [AuthGuard], // AuthGuard protegge l'intera area /cliente
+    data: { title: 'Area Cliente' }
 },
   {
     path: ':id',

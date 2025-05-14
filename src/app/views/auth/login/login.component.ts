@@ -27,7 +27,7 @@ export class LoginComponent implements OnInit {
       email: new FormControl('', [Validators.required, Validators.email]),
       password: new FormControl('', [Validators.required]),
     });
-    this.store.dispatch(autoLogin())
+    this.store.dispatch(autoLogin());
   }
 
   googleAuth() {
@@ -35,9 +35,17 @@ export class LoginComponent implements OnInit {
   }
 
   onLoginSubmit() {
+    if (!this.loginForm.valid) {
+      // Aggiungi controllo validità se mancante
+      this.loginForm.markAllAsTouched();
+      return;
+    }
     const email = this.loginForm.value.email;
     const password = this.loginForm.value.password;
     this.store.dispatch(setLoadingSpinner({ status: true }));
-    this.store.dispatch(loginStart({ email, password }));
+    // Aggiungi redirect: true e isCustomerLogin: false qui
+    this.store.dispatch(
+      loginStart({ email, password, isCustomerLogin: false, redirect: true })
+    );
   }
 }

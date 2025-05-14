@@ -1,30 +1,30 @@
 // src/app/views/auth/state/auth.effects.ts
+import { Injectable } from '@angular/core';
+import { Actions, concatLatestFrom, createEffect, ofType } from '@ngrx/effects';
+import { Router } from '@angular/router';
+import { Store } from '@ngrx/store';
+import { of } from 'rxjs';
+import { catchError, exhaustMap, map, switchMap, tap, filter } from 'rxjs/operators'; // Aggiunto filter
+import { AppState } from 'src/app/shared/app.state';
+import { AuthResponseData } from 'src/app/shared/models/AuthResponseData';
+import { User } from 'src/app/shared/models/user.interface';
 import { AuthService } from 'src/app/shared/servizi/auth.service';
-import { catchError, map, switchMap, tap, exhaustMap } from 'rxjs/operators'; // Aggiunto exhaustMap se non presente
+import { UserService } from 'src/app/shared/servizi/user.service';
+import { setErrorMessage, setLoadingSpinner } from 'src/app/shared/store/shared.actions';
 import {
   autoLogin,
   autologout,
-  changeInfoStart,
-  changeInfoSuccess,
-  changePasswordStart,
-  changePasswordSuccess,
   loginStart,
   loginSuccess,
   updateLogin,
   updateLoginSuccess,
+  changePasswordStart,
+  changePasswordSuccess,
+  changeInfoStart,
+  changeInfoSuccess
 } from './auth.action';
-import { Actions, concatLatestFrom, createEffect, ofType } from '@ngrx/effects';
-import { Injectable } from '@angular/core';
-import { Router } from '@angular/router';
-import {
-  setErrorMessage,
-  setLoadingSpinner,
-} from 'src/app/shared/store/shared.actions';
-import { Store } from '@ngrx/store';
-import { AppState } from 'src/app/shared/app.state';
-import { of } from 'rxjs';
-import { UserService } from 'src/app/shared/servizi/user.service';
 import { getUser, getUserlocalId } from './auth.selector';
+
 
 @Injectable()
 export class AuthEffects {
@@ -36,24 +36,26 @@ export class AuthEffects {
     private readonly userService: UserService
   ) {}
 
-   login$ = createEffect(() =>
+  login$ = createEffect(() =>
     this.actions$.pipe(
       ofType(loginStart),
-      // Usiamo exhaustMap per ignorare nuovi loginStart finché il precedente non è completato
-      exhaustMap((action) => { // action qui contiene isCustomerLogin
+      exhaustMap((action) => {
+        console.log('[AuthEffects login$] Action received:', JSON.parse(JSON.stringify(action)));
         return this.authService.SignIn(action.email, action.password).pipe(
-          map((data) => {
+          map((data: AuthResponseData) => {
+            console.log('[AuthEffects login$] SignIn success, data:', data);
             this.store.dispatch(setLoadingSpinner({ status: false }));
             this.store.dispatch(setErrorMessage({ message: null }));
             const user = this.authService.formatUser(data);
-            this.authService.setUserInLocalStorage(user); // Salva subito i dati base
-            // Dispatch updateLogin per arricchire i dati utente dallo store/firestore se necessario
-            // e per sincronizzare lo stato di NGRX con localStorage
-            this.store.dispatch(updateLogin());
-            // Passa isCustomerLogin a loginSuccess
-            return loginSuccess({ user, redirect: true, isCustomerLogin: action.isCustomerLogin });
+            console.log('[AuthEffects login$] User formatted, before localStorage:', JSON.parse(JSON.stringify(user)));
+            this.authService.setUserInLocalStorage(user);
+            // Dispatch loginSuccess per aggiornare lo store con i dati base.
+            // Il redirect è false qui, perché il redirect effettivo avverrà dopo updateLoginSuccess.
+            // L'intento di redirect originale (action.redirect) e isCustomerLogin vengono passati.
+            return loginSuccess({ user, redirect: action.redirect, isCustomerLogin: action.isCustomerLogin });
           }),
           catchError((errResp) => {
+            console.error('[AuthEffects login$] SignIn error:', errResp);
             this.store.dispatch(setLoadingSpinner({ status: false }));
             const errorMessage = this.authService.getErrorMessage(
               errResp?.error?.error?.message || 'ERRORE_LOGIN_SCONOSCIUTO'
@@ -65,17 +67,90 @@ export class AuthEffects {
     )
   );
 
+  // Nuovo effetto che ascolta loginSuccess e poi dispatcha updateLogin
+  loginSuccessTriggerUpdateLogin$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(loginSuccess),
+      tap(action => console.log('[AuthEffects loginSuccessTriggerUpdateLogin$] loginSuccess action received. Props from action:', JSON.parse(JSON.stringify(action)))),
+      map(action => {
+        // Dispatcha updateLogin, passando i flag redirect e isCustomerLogin dall'azione loginSuccess
+        console.log('[AuthEffects loginSuccessTriggerUpdateLogin$] Dispatching updateLogin() with redirect:', action.redirect, 'isCustomerLogin:', action.isCustomerLogin);
+        return updateLogin({ redirect: action.redirect, isCustomerLogin: action.isCustomerLogin });
+      })
+    )
+  );
+
+
+  updateLogin$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(updateLogin),
+      tap(action => console.log('[AuthEffects updateLogin$] Effect triggered by updateLogin. Props:', JSON.parse(JSON.stringify(action)))),
+      concatLatestFrom(() => [ // Usa concatLatestFrom per assicurarti che lo store sia aggiornato da loginSuccess
+        this.store.select(getUserlocalId),
+        this.store.select(getUser),
+      ]),
+      filter(([updateLoginAction, uid, userState]) => { // Aggiunto filter per procedere solo se uid e token sono validi
+        const isValid = !!uid && !!userState && !!userState.token;
+        if (!isValid) {
+            console.error('[AuthEffects updateLogin$] UID o token utente mancanti nello stato DOPO loginSuccess. Impossibile chiamare MergeDatiUtente.');
+        }
+        return isValid;
+      }),
+      switchMap(([updateLoginAction, uid, userState]) => {
+        console.log(`[AuthEffects updateLogin$] UID from store (valid): ${uid}`);
+        console.log('[AuthEffects updateLogin$] User state from store (before merge, valid token):', userState ? JSON.parse(JSON.stringify(userState)) : null);
+        console.log(`[AuthEffects updateLogin$] Calling MergeDatiUtente with UID: ${uid}`);
+        return this.userService.MergeDatiUtente(uid!, userState!).pipe( // Aggiunto '!' perché il filter garantisce che non siano null
+          map((mergedUser: User) => {
+            console.log('[AuthEffects updateLogin$] MergeDatiUtente success, mergedUser:', JSON.parse(JSON.stringify(mergedUser)));
+            this.authService.setUserInLocalStorage(mergedUser);
+            return updateLoginSuccess({
+              user: mergedUser,
+              redirect: updateLoginAction.redirect, // Propaga il flag redirect
+              isCustomerLogin: updateLoginAction.isCustomerLogin // Propaga il flag isCustomerLogin
+            });
+          }),
+          catchError(err => {
+            console.error("[AuthEffects updateLogin$] Errore durante MergeDatiUtente:", err);
+            return of(setErrorMessage({ message: 'Errore nell\'aggiornamento dei dati utente da Firestore.' }));
+          })
+        );
+      })
+    )
+  );
+
   loginRedirect$ = createEffect(
     () => {
       return this.actions$.pipe(
-        ofType(loginSuccess),
-        tap((action) => { // action qui contiene isCustomerLogin
-          if (action.redirect) { // Controlla se il reindirizzamento è richiesto
+        ofType(updateLoginSuccess), // Ora ascolta SOLO updateLoginSuccess
+        // Non è più necessario concatLatestFrom qui se l'azione updateLoginSuccess contiene già l'utente completo
+        tap((action) => { // action è updateLoginSuccess e contiene l'utente completo e i flag
+          console.log('[AuthEffects loginRedirect$] updateLoginSuccess action received:', JSON.parse(JSON.stringify(action)));
+          const user = action.user; // L'utente completo è nell'azione
+
+          if (action.redirect && user) {
+            console.log('[AuthEffects loginRedirect$] Evaluating redirect. isCustomerLogin:', action.isCustomerLogin, 'User role:', user.ruolo);
             if (action.isCustomerLogin) {
-              this.router.navigate(['/cliente/account']); // Reindirizzamento Cliente
-            } else {
-              this.router.navigate(['/admin']); // Reindirizzamento Admin (o dashboard admin)
+              if (user.ruolo === 'cliente') {
+                console.log('[AuthEffects loginRedirect$] Navigating to /cliente/account');
+                this.router.navigate(['/cliente/account']);
+              } else {
+                console.warn(`[AuthEffects loginRedirect$] Tentativo di login cliente fallito: utente ${user.email} non ha ruolo cliente. Ruolo trovato: ${user.ruolo}`);
+                this.store.dispatch(autologout());
+                this.router.navigate(['/auth/login-cliente'], { queryParams: { error: 'unauthorized_role' } });
+              }
+            } else { // Admin login
+              if (user.ruolo === 'admin') {
+                console.log('[AuthEffects loginRedirect$] Navigating to /admin');
+                this.router.navigate(['/admin']);
+              } else {
+                 console.warn(`[AuthEffects loginRedirect$] Tentativo di login admin fallito: utente ${user.email} non ha ruolo admin. Ruolo trovato: ${user.ruolo}`);
+                this.store.dispatch(autologout());
+                this.router.navigate(['/auth/login'], { queryParams: { error: 'unauthorized_role' } });
+              }
             }
+          } else {
+            console.log('[AuthEffects loginRedirect$] No redirect needed or user is null. Redirect flag:', action.redirect, 'User:', user);
           }
         })
       );
@@ -83,72 +158,38 @@ export class AuthEffects {
     { dispatch: false }
   );
 
-  autoLogin$ = createEffect(() => // Assicurati che autoLogin gestisca correttamente i dati utente da localStorage
-        this.actions$.pipe(
-        ofType(autoLogin),
-        map(() => {
-            const user = this.authService.getUserFromLocalStorage();
-            if (user) {
-            // È importante rieseguire il timeout per il logout automatico
-            this.authService.runTimeoutInterval(user);
-            // Puoi decidere se chiamare updateLogin anche qui per aggiornare i dati da Firestore
-            // o se i dati in localStorage sono sufficienti per l'autologin.
-            // Se chiami updateLogin, assicurati che non crei loop o condizioni di gara.
-            // this.store.dispatch(updateLogin());
-            // Per ora, ci fidiamo dei dati in localStorage per l'autologin.
-            // Il flag isCustomerLogin non è presente in localStorage, quindi il redirect
-            // dell'autologin potrebbe dover essere gestito diversamente o basarsi sul ruolo.
-            // Per semplicità, l'autologin potrebbe reindirizzare a una dashboard generica
-            // o alla pagina `/admin` e poi la logica interna decide se rimanere o spostare.
-            // Oppure, lo stato 'user' nello store NGRX (popolato da Firestore) potrebbe avere un campo 'ruolo'.
-            return loginSuccess({ user, redirect: false }); // redirect: false per autologin
-            }
-            return { type: '[Auth] AutoLogin No User Found' }; // o un'azione dummy
-        })
-        )
-    );
 
-    updateLogin$ = createEffect(() => // Questo effect è cruciale
-        this.actions$.pipe(
-        ofType(updateLogin),
-        concatLatestFrom(() => [
-            this.store.select(getUserlocalId), // Prende il localId dallo stato corrente (appena loggato o da localStorage)
-            this.store.select(getUser),       // Prende l'utente (con token, email, ecc.) dallo stato corrente
-        ]),
-        switchMap(([_, uid, userState]) => { // _ è l'azione updateLogin, uid è localId, userState è l'utente NGRX
-            if (!uid || !userState) {
-            // Se uid o userState non sono validi, non possiamo procedere.
-            // Questo potrebbe accadere se updateLogin viene chiamato prima che il login iniziale
-            // o l'autologin abbiano popolato lo stato.
-            return of(setErrorMessage({ message: 'Dati utente non pronti per l\'aggiornamento.' }));
-            }
-            // MergeDatiUtente dovrebbe prendere l'UID e l'IDToken (da userState.token)
-            // per recuperare i dati completi da Firestore e fonderli.
-            return this.userService.MergeDatiUtente(uid, userState).pipe(
-            map((mergedUser) => {
-                this.authService.setUserInLocalStorage(mergedUser); // Aggiorna localStorage con i dati completi
-                return updateLoginSuccess({ user: mergedUser, redirect: false }); // Aggiorna lo store NGRX
-            }),
-            catchError(err => {
-                console.error("Errore in updateLogin$ durante MergeDatiUtente:", err);
-                return of(setErrorMessage({ message: 'Errore nell\'aggiornamento dei dati utente.' }));
-            })
-            );
-        })
-        )
-    );
+  autoLogin$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(autoLogin),
+      map(() => {
+        const userFromStorage = this.authService.getUserFromLocalStorage();
+        console.log('[AuthEffects autoLogin$] User from localStorage:', userFromStorage ? JSON.parse(JSON.stringify(userFromStorage)) : null);
+        if (userFromStorage && userFromStorage.expirationDate && new Date(userFromStorage.expirationDate) > new Date()) {
+          this.authService.runTimeoutInterval(userFromStorage);
+          // Dispatch loginSuccess. Questo triggererà loginSuccessTriggerUpdateLogin$
+          // che a sua volta dispatcherà updateLogin, propagando i flag.
+          console.log('[AuthEffects autoLogin$] Dispatching loginSuccess for autoLogin. User role from storage:', userFromStorage.ruolo);
+          return loginSuccess({
+            user: userFromStorage,
+            redirect: true, // Intento di redirect dopo auto-login e aggiornamento ruolo
+            isCustomerLogin: userFromStorage.ruolo === 'cliente'
+          });
+        }
+        console.log('[AuthEffects autoLogin$] No valid user found in localStorage or token expired.');
+        return { type: '[Auth] AutoLogin No User Found or Token Expired' }; // Azione No-Op
+      })
+    )
+  );
 
   logout$ = createEffect(
     () => {
       return this.actions$.pipe(
         ofType(autologout),
         tap(() => {
-          this.authService.logoutS(); // Chiama il metodo di logout dal servizio
-          this.router.navigate(['/auth/login-cliente']); // O una pagina di logout/landing page
-          localStorage.removeItem('userData'); // Assicurati che venga rimosso
-          if (this.authService.timeoutInterval) {
-            clearTimeout(this.authService.timeoutInterval);
-          }
+          console.log('[AuthEffects logout$] Logout action triggered.');
+          this.authService.logoutS();
+          this.router.navigate(['/auth/login-cliente']);
         })
       );
     },
@@ -167,7 +208,6 @@ export class AuthEffects {
           }),
           catchError((errResp) => {
             this.store.dispatch(setLoadingSpinner({ status: false }));
-            console.log('errore', errResp.error.error.message);
             const ErrorMessage = this.authService.getErrorMessage(
               errResp.error.error.message
             );
@@ -177,6 +217,7 @@ export class AuthEffects {
       })
     )
   );
+
   changeInfo$ = createEffect(() =>
     this.actions$.pipe(
       ofType(changeInfoStart),
@@ -185,12 +226,14 @@ export class AuthEffects {
           map((data) => {
             this.store.dispatch(setLoadingSpinner({ status: false }));
             this.store.dispatch(setErrorMessage({ message: null }));
-            this.store.dispatch(updateLogin());
+            // Dopo aver cambiato le info, aggiorna lo stato utente nello store
+            // passando redirect: false perché non vogliamo un redirect completo qui,
+            // ma solo un aggiornamento dei dati.
+            this.store.dispatch(updateLogin({ redirect: false, isCustomerLogin: action.value.ruolo === 'cliente' }));
             return changeInfoSuccess();
           }),
           catchError((errResp) => {
             this.store.dispatch(setLoadingSpinner({ status: false }));
-            console.log('errore', errResp.error.error.message);
             const ErrorMessage = this.authService.getErrorMessage(
               errResp.error.error.message
             );

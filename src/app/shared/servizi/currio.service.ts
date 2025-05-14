@@ -17,7 +17,7 @@ export class CurrioService {
 
   getCurrios(): Observable<Currio[]> {
     return this.http
-      .get<{ [key: string]: Omit<Currio, 'id'> }>(
+      .get<{ [key: string]: Omit<Currio, 'id'> }>( // Tipizzazione per la risposta da RTDB
         `${environment.firebase.databaseURL}/${this.currioDbPath}.json`
       )
       .pipe(
@@ -26,28 +26,7 @@ export class CurrioService {
           if (data) {
             for (const key in data) {
               if (data.hasOwnProperty(key)) {
-                const currioFromDb = data[key] as any; // Cast to any to avoid type issues with partial data
-                currios.push({
-                    id: key,
-                    nomePortfolio: currioFromDb.nomePortfolio || '',
-                    heroTitle: currioFromDb.heroTitle || '',
-                    heroSubtitle: currioFromDb.heroSubtitle || '',
-                    contatti: currioFromDb.contatti || {},
-                    progetti: currioFromDb.progetti || [],
-                    esperienze: currioFromDb.esperienze || [],
-                    competenze: currioFromDb.competenze || [],
-                    chiSonoFotoUrl: currioFromDb.chiSonoFotoUrl || '',
-                    chiSonoDescrizione1: currioFromDb.chiSonoDescrizione1 || '',
-                    chiSonoDescrizione2: currioFromDb.chiSonoDescrizione2 || '',
-                    curriculumUrl: currioFromDb.curriculumUrl || undefined,
-                    linguaDefault: currioFromDb.linguaDefault || 'it',
-                    templateScelto: currioFromDb.templateScelto || undefined,
-                    userId: currioFromDb.userId || undefined,
-                    status: currioFromDb.status || 'nuova_richiesta',
-                    datiCliente: currioFromDb.datiCliente || undefined,
-                    tokenRegistrazione: currioFromDb.tokenRegistrazione || undefined,
-                    tokenRegistrazioneScadenza: currioFromDb.tokenRegistrazioneScadenza || undefined,
-                 } as Currio);
+                currios.push({ ...(data[key] as any), id: key }); // Aggiunge l'ID (chiave) all'oggetto
               }
             }
           }
@@ -92,9 +71,9 @@ export class CurrioService {
       );
   }
 
-  createCurrio(currioData: Omit<Currio, 'id'>): Observable<{ name: string }> {
+  createCurrio(currioData: Omit<Currio, 'id'>): Observable<{ name: string }> { // Firebase RTDB restituisce un oggetto con la chiave 'name' (l'ID generato)
     return this.http.post<{ name: string }>(
-      `${environment.firebase.databaseURL}/${this.currioDbPath}.json`,
+      `${environment.firebase.databaseURL}/${this.currioDbPath}.json`, // Aggiungi .json per RTDB
       currioData
     );
   }

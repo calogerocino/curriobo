@@ -1,4 +1,4 @@
-import { Component, ViewChild, ElementRef } from '@angular/core'; // Aggiungi ViewChild, ElementRef
+import { Component, ViewChild, ElementRef } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { AppState } from 'src/app/shared/app.state';
@@ -10,7 +10,7 @@ import { Currio, DatiClienteCurrio, CurrioContatti } from 'src/app/shared/models
 @Component({
   selector: 'app-landingpage',
   templateUrl: './landingpage.component.html',
-  styleUrls: ['./landingpage.component.css'], // Assicurati che il CSS sia linkato
+  styleUrls: ['./landingpage.component.css'],
 })
 export class LandingpageComponent {
   isModalOpen = false;
@@ -21,16 +21,15 @@ export class LandingpageComponent {
   };
   selectedFile: File | null = null;
   selectedFileName: string | null = null;
-  isDraggingOver = false; // Nuovo stato per l'effetto drag over
-  fileError: string | null = null; // Per messaggi di errore relativi al file
+  isDraggingOver = false;
+  fileError: string | null = null;
 
-  // Riferimento all'input file nascosto
   @ViewChild('fileInput') fileInputRef!: ElementRef<HTMLInputElement>;
 
 
   constructor(
     private readonly store: Store<AppState>,
-    private readonly storage: Storage
+    private readonly storage: Storage // Per Firebase Storage
   ) {}
 
   openModal(): void {
@@ -42,8 +41,6 @@ export class LandingpageComponent {
     this.isModalOpen = false;
     this.resetFileState();
     document.body.style.overflow = 'auto';
-    // Considera di resettare il form se necessario
-    // if (this.currioForm) { this.currioForm.resetForm(); }
   }
 
   private resetFileState(): void {
@@ -52,16 +49,15 @@ export class LandingpageComponent {
     this.isDraggingOver = false;
     this.fileError = null;
     if (this.fileInputRef && this.fileInputRef.nativeElement) {
-      this.fileInputRef.nativeElement.value = ''; // Resetta l'input file
+      this.fileInputRef.nativeElement.value = '';
     }
   }
 
-  // --- Metodi per Drag & Drop ---
   onDragOver(event: DragEvent): void {
     event.preventDefault();
     event.stopPropagation();
     this.isDraggingOver = true;
-    this.fileError = null; // Pulisce errori precedenti
+    this.fileError = null;
   }
 
   onDragLeave(event: DragEvent): void {
@@ -81,7 +77,6 @@ export class LandingpageComponent {
     }
   }
 
-  // Chiamato sia dal change dell'input che dal drop
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length) {
@@ -90,7 +85,7 @@ export class LandingpageComponent {
   }
 
   private handleFile(file: File): void {
-    this.fileError = null; // Resetta l'errore
+    this.fileError = null;
     const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'];
     const maxSize = 5 * 1024 * 1024; // 5MB
 
@@ -98,13 +93,13 @@ export class LandingpageComponent {
 
     if (!allowedTypes.includes(file.type)) {
       this.fileError = `Formato file non supportato. Accettati: PDF, JPG, PNG. (Fornito: ${file.type || 'sconosciuto'})`;
-      this.resetFileState(); // Resetta lo stato del file
+      this.resetFileState();
       return;
     }
 
     if (file.size > maxSize) {
       this.fileError = `File troppo grande (max 5MB). Dimensione attuale: ${(file.size / 1024 / 1024).toFixed(2)}MB`;
-      this.resetFileState(); // Resetta lo stato del file
+      this.resetFileState();
       return;
     }
 
@@ -128,13 +123,6 @@ export class LandingpageComponent {
       return;
     }
 
-    // Opzionale: verifica se il file è obbligatorio
-    // if (!this.selectedFile) {
-    //   this.fileError = 'Il caricamento del curriculum è obbligatorio.';
-    //   Swal.fire('Attenzione', 'Per favore, allega il tuo curriculum.', 'warning');
-    //   return;
-    // }
-
     let curriculumUrl: string | undefined = undefined;
 
     if (this.selectedFile) {
@@ -147,47 +135,53 @@ export class LandingpageComponent {
         }
       });
       try {
+        // Crea un nome file univoco per evitare sovrascritture e per organizzazione
         const safeEmailForPath = this.formData.email.replace(/[^a-zA-Z0-9]/g, '_');
         const filePath = `curriculums/${safeEmailForPath}_${Date.now()}/${this.selectedFile.name}`;
         const storageRef = ref(this.storage, filePath);
         const uploadTask = uploadBytesResumable(storageRef, this.selectedFile);
 
+        // Attendi il completamento dell'upload
         await uploadTask;
+        // Ottieni l'URL di download
         curriculumUrl = await getDownloadURL(storageRef);
-        Swal.close();
+        Swal.close(); // Chiudi lo Swal di caricamento
       } catch (error) {
         Swal.close();
         console.error("Errore durante l'upload del curriculum:", error);
         Swal.fire('Errore Upload', 'Non è stato possibile caricare il curriculum. Riprova.', 'error');
-        return;
+        return; // Interrompi l'esecuzione se l'upload fallisce
       }
     }
 
+    // Prepara i dati per il Currio
     const datiClienteForm: DatiClienteCurrio = {
       nome: this.formData.nome,
       email: this.formData.email,
     };
 
     const newCurrioData: Omit<Currio, 'id'> = {
-      nomePortfolio: `Curriò Iniziale per ${this.formData.nome}`,
-      heroTitle: `Benvenuto ${this.formData.nome}!`,
-      heroSubtitle: this.formData.esperienze,
-      contatti: {
+      nomePortfolio: `Curriò Iniziale per ${this.formData.nome}`, // Nome portfolio di default
+      heroTitle: `Benvenuto ${this.formData.nome}!`, // Titolo hero di default
+      heroSubtitle: this.formData.esperienze, // Sottotitolo hero basato sulle esperienze
+      contatti: { // Contatti di default
         email: this.formData.email,
       } as CurrioContatti,
-      progetti: [],
+      progetti: [], // Array vuoti per le sezioni da popolare
       esperienze: [],
       competenze: [],
-      chiSonoDescrizione1: `Profilo di ${this.formData.nome}. Inserisci qui una tua descrizione.`,
-      linguaDefault: 'it',
-      curriculumUrl: curriculumUrl,
-      datiCliente: datiClienteForm,
-      status: 'nuova_richiesta',
+      chiSonoDescrizione1: `Profilo di ${this.formData.nome}. Inserisci qui una tua descrizione.`, // Descrizione di default
+      linguaDefault: 'it', // Lingua di default
+      curriculumUrl: curriculumUrl, // URL del CV caricato (se presente)
+      datiCliente: datiClienteForm, // Dati del cliente dal form
+      status: 'nuova_richiesta', // Stato iniziale della richiesta
+      // Campi che verranno popolati successivamente
       userId: undefined,
       tokenRegistrazione: undefined,
       tokenRegistrazioneScadenza: undefined,
     };
 
+    // Dispatch dell'azione per creare il Currio
     this.store.dispatch(createCurrio({ currio: newCurrioData }));
 
     Swal.fire({

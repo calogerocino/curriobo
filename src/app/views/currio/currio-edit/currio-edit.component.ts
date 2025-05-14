@@ -32,13 +32,12 @@ import Swal from 'sweetalert2'; // Per notifiche
   styleUrls: ['./currio-edit.component.scss'],
 })
 export class CurrioEditComponent implements OnInit, OnDestroy {
-  currio: Currio | undefined; // Usa undefined per coerenza con filter(data => !!data)
-  currioForm: FormGroup;
+  currio: Currio | undefined;
+  currioForm: FormGroup; // Deve essere inizializzata
   private currioSubscription: Subscription | undefined;
   private routeSubscription: Subscription | undefined;
   isEditMode = false;
   currioId: string | null = null;
-
   linkRegistrazione: string | null = null;
   encodedLinkRegistrazione: string | null = null;
 
@@ -63,9 +62,7 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
         linkedin: [''],
         instagram: [''],
       }),
-      // Inizializza qui anche i FormArray se li usi
-      // progetti: this.fb.array([]),
-      // esperienze: this.fb.array([]),
+      // Aggiungi qui altri FormArray o FormControl se necessario
     });
   }
 
@@ -74,17 +71,17 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
       this.currioId = params.get('id');
       if (this.currioId && this.currioId !== 'new') {
         this.isEditMode = true;
-        this.store.dispatch(loadCurrios()); // Assicurati che i currio siano caricati
+        this.store.dispatch(loadCurrios()); // Carica tutti i currios per trovare quello specifico
+        // o usa un'azione specifica loadCurrioById se disponibile e funzionante
         if (this.currioSubscription) {
-          this.currioSubscription.unsubscribe(); // Annulla sottoscrizione precedente
+          this.currioSubscription.unsubscribe();
         }
         this.currioSubscription = this.store
-          .select(getCurrioById, { id: this.currioId })
-          .pipe(filter((data) => !!data)) // Filtra undefined o null
+          .select(getCurrioById, { id: this.currioId }) // Passa l'id come props
+          .pipe(filter((data): data is Currio => !!data)) // Assicura che data non sia undefined
           .subscribe((data) => {
-            this.currio = data as Currio; // Cast sicuro dopo il filter
+            this.currio = data;
             this.initializeForm();
-            // Se l'invito era già stato inviato, ricostruisci il link per visualizzarlo
             if (
               this.currio.status === 'invito_spedito' &&
               this.currio.tokenRegistrazione
@@ -109,29 +106,8 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
     });
   }
 
-  getEmptyCurrio(): Currio {
-    return {
-      id: '', // Sarà generato da Firebase o non necessario per la creazione
-      nomePortfolio: '',
-      heroTitle: '',
-      heroSubtitle: '',
-      linguaDefault: 'it',
-      contatti: { email: '', github: '', linkedin: '', instagram: '' },
-      progetti: [],
-      esperienze: [],
-      competenze: [],
-      chiSonoDescrizione1: '',
-      chiSonoDescrizione2: '',
-      curriculumUrl: '',
-      // Campi per il flusso di registrazione
-      status: 'nuova_richiesta', // Default per un currio creato dall'admin, se applicabile
-      // datiCliente: { nome: '', email: ''} // Potrebbe essere popolato diversamente se l'admin crea da zero
-    } as Currio;
-  }
-
   initializeForm(): void {
     if (!this.currio) return;
-
     this.currioForm.patchValue({
       nomePortfolio: this.currio.nomePortfolio || '',
       heroTitle: this.currio.heroTitle || '',
@@ -147,7 +123,18 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
         instagram: this.currio.contatti?.instagram || '',
       },
     });
-    // Logica per patchare FormArray se li usi
+  }
+
+  private getEmptyCurrio(): Currio {
+    return {
+      id: '', // Sarà generato da Firebase o non necessario per la creazione
+      nomePortfolio: '',
+      heroTitle: '',
+      heroSubtitle: '',
+      linguaDefault: 'it',
+      contatti: { email: '', github: '', linkedin: '', instagram: '' },
+      status: 'nuova_richiesta', // Default per un currio creato dall'admin
+    } as Currio; // Cast parziale, assicurati che tutti i campi obbligatori siano presenti
   }
 
   preparaEInviaInvito(): void {
@@ -175,10 +162,9 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
     };
 
     this.store.dispatch(updateCurrio({ currio: currioAggiornato }));
-    // Il template mostrerà il link. Un messaggio Swal può confermare l'azione.
     Swal.fire({
       title: 'Link di Registrazione Generato!',
-      html: `Per favore, invia il seguente link di registrazione a <strong>${this.currio.datiCliente.email}</strong>:<br><br><div class="input-group input-group-sm"><input type="text" class="form-control form-control-sm" value="${this.linkRegistrazione}" readonly><button class="btn btn-outline-secondary btn-sm" type="button" onclick="navigator.clipboard.writeText('${this.linkRegistrazione}')"><i class="feather icon-copy"></i> Copia</button></div><br>Il link scadrà tra 24 ore.`,
+      html: `Per favore, invia il seguente link di registrazione a <strong>${this.currio.datiCliente.email}</strong>:<br><br><div class="input-group input-group-sm"><input type="text" class="form-control form-control-sm" value="${this.linkRegistrazione}" readonly #registrationLinkInput><button class="btn btn-outline-secondary btn-sm" type="button" (click)="copyToClipboard(registrationLinkInput)"><i class="feather icon-copy"></i> Copia</button></div><br>Il link scadrà tra 24 ore.`,
       icon: 'info',
       confirmButtonText: 'Ok, ho capito',
     });
@@ -187,7 +173,6 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
   copyToClipboard(inputElement: HTMLInputElement): void {
     inputElement.select();
     document.execCommand('copy');
-    // Fornisci un feedback all'utente, es. con un toast o cambiando l'icona del pulsante
     Swal.fire({
       toast: true,
       position: 'top-end',
@@ -209,13 +194,12 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // Assicurati che this.currio sia definito, specialmente in modalità creazione
     const baseCurrio =
       this.isEditMode && this.currio ? this.currio : this.getEmptyCurrio();
-
     const formValue = this.currioForm.value;
+
     const currioToSave: Currio = {
-      ...baseCurrio, // Mantiene status, datiCliente, token, etc. se in edit mode
+      ...baseCurrio,
       id: this.isEditMode && this.currio ? this.currio.id : undefined, // Mantiene l'ID se in edit mode
       nomePortfolio: formValue.nomePortfolio,
       heroTitle: formValue.heroTitle,
@@ -225,32 +209,34 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
       chiSonoDescrizione1: formValue.chiSonoDescrizione1,
       chiSonoDescrizione2: formValue.chiSonoDescrizione2,
       contatti: formValue.contatti,
-      // ... (gestisci FormArray se presenti)
+      // Se lo status era 'invito_spedito', preservalo a meno che non sia stato attivato
+      status: baseCurrio.status, // Mantiene lo status corrente
+      // Preserva userId, tokenRegistrazione, tokenRegistrazioneScadenza se già presenti e non modificati da altre logiche
+      userId: baseCurrio.userId,
+      tokenRegistrazione: baseCurrio.tokenRegistrazione,
+      tokenRegistrazioneScadenza: baseCurrio.tokenRegistrazioneScadenza,
+      datiCliente: baseCurrio.datiCliente, // Preserva i dati cliente
     };
 
     if (this.isEditMode && currioToSave.id) {
       this.store.dispatch(updateCurrio({ currio: currioToSave as Currio }));
-    } else {
-      // In modalità creazione da admin, i campi come datiCliente, status, etc.
-      // dovrebbero essere impostati diversamente o non popolati qui.
-      // Questo flusso si concentra sull'edit di un currio generato dalla landing.
-      // Se l'admin crea un currio da zero, non ci sarà un 'datiCliente' o uno status 'nuova_richiesta'
-      // a meno che non li imposti esplicitamente.
-      const { id, ...currioDataToCreate } = currioToSave; // Rimuovi l'ID se è vuoto
-      this.store.dispatch(
-        createCurrio({ currio: currioDataToCreate as Omit<Currio, 'id'> })
-      );
-    }
-
-    // Non reindirizzare immediatamente se è stata appena generata un'email di invito
-    if (!this.linkRegistrazione || this.currio?.status !== 'invito_spedito') {
-      this.router.navigate(['/admin/currio/listacurrio']);
-    } else {
-      // Se il link è stato appena generato, l'admin potrebbe volerlo copiare prima di navigare via
       Swal.fire(
         'Curriò Aggiornato',
-        'Le modifiche al curriò sono state salvate.',
+        'Le modifiche sono state salvate.',
         'success'
+      );
+      // Considera se reindirizzare o meno, specialmente se è stato appena generato un invito
+      if (!this.linkRegistrazione || this.currio?.status !== 'invito_spedito') {
+        this.router.navigate(['/admin/currio/listacurrio']);
+      }
+    } else {
+      // Logica per la creazione di un nuovo Curriò da parte dell'admin (se necessaria)
+      // In questo caso, 'datiCliente' potrebbe dover essere inserito manualmente dall'admin.
+      // const { id, ...currioDataToCreate } = currioToSave;
+      // this.store.dispatch(createCurrio({ currio: currioDataToCreate as Omit<Currio, 'id'> }));
+      // this.router.navigate(['/admin/currio/listacurrio']);
+      console.warn(
+        'Modalità creazione da admin non completamente implementata in questo snippet.'
       );
     }
   }

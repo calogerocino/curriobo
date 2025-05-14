@@ -89,50 +89,44 @@ export class AuthService {
   }
 
   // Salva/Aggiorna i dati dell'utente in Firestore
-  SetUserData(firebaseUser: FirebaseAuthUserType | any): Promise<void> {
+ SetUserData(firebaseUser: FirebaseAuthUserType | any): Promise<void> {
     if (!firebaseUser || !firebaseUser.uid) {
       console.error('[AuthService.SetUserData] Chiamato con un oggetto utente non valido:', firebaseUser);
       return Promise.reject(new Error('Oggetto utente non valido per SetUserData'));
     }
 
     const userRef: AngularFirestoreDocument<User> = this.afs.doc<User>(
-      `users/${firebaseUser.uid}`
+      `users/${firebaseUser.uid}` // Usa l'UID di Firebase Auth come ID del documento
     );
 
-    // L'oggetto firebaseUser fornito da createUserWithEmailAndPassword o da signInWithPopup
-    // contiene solo le proprietà standard di Firebase Auth (uid, email, displayName, photoURL, emailVerified).
-    // Gli altri campi della tua interfaccia User (ruolo, cellulare, token, expirationDate)
-    // non saranno presenti su questo oggetto `firebaseUser` a meno che non li aggiungi tu
-    // da qualche altra fonte prima di chiamare SetUserData.
+    // Determina il ruolo. Se firebaseUser.ruolo è fornito (es. da completa-registrazione), usalo.
+    // Altrimenti, se è un login standard, il ruolo dovrebbe essere già in Firestore o dedotto.
+    // Per la registrazione tramite invito, il ruolo sarà 'cliente'.
+    const ruoloDaUsare = firebaseUser.ruolo || 'cliente'; // Default a 'cliente' se non specificato
 
-    // Se `firebaseUser.ruolo` è passato (es. da CompletaRegistrazioneComponent), usalo, altrimenti default.
-    const ruoloDaUsare = firebaseUser.ruolo || 'cliente';
-
-    // Costruisci l'oggetto da salvare, assicurandoti che i campi opzionali
-    // della tua interfaccia User siano null se non forniti.
     const dataToSet: User = {
-      localId: firebaseUser.uid,
-      email: firebaseUser.email || '', // Default a stringa vuota se null/undefined da Auth
-      displayName: firebaseUser.displayName || '', // Default a stringa vuota
-      photoURL: firebaseUser.photoURL || '',   // Default a stringa vuota
+      localId: firebaseUser.uid, // Corrisponde a User.localId
+      email: firebaseUser.email || '',
+      displayName: firebaseUser.displayName || '',
+      photoURL: firebaseUser.photoURL || 'assets/images/default-avatar.png', // Un avatar di default
       emailVerified: firebaseUser.emailVerified || false,
-      ruolo: ruoloDaUsare,
-      // Per i campi non standard di Firebase Auth, se non sono nell'oggetto `firebaseUser` passato,
-      // verranno impostati a null.
+      ruolo: ruoloDaUsare, // Imposta il ruolo qui!
+      // Altri campi della tua interfaccia User che potresti voler inizializzare
       cellulare: firebaseUser.cellulare !== undefined ? firebaseUser.cellulare : null,
-      token: firebaseUser.token !== undefined ? firebaseUser.token : null, // Solitamente l'idToken non si salva qui.
-      expirationDate: firebaseUser.expirationDate !== undefined ? new Date(firebaseUser.expirationDate) : null, // Anche questo è insolito qui.
+      // Non salvare token o expirationDate di Firebase Auth direttamente in Firestore qui,
+      // sono gestiti dallo stato NGRX e/o localStorage per la sessione.
     };
 
-    console.log(`[AuthService.SetUserData] Scrittura su Firestore per users/${firebaseUser.uid} con payload:`, JSON.parse(JSON.stringify(dataToSet)));
+    console.log(`[AuthService.SetUserData] Scrittura/Aggiornamento su Firestore per users/${firebaseUser.uid} con payload:`, JSON.parse(JSON.stringify(dataToSet)));
 
+    // Usa { merge: true } per aggiornare i campi esistenti o creare il documento se non esiste.
     return userRef.set(dataToSet, { merge: true })
       .then(() => {
         console.log(`[AuthService.SetUserData] Dati utente per ${firebaseUser.uid} salvati/aggiornati in Firestore.`);
       })
       .catch(error => {
         console.error(`[AuthService.SetUserData] Errore nel salvare i dati utente ${firebaseUser.uid} in Firestore:`, error);
-        throw error; // Rilancia l'errore per permettere al chiamante di gestirlo
+        throw error;
       });
   }
 
@@ -160,23 +154,19 @@ export class AuthService {
     const expiresInMilliseconds = Number(data.expiresIn) * 1000;
     const expirationDate = new Date(now.getTime() + expiresInMilliseconds);
 
-    // Questo oggetto è usato per lo stato NGRX.
-    // I campi come displayName, photoURL, ruolo, cellulare verranno popolati
-    // dallo store NGRX dopo aver letto i dati da Firestore (tramite un effect come updateLogin$).
-    return {
+    const formattedUser: User = { // Rinominato per chiarezza nel log
       email: data.email,
-      token: data.idToken, // idToken per le chiamate API
-      localId: data.localId, // Auth UID
+      token: data.idToken,
+      localId: data.localId,
       expirationDate: expirationDate,
       displayName: undefined,
       photoURL: undefined,
-      // 'data.registered' indica se l'utente è nuovo o esistente all'API signInWithPassword,
-      // non è direttamente 'emailVerified'. emailVerified viene dall'oggetto FirebaseUser.
-      // Per coerenza, emailVerified nello store NGRX dovrebbe riflettere lo stato reale.
-      emailVerified: undefined, // Sarà popolato da Firestore/FirebaseUser
+      emailVerified: undefined,
       ruolo: undefined,
       cellulare: undefined,
     };
+    console.log('[AuthService formatUser] User object created:', JSON.parse(JSON.stringify(formattedUser))); // LOG
+    return formattedUser;
   }
 
   // Salva i dati utente in localStorage

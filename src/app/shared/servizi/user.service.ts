@@ -1,11 +1,10 @@
-// src/app/shared/servizi/user.service.ts
 import { Injectable } from '@angular/core';
 import { AngularFirestore, AngularFirestoreDocument } from '@angular/fire/compat/firestore';
 import { User } from '../models/user.interface';
+import { Observable, of, from } from 'rxjs';
+import { map, catchError, take, switchMap } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
 import { AppState } from '../app.state';
-import { from, Observable, of } from 'rxjs'; // Importa Observable e of
-import { map, catchError, take } from 'rxjs/operators'; // Importa map, catchError, take
 
 @Injectable({
   providedIn: 'root',
@@ -17,16 +16,17 @@ export class UserService {
   ) {}
 
   /* Impostazione dei dati utente */
-  SetUserData(user: Partial<User>): Promise<void> { // User può essere Partial per permettere aggiornamenti parziali
+  SetUserData(user: Partial<User>): Promise<void> {
+    // User può essere Partial per permettere aggiornamenti parziali
     const userRef: AngularFirestoreDocument<any> = this.afs.doc(
       `users/${user.localId}`
     );
     // Filtra via i campi undefined prima di salvare, Firebase non li gradisce
     const userDataToSet = Object.entries(user).reduce((acc, [key, value]) => {
-        if (value !== undefined) {
-            acc[key] = value;
-        }
-        return acc;
+      if (value !== undefined) {
+        acc[key] = value;
+      }
+      return acc;
     }, {});
 
     return userRef.set(userDataToSet, {
@@ -34,92 +34,101 @@ export class UserService {
     });
   }
 
-  getFFList(): Observable<any[]> { // Mantenuto per ora, ma considera di tipizzarlo meglio se usato
+  getFFList(): Observable<any[]> {
+    // Mantenuto per ora, ma considera di tipizzarlo meglio se usato
     return this.afs.collection('users').snapshotChanges();
   }
 
   // Restituisce Observable<User[]>
-  getFFUser(uid: string): Observable<User[]> {
+   getFFUser(uid: string): Observable<User | null> {
+    console.log(`[UserService.getFFUser] Tentativo di recupero utente da Firestore con UID: ${uid}`);
     return this.afs
-      .collection<User>('users', (ref) => ref.where('localId', '==', uid))
-      .valueChanges() // Questo restituisce Observable<User[]>
-      .pipe(take(1)); // Prende il primo valore emesso e completa, utile per letture singole
+      .doc<User>(`users/${uid}`)
+      .valueChanges()
+      .pipe(
+        take(1),
+        map(firestoreUser => {
+          if (firestoreUser) {
+            console.log(`[UserService.getFFUser] Dati GREZZI recuperati da Firestore per UID ${uid}:`, JSON.parse(JSON.stringify(firestoreUser)));
+          } else {
+            console.warn(`[UserService.getFFUser] NESSUN documento trovato in Firestore per UID: ${uid}`);
+          }
+          return firestoreUser || null;
+        }),
+        catchError(error => {
+          console.error(`[UserService.getFFUser] Errore durante il recupero del documento per UID ${uid} da Firestore:`, error);
+          return of(null); // Restituisci null in caso di errore per non rompere il flusso
+        })
+      );
   }
 
-  // Modificato per restituire Observable<User>
-  MergeDatiUtente(uid: string, authUser: User): Observable<User> {
+  // Unisce i dati da Firebase Auth (passati come userFromAuth) con quelli di Firestore
+  MergeDatiUtente(uid: string, userFromAuth: User): Observable<User> {
+    console.log(`[UserService.MergeDatiUtente] Inizio merge per UID: ${uid}`);
+    console.log(`[UserService.MergeDatiUtente] Dati da Auth (userFromAuth):`, JSON.parse(JSON.stringify(userFromAuth)));
+
     return this.getFFUser(uid).pipe(
-      map(firestoreUsersArray => {
-        const firestoreUser = firestoreUsersArray.length > 0 ? firestoreUsersArray[0] : null;
+      map(firestoreUser => {
+        console.log(`[UserService.MergeDatiUtente] Dati da Firestore (firestoreUser) per UID ${uid}:`, firestoreUser ? JSON.parse(JSON.stringify(firestoreUser)) : null);
 
         if (!firestoreUser) {
-          console.warn(`[UserService.MergeDatiUtente] Utente NON trovato in Firestore con UID: ${uid}. Uso dati da Auth e default.`);
-          // Restituisci l'utente da Auth con eventuali default se non c'è corrispondenza in Firestore
-          // Questo è importante per i nuovi utenti che non hanno ancora un record in 'users'
-          return {
-            email: authUser.email,
-            token: authUser.token,
-            localId: authUser.localId,
-            expirationDate: authUser.expirationDate,
-            displayName: authUser.displayName || 'Nuovo Utente', // Potrebbe essere vuoto se non ancora impostato
-            photoURL: authUser.photoURL || 'assets/images/default-avatar.png', // Immagine di default
-            emailVerified: authUser.emailVerified || false,
-            ruolo: authUser.ruolo || 'cliente', // Ruolo di default
-            cellulare: authUser.cellulare || undefined,
-          } as User;
+          console.warn(`[UserService.MergeDatiUtente] Utente NON trovato in Firestore con UID: ${uid}. Uso dati da Auth e default per ruolo 'cliente'.`);
+          const userSenzaDatiFirestore: User = {
+            ...userFromAuth,
+            displayName: userFromAuth.displayName || 'Nuovo Utente (No Firestore)',
+            photoURL: userFromAuth.photoURL || 'assets/images/default-avatar.png',
+            emailVerified: userFromAuth.emailVerified || false,
+            ruolo: userFromAuth.ruolo || 'cliente', // Default a 'cliente' se non specificato e no Firestore
+            cellulare: userFromAuth.cellulare || undefined,
+          };
+          console.log(`[UserService.MergeDatiUtente] Utente risultante (senza dati Firestore):`, JSON.parse(JSON.stringify(userSenzaDatiFirestore)));
+          return userSenzaDatiFirestore;
         }
 
-        // Utente trovato in Firestore, esegui il merge
+        // Utente trovato in Firestore, esegui il merge.
         const mergedUser: User = {
-          email: authUser.email, // Email da Auth (più aggiornato per l'autenticazione)
-          token: authUser.token, // Token da Auth
-          localId: authUser.localId, // UID da Auth
-          expirationDate: authUser.expirationDate, // Scadenza token da Auth
-          // Per gli altri campi, dai priorità a Firestore, poi ad Auth, poi a un default
-          displayName: firestoreUser.displayName || authUser.displayName || '',
-          photoURL: firestoreUser.photoURL || authUser.photoURL || 'assets/images/default-avatar.png',
-          emailVerified: firestoreUser.emailVerified !== undefined ? firestoreUser.emailVerified : (authUser.emailVerified || false),
-          ruolo: firestoreUser.ruolo || authUser.ruolo || 'cliente', // Priorità Firestore, poi Auth, poi default
-          cellulare: firestoreUser.cellulare || authUser.cellulare || undefined,
+          ...userFromAuth,
+          displayName: firestoreUser.displayName || userFromAuth.displayName || '',
+          photoURL: firestoreUser.photoURL || userFromAuth.photoURL || 'assets/images/default-avatar.png',
+          emailVerified: firestoreUser.emailVerified !== undefined ? firestoreUser.emailVerified : (userFromAuth.emailVerified || false),
+          ruolo: firestoreUser.ruolo || userFromAuth.ruolo || 'cliente', // Priorità a firestoreUser.ruolo
+          cellulare: firestoreUser.cellulare || userFromAuth.cellulare || undefined,
         };
+        console.log(`[UserService.MergeDatiUtente] RUOLO da Firestore: ${firestoreUser.ruolo}, RUOLO in userFromAuth: ${userFromAuth.ruolo}, RUOLO finale in mergedUser: ${mergedUser.ruolo}`);
+        console.log(`[UserService.MergeDatiUtente] Utente finale unito (mergedUser) per UID ${uid}:`, JSON.parse(JSON.stringify(mergedUser)));
         return mergedUser;
       }),
       catchError(error => {
-        console.error('[UserService.MergeDatiUtente] Errore durante il recupero o merge:', error);
-        // In caso di errore, restituisci l'utente Auth come fallback per non interrompere il flusso
+        console.error(`[UserService.MergeDatiUtente] Errore CRITICO durante il recupero o merge per UID ${uid}:`, error);
         const fallbackUser: User = {
-            email: authUser.email,
-            token: authUser.token,
-            localId: authUser.localId,
-            expirationDate: authUser.expirationDate,
-            displayName: authUser.displayName || 'Utente (errore db)',
-            photoURL: authUser.photoURL || 'assets/images/default-avatar.png',
-            emailVerified: authUser.emailVerified || false,
-            ruolo: authUser.ruolo || 'cliente',
-            cellulare: authUser.cellulare || undefined,
+            ...userFromAuth,
+            displayName: userFromAuth.displayName || 'Utente (errore db)',
+            photoURL: userFromAuth.photoURL || 'assets/images/default-avatar.png',
+            emailVerified: userFromAuth.emailVerified || false,
+            ruolo: 'cliente', // Fallback ruolo in caso di errore grave
         };
-        return of(fallbackUser); // 'of' crea un Observable che emette il valore e completa
+        console.warn(`[UserService.MergeDatiUtente] Restituzione utente di fallback a causa di errore:`, JSON.parse(JSON.stringify(fallbackUser)));
+        return of(fallbackUser);
       })
     );
   }
 
-  // Modificato per restituire Observable<User | null>
-  Searchuser(uid: string): Observable<User | null> {
-    return this.getFFUser(uid).pipe(
-      map(usersArray => (usersArray.length > 0 ? usersArray[0] : null))
-    );
-  }
+Searchuser(uid: string): Observable<User | null> {
+  return this.getFFUser(uid).pipe(
+    map(firestoreUser => firestoreUser) // Corretto: restituisce direttamente l'utente o null
+  );
+}
 
   updateUserInfo(localId: string, value: Partial<User>): Observable<void> {
     // Filtra i campi undefined prima dell'aggiornamento
     const updateData = Object.entries(value).reduce((acc, [key, val]) => {
-        if (val !== undefined) {
-            acc[key] = val;
-        }
-        return acc;
+      if (val !== undefined) {
+        acc[key] = val;
+      }
+      return acc;
     }, {});
     if (Object.keys(updateData).length === 0) {
-        return of(undefined); // Nessun dato da aggiornare
+      return of(undefined); // Nessun dato da aggiornare
     }
     return from(this.afs.doc<User>(`users/${localId}`).update(updateData));
   }
