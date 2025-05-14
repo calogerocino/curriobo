@@ -1,0 +1,63 @@
+<p>customer-login works!</p>
+<div class="main-wrapper">
+<div class="page-wrapper full-page">
+<div class="page-content d-flex align-items-center justify-content-center">
+<div class="row w-100 mx-0 auth-page">
+<div class="col-md-8 col-xl-6 mx-auto">
+<div class="card">
+<div class="row">
+<div class="col-md-4 pr-md-0 d-none d-md-block">
+<div class="auth-left-wrapper" style="background-image: url('assets/images/auth-bg.jpg');">
+</div>
+</div>
+<div class="col-md-8 pl-md-0">
+<div class="auth-form-wrapper px-4 py-5">
+<a routerLink="/" class="pixel-ui-logo d-block mb-2">Pixel<span>Smart</span></a>
+<h5 class="text-muted font-weight-normal mb-4">Bentornato! Accedi alla tua area personale.</h5> <div *ngIf="showLoading$ | async" class="text-center my-3">
+                    <div class="spinner-border text-primary" role="status">
+                      <span class="sr-only">Caricamento...</span>
+                    </div>
+                  </div>
+
+                  <form [formGroup]="loginForm" (ngSubmit)="onLoginSubmit()">
+                    <div class="form-group mb-3">
+                      <label for="email" class="form-label">Email</label>
+                      <input type="email" id="email" class="form-control" formControlName="email" placeholder="latuaemail@esempio.com">
+                      <div *ngIf="loginForm.get('email')?.invalid && (loginForm.get('email')?.dirty || loginForm.get('email')?.touched)" class="text-danger small mt-1">
+                        <div *ngIf="loginForm.get('email')?.errors?.['required']">L'email è obbligatoria.</div>
+                        <div *ngIf="loginForm.get('email')?.errors?.['email']">Inserisci un'email valida.</div>
+                      </div>
+                    </div>
+
+                    <div class="form-group mb-3">
+                      <label for="password" class="form-label">Password</label>
+                      <input type="password" id="password" class="form-control" formControlName="password" placeholder="La tua password">
+                       <div *ngIf="loginForm.get('password')?.invalid && (loginForm.get('password')?.dirty || loginForm.get('password')?.touched)" class="text-danger small mt-1">
+                        <div *ngIf="loginForm.get('password')?.errors?.['required']">La password è obbligatoria.</div>
+                      </div>
+                    </div>
+
+                    <p class="text-danger mt-1" *ngIf="errorMessage$ | async as errorMsg">
+                      <i class="feather icon-alert-circle"></i> {{errorMsg}}
+                    </p>
+
+                    <div class="mt-4">
+                      <button type="submit" class="btn btn-primary w-100" [disabled]="loginForm.invalid || (showLoading$ | async)">
+                        <span *ngIf="!(showLoading$ | async)">Accedi</span>
+                        <span *ngIf="showLoading$ | async">Accesso in corso...</span>
+                      </button>
+                    </div>
+                    <div class="mt-3 text-center">
+                        <a routerLink="/auth/resetpassword" class="text-muted small d-block mb-1">Password dimenticata?</a>
+                        <span class="text-muted small">Non hai un account? </span><a routerLink="/auth/completa-registrazione" class="text-muted small">Completa la registrazione.</a>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

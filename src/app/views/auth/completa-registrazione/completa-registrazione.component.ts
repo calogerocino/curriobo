@@ -76,7 +76,7 @@ export class CompletaRegistrazioneComponent implements OnInit, OnDestroy {
 
     this.curriosSub = this.currioService.getCurrios().subscribe({
       next: (currios) => {
-        const currio = currios.find(c => c.tokenRegistrazione === token && c.status === 'invito_inviato');
+        const currio = currios.find(c => c.tokenRegistrazione === token && c.status === 'invito_spedito');
         if (currio && currio.datiCliente?.email) {
           if (currio.tokenRegistrazioneScadenza && Date.now() > currio.tokenRegistrazioneScadenza) {
             this.errorMessage = 'Il link di registrazione è scaduto. Contatta l\'amministratore.';

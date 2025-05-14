@@ -1,5 +1,6 @@
+// src/app/views/auth/state/auth.effects.ts
 import { AuthService } from 'src/app/shared/servizi/auth.service';
-import { catchError, map, switchMap, tap } from 'rxjs/operators';
+import { catchError, map, switchMap, tap, exhaustMap } from 'rxjs/operators'; // Aggiunto exhaustMap se non presente
 import {
   autoLogin,
   autologout,
@@ -35,25 +36,29 @@ export class AuthEffects {
     private readonly userService: UserService
   ) {}
 
-  login$ = createEffect(() =>
+   login$ = createEffect(() =>
     this.actions$.pipe(
       ofType(loginStart),
-      switchMap((action) => {
+      // Usiamo exhaustMap per ignorare nuovi loginStart finché il precedente non è completato
+      exhaustMap((action) => { // action qui contiene isCustomerLogin
         return this.authService.SignIn(action.email, action.password).pipe(
           map((data) => {
             this.store.dispatch(setLoadingSpinner({ status: false }));
             this.store.dispatch(setErrorMessage({ message: null }));
             const user = this.authService.formatUser(data);
+            this.authService.setUserInLocalStorage(user); // Salva subito i dati base
+            // Dispatch updateLogin per arricchire i dati utente dallo store/firestore se necessario
+            // e per sincronizzare lo stato di NGRX con localStorage
             this.store.dispatch(updateLogin());
-            this.authService.setUserInLocalStorage(user);
-            return loginSuccess({ user, redirect: true });
+            // Passa isCustomerLogin a loginSuccess
+            return loginSuccess({ user, redirect: true, isCustomerLogin: action.isCustomerLogin });
           }),
           catchError((errResp) => {
             this.store.dispatch(setLoadingSpinner({ status: false }));
-            const ErrorMessage = this.authService.getErrorMessage(
-              errResp.error.error.message
+            const errorMessage = this.authService.getErrorMessage(
+              errResp?.error?.error?.message || 'ERRORE_LOGIN_SCONOSCIUTO'
             );
-            return of(setErrorMessage({ message: ErrorMessage }));
+            return of(setErrorMessage({ message: errorMessage }));
           })
         );
       })
@@ -64,51 +69,86 @@ export class AuthEffects {
     () => {
       return this.actions$.pipe(
         ofType(loginSuccess),
-        tap((action) => {
-          // if (action.redirect) {
-          this.store.dispatch(updateLogin());
-          this.router.navigate(['admin']);
-          //  }
+        tap((action) => { // action qui contiene isCustomerLogin
+          if (action.redirect) { // Controlla se il reindirizzamento è richiesto
+            if (action.isCustomerLogin) {
+              this.router.navigate(['/cliente/account']); // Reindirizzamento Cliente
+            } else {
+              this.router.navigate(['/admin']); // Reindirizzamento Admin (o dashboard admin)
+            }
+          }
         })
       );
     },
     { dispatch: false }
   );
 
-  autoLogin$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(autoLogin),
-      map(() => {
-        const user = this.authService.getUserFromLocalStorage();
-        return loginSuccess({ user, redirect: false });
-      })
-    )
-  );
+  autoLogin$ = createEffect(() => // Assicurati che autoLogin gestisca correttamente i dati utente da localStorage
+        this.actions$.pipe(
+        ofType(autoLogin),
+        map(() => {
+            const user = this.authService.getUserFromLocalStorage();
+            if (user) {
+            // È importante rieseguire il timeout per il logout automatico
+            this.authService.runTimeoutInterval(user);
+            // Puoi decidere se chiamare updateLogin anche qui per aggiornare i dati da Firestore
+            // o se i dati in localStorage sono sufficienti per l'autologin.
+            // Se chiami updateLogin, assicurati che non crei loop o condizioni di gara.
+            // this.store.dispatch(updateLogin());
+            // Per ora, ci fidiamo dei dati in localStorage per l'autologin.
+            // Il flag isCustomerLogin non è presente in localStorage, quindi il redirect
+            // dell'autologin potrebbe dover essere gestito diversamente o basarsi sul ruolo.
+            // Per semplicità, l'autologin potrebbe reindirizzare a una dashboard generica
+            // o alla pagina `/admin` e poi la logica interna decide se rimanere o spostare.
+            // Oppure, lo stato 'user' nello store NGRX (popolato da Firestore) potrebbe avere un campo 'ruolo'.
+            return loginSuccess({ user, redirect: false }); // redirect: false per autologin
+            }
+            return { type: '[Auth] AutoLogin No User Found' }; // o un'azione dummy
+        })
+        )
+    );
 
-  updateLogin$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(updateLogin),
-      concatLatestFrom(() => [
-        this.store.select(getUserlocalId),
-        this.store.select(getUser),
-      ]),
-      switchMap(([action, uid, user]) =>
-        this.userService.MergeDatiUtente(uid, user)
-      ),
-      map((user) => {
-        this.authService.setUserInLocalStorage(user);
-        return updateLoginSuccess({ user, redirect: false });
-      })
-    )
-  );
+    updateLogin$ = createEffect(() => // Questo effect è cruciale
+        this.actions$.pipe(
+        ofType(updateLogin),
+        concatLatestFrom(() => [
+            this.store.select(getUserlocalId), // Prende il localId dallo stato corrente (appena loggato o da localStorage)
+            this.store.select(getUser),       // Prende l'utente (con token, email, ecc.) dallo stato corrente
+        ]),
+        switchMap(([_, uid, userState]) => { // _ è l'azione updateLogin, uid è localId, userState è l'utente NGRX
+            if (!uid || !userState) {
+            // Se uid o userState non sono validi, non possiamo procedere.
+            // Questo potrebbe accadere se updateLogin viene chiamato prima che il login iniziale
+            // o l'autologin abbiano popolato lo stato.
+            return of(setErrorMessage({ message: 'Dati utente non pronti per l\'aggiornamento.' }));
+            }
+            // MergeDatiUtente dovrebbe prendere l'UID e l'IDToken (da userState.token)
+            // per recuperare i dati completi da Firestore e fonderli.
+            return this.userService.MergeDatiUtente(uid, userState).pipe(
+            map((mergedUser) => {
+                this.authService.setUserInLocalStorage(mergedUser); // Aggiorna localStorage con i dati completi
+                return updateLoginSuccess({ user: mergedUser, redirect: false }); // Aggiorna lo store NGRX
+            }),
+            catchError(err => {
+                console.error("Errore in updateLogin$ durante MergeDatiUtente:", err);
+                return of(setErrorMessage({ message: 'Errore nell\'aggiornamento dei dati utente.' }));
+            })
+            );
+        })
+        )
+    );
 
   logout$ = createEffect(
     () => {
       return this.actions$.pipe(
         ofType(autologout),
         tap(() => {
-          this.authService.logoutS();
-          this.router.navigate(['auth/login']);
+          this.authService.logoutS(); // Chiama il metodo di logout dal servizio
+          this.router.navigate(['/auth/login-cliente']); // O una pagina di logout/landing page
+          localStorage.removeItem('userData'); // Assicurati che venga rimosso
+          if (this.authService.timeoutInterval) {
+            clearTimeout(this.authService.timeoutInterval);
+          }
         })
       );
     },

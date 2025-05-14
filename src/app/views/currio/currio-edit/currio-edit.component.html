@@ -11,7 +11,7 @@
 
 <div class="row mt-4">
   <div class="col-md-5">
-    <h4>Anteprima Curriò (Layout Ispirato a home.html)</h4>
+    <h4>Anteprima Curriò</h4>
     <div class="card">
       <div class="card-body">
         <ng-container *ngIf="currioForm.value as formData">
@@ -58,7 +58,7 @@
       <div class="card-header bg-light fw-bold">
         Gestione Account Cliente
         <span *ngIf="currio.status === 'nuova_richiesta'" class="badge bg-warning text-dark ms-2">Nuova Richiesta</span>
-        <span *ngIf="currio.status === 'invito_inviato'" class="badge bg-info text-white ms-2">Invito Inviato</span>
+        <span *ngIf="currio.status === 'invito_spedito'" class="badge bg-info text-white ms-2">Invito Spedito</span>
         <span *ngIf="currio.status === 'attivo'" class="badge bg-success text-white ms-2">Account Attivo</span>
       </div>
       <div class="card-body">
@@ -70,7 +70,7 @@
           </button>
         </div>
 
-        <div *ngIf="linkRegistrazione && currio.status === 'invito_inviato'" class="mt-3 alert alert-info">
+        <div *ngIf="linkRegistrazione && currio.status === 'invito_spedito'" class="mt-3 alert alert-info">
           <p class="mb-1"><strong>Istruzioni per l'admin:</strong></p>
           <p class="small">Per favore, invia manualmente il seguente link di registrazione al cliente ({{currio.datiCliente.email}}). Il link scadrà tra 24 ore.</p>
           <div class="input-group input-group-sm mb-2">

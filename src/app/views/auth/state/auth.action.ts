@@ -15,12 +15,12 @@ export const CHANGE_INFO_SUCCESST = '[Auth] Change info success';
 
 export const loginStart = createAction(
   LOGIN_START,
-  props<{ email: string; password: string }>()
+  props<{ email: string; password: string; isCustomerLogin?: boolean }>() // Aggiunto isCustomerLogin opzionale
 );
 
 export const loginSuccess = createAction(
   LOGIN_SUCCESS,
-  props<{ user: User; redirect: boolean }>()
+  props<{ user: User; redirect: boolean; isCustomerLogin?: boolean }>() // Aggiunto isCustomerLogin opzionale
 );
 
 export const loginFail = createAction(LOGIN_FAIL);

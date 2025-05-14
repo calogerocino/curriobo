@@ -25,11 +25,15 @@
 }
 
 .header {
-  padding: 20px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 40px;
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
+  box-sizing: border-box;
   z-index: 10;
 }
 
@@ -37,6 +41,46 @@
   height: 45px;
   width: auto;
   opacity: 0.9;
+}
+
+.main-nav {
+  display: flex;
+  gap: 15px; /* Spazio tra i pulsanti/link */
+}
+
+.nav-link {
+  color: #ffffff;
+  text-decoration: none;
+  padding: 10px 20px;
+  border-radius: 25px; /* Bordi più arrotondati */
+  font-weight: 500;
+  transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+  border: 1px solid transparent; /* Bordo base trasparente */
+}
+
+.nav-link:hover {
+  transform: translateY(-2px); /* Leggero effetto al passaggio del mouse */
+}
+
+.admin-login-btn {
+  border-color: rgba(255, 255, 255, 0.7);
+}
+.admin-login-btn:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+  border-color: #ffffff;
+}
+
+.customer-login-btn {
+  background-color: rgba(255, 255, 255, 0.95);
+  color: #3b82f6; /* Un blu simile a quello primario del tema */
+  font-weight: 600;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.customer-login-btn:hover {
+  background-color: #ffffff;
+  color: #2563eb; /* Blu più scuro al passaggio del mouse */
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
 }
 
 .main-content {

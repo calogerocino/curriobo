@@ -40,6 +40,9 @@ import { CommonModule } from '@angular/common';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { LandingpageComponent } from './views/landingpage/landingpage.component';
+import { CURRIO_STATE_NAME } from './views/currio/state/currio.selector';
+import { currioReducer } from './views/currio/state/currio.reducer';
+import { CurrioEffects } from './views/currio/state/currio.effects';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http);
@@ -65,6 +68,8 @@ export function HttpLoaderFactory(http: HttpClient) {
     NgbModule,
     EffectsModule.forRoot([]),
     StoreModule.forRoot(appReducer),
+    StoreModule.forFeature(CURRIO_STATE_NAME, currioReducer),
+    EffectsModule.forFeature([CurrioEffects]),
     StoreDevtoolsModule.instrument({
       logOnly: false,
       connectInZone: true,

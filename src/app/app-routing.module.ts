@@ -49,9 +49,14 @@ const routes: Routes = [
       },
     ],
   },
-
+{
+  path: 'cliente',
+  loadChildren: () => import('./views/customer/customer.module').then(m => m.CustomerModule),
+  canActivate: [AuthGuard], // AuthGuard protegge l'intera area /cliente
+  data: { title: 'Area Cliente' } // Titolo base per quest'area
+},
   {
-    path: 'currio/preview/:id',
+    path: ':id',
     component: CurrioPreviewComponent,
     data: { title: 'Anteprima Curriò' },
   },
@@ -68,6 +73,7 @@ const routes: Routes = [
     path: 'error/:type',
     component: ErrorPageComponent,
   },
+  { path: 'cliente', loadChildren: () => import('./views/customer/customer.module').then(m => m.CustomerModule) },
   { path: '**', redirectTo: 'error', pathMatch: 'full' },
 ];
 

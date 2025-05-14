@@ -10,12 +10,6 @@ import { ListaCurrioComponent } from './listacurrio/listacurrio.component';
 import { CurrioEditComponent } from './currio-edit/currio-edit.component';
 import { CurrioPreviewComponent } from './currio-preview/currio-preview.component'; // << IMPORTA QUI
 
-import { StoreModule } from '@ngrx/store';
-import { EffectsModule } from '@ngrx/effects';
-import { CurrioEffects } from './state/currio.effects';
-import { CURRIO_STATE_NAME } from './state/currio.selector';
-import { currioReducer } from './state/currio.reducer';
-
 import { TranslateModule } from '@ngx-translate/core';
 
 const routes: Routes = [
@@ -38,11 +32,11 @@ const routes: Routes = [
         component: CurrioEditComponent,
         data: { title: 'Gestisci Curriò' },
       },
-      {
-        path: 'preview/:id', // -> admin/currio/preview/:id  << NUOVA ROTTA SPOSTATA QUI
-        component: CurrioPreviewComponent,
-        data: { title: 'Anteprima Curriò' }
-      }
+      // {
+      //   path: 'preview/:id', // -> admin/currio/preview/:id  << NUOVA ROTTA SPOSTATA QUI
+      //   component: CurrioPreviewComponent,
+      //   data: { title: 'Anteprima Curriò' }
+      // }
     ],
   },
 ];
@@ -61,8 +55,6 @@ const routes: Routes = [
     FormsModule,
     ReactiveFormsModule,
     TranslateModule,
-    StoreModule.forFeature(CURRIO_STATE_NAME, currioReducer),
-    EffectsModule.forFeature([CurrioEffects]),
   ],
   providers: [
     // ... eventuali provider

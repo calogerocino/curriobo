@@ -1,0 +1,11 @@
+<div style="padding: 20px; text-align: center; min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; background-color: #f0f2f5;">
+  <div *ngIf="currentUserEmail$ | async as email; else loadingOrError">
+    <h1>Ciao {{ email }}</h1>
+    <p>Benvenuto nella tua area personale!</p>
+    <button (click)="logout()" class="btn btn-danger mt-3">Esci</button>
+  </div>
+  <ng-template #loadingOrError>
+    <div *ngIf="!(currentUserEmail$ | async)"> <p>Caricamento dati utente o utente non loggato...</p>
+    </div>
+  </ng-template>
+</div>
