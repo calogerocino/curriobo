@@ -23,14 +23,28 @@ const _currioReducer = createReducer(
     currios: currios,
     loading: false,
   })),
-  on(CurrioActions.loadCurrioByIdSuccess, (state, { currio }) => ({
-    ...state,
-    selectedCurrio: currio,
-    currios: state.currios.find((c) => c.id === currio.id)
-      ? state.currios.map((c) => (c.id === currio.id ? currio : c))
-      : [...state.currios, currio],
-    loading: false,
-  })),
+  on(CurrioActions.loadCurrioByIdSuccess, (state, { currio }) => {
+    // Verifica se il payload 'currio' o 'currio.id' è undefined
+    if (!currio || typeof currio.id === 'undefined') {
+      console.error("Reducer: loadCurrioByIdSuccess ha ricevuto un currio undefined o un currio senza id:", currio);
+      return {
+        ...state,
+        selectedCurrio: null, // Imposta selectedCurrio a null o gestisci come preferisci
+        loading: false,       // Assicurati che il caricamento sia impostato su false
+        error: state.error || "Errore nell'elaborazione dei dati del Curriò dopo il recupero.", // Imposta un messaggio di errore
+      };
+    }
+    // Procedi normalmente se 'currio' e 'currio.id' sono validi
+    return {
+      ...state,
+      selectedCurrio: currio,
+      currios: state.currios.find((c) => c.id === currio.id)
+        ? state.currios.map((c) => (c.id === currio.id ? currio : c))
+        : [...state.currios, currio],
+      loading: false,
+      error: null, // Pulisci eventuali errori precedenti in caso di successo
+    };
+  }),
   on(CurrioActions.createCurrioSuccess, (state, { currio }) => ({
     ...state,
     currios: [...state.currios, currio],
@@ -75,6 +89,5 @@ const _currioReducer = createReducer(
 );
 
 export function currioReducer(state: CurrioState | undefined, action: any) {
-  // Rinomina
   return _currioReducer(state, action);
 }

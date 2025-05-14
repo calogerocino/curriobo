@@ -56,13 +56,17 @@ export class CurrioService {
       );
   }
 
-  getCurrioById(id: string): Observable<Currio> {
+    getCurrioById(id: string): Observable<Currio | undefined> { // Modifica il tipo restituito
     return this.http
-      .get<Omit<Currio, 'id'>>(`${environment.firebase.databaseURL}/${this.currioDbPath}/${id}.json`)
+      .get<Omit<Currio, 'id'> | null>(`${environment.firebase.databaseURL}/${this.currioDbPath}/${id}.json`)
       .pipe(
         map(data => {
-            // Assicurati che tutti i campi opzionali siano gestiti se non presenti nel DB
-            const currioFromDb = data as any;
+            if (data === null) { // Gestisci esplicitamente il caso null da Firebase
+              console.warn(`[CurrioService] Nessun dato trovato per l'ID Curriò: ${id}. Restituisco undefined.`);
+              return undefined; // Restituisci undefined se nessun dato viene trovato
+            }
+            // Se data non è null, procedi a mappare i dati come prima
+            const currioFromDb = data as any; // Cast ad any per flessibilità con i dati parziali
             return {
                 id: id,
                 nomePortfolio: currioFromDb.nomePortfolio || '',

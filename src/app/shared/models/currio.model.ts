@@ -63,7 +63,7 @@ export interface Currio {
 
   // --- NUOVI CAMPI PER IL FLUSSO DI REGISTRAZIONE ---
   userId?: string; // UID dell'utente Firebase Auth dopo che si è registrato
-  status?: 'nuova_richiesta' | 'invito_inviato' | 'attivo' | 'archiviato'; // Stato del currio/richiesta
+  status?: 'nuova_richiesta' | 'invito_spedito' | 'attivo' | 'archiviato'; // Stato del currio/richiesta
   datiCliente?: DatiClienteCurrio; // Dati iniziali forniti dal cliente per la registrazione
   tokenRegistrazione?: string; // Token univoco per il link di registrazione
   tokenRegistrazioneScadenza?: number; // Timestamp (millisecondi Epoch) per la scadenza del token

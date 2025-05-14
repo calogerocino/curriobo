@@ -86,7 +86,7 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
             this.initializeForm();
             // Se l'invito era già stato inviato, ricostruisci il link per visualizzarlo
             if (
-              this.currio.status === 'invito_inviato' &&
+              this.currio.status === 'invito_spedito' &&
               this.currio.tokenRegistrazione
             ) {
               const baseUrl = window.location.origin;
@@ -171,7 +171,7 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
       ...this.currio,
       tokenRegistrazione: token,
       tokenRegistrazioneScadenza: scadenzaTimestamp,
-      status: 'invito_inviato',
+      status: 'invito_spedito',
     };
 
     this.store.dispatch(updateCurrio({ currio: currioAggiornato }));
@@ -243,7 +243,7 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
     }
 
     // Non reindirizzare immediatamente se è stata appena generata un'email di invito
-    if (!this.linkRegistrazione || this.currio?.status !== 'invito_inviato') {
+    if (!this.linkRegistrazione || this.currio?.status !== 'invito_spedito') {
       this.router.navigate(['/admin/currio/listacurrio']);
     } else {
       // Se il link è stato appena generato, l'admin potrebbe volerlo copiare prima di navigare via
@@ -262,7 +262,8 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
   openPreviewInNewTab(): void {
     if (this.currio && this.currio.id) {
       const url = this.router.serializeUrl(
-        this.router.createUrlTree(['/admin/currio/preview', this.currio.id]) // URL corretto
+        // this.router.createUrlTree(['/admin/currio/preview', this.currio.id]) // URL corretto
+        this.router.createUrlTree([this.currio.id])
       );
       window.open(url, '_blank');
     } else {

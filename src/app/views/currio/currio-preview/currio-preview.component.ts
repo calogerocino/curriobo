@@ -91,7 +91,6 @@ export class CurrioPreviewComponent implements OnInit, OnDestroy {
     if (this.errorSub) this.errorSub.unsubscribe();
   }
 
-  // Funzione per l'espansione/collasso della timeline (se la usi come in home.html)
   toggleTimelineDetails(event: MouseEvent): void {
     const trigger = event.currentTarget as HTMLElement;
     const content = trigger.nextElementSibling as HTMLElement; // .expandable-details
