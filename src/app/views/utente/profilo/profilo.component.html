@@ -3,8 +3,10 @@
     <div class="card mb-4">
       <div class="card-body text-center">
         <img [src]="ffuser?.photoURL" alt="avatar" class="rounded-circle img-fluid" style="width: 150px;">
-        <h5 class="my-3">{{ffuser.displayName?ffuser.displayName:'profiloUtente.nome-set' | translate}}</h5>
-        <p class="text-muted mb-1">{{ffuser.ruolo?ffuser.ruolo:'profiloUtente.ruolo-set' | translate}}</p>
+        <h5 class="my-3">{{ffuser?.displayName ? (ffuser.displayName | translate) : ('profiloUtente.nome-set' |
+          translate)}}</h5>
+        <p class="text-muted mb-1">{{ffuser?.ruolo ? (ffuser.ruolo | translate) : ('profiloUtente.ruolo-set' |
+          translate)}}</p>
         <div class="d-flex justify-content-center mb-2">
           <button type="button" class="btn btn-outline-primary ms-1">{{'profiloUtente.inviamessaggio' |
             translate}}</button>
@@ -13,92 +15,115 @@
     </div>
   </div>
   <div class="col-lg-8">
+    <div *ngIf="showUnsavedChangesWarning" class="alert alert-warning d-flex align-items-center" role="alert">
+      <i class="feather icon-alert-triangle me-2"></i>
+      <div>
+        {{ 'profiloUtente.avvisoModificheNonSalvate' | translate }}
+      </div>
+    </div>
+
     <div class="card mb-4">
       <div class="card-body">
         <form [formGroup]="userForm" (ngSubmit)="onSubmit($event)" autocomplete="off">
           <div class="row">
             <div class="col-6">
               <div class="mb-3">
-                <label>
+                <label class="form-label">
                   <p class="mb-0">{{'profiloUtente.nome' | translate}}</p>
                 </label>
-                <input type="text" class="form-control form-group" formControlName="displayName" autocomplete="off"
+                <input type="text" class="form-control" formControlName="displayName" autocomplete="off"
                   placeholder="{{'profiloUtente.nome-set' | translate}}">
-                <div *ngIf="userForm.get('displayName').touched && !userForm.get('displayName').valid">
-                  <p class="text-danger mt-1" *ngIf="userForm.get('displayName').errors['required']">
+                <div *ngIf="userForm.get('displayName')?.touched && userForm.get('displayName')?.invalid">
+                  <p class="text-danger mt-1" *ngIf="userForm.get('displayName')?.errors?.['required']">
                     <i class="feather icon-alert-circle"></i> {{'generale.errori.camporichiesto' | translate}}
                   </p>
-                  <p class="text-danger mt-1" *ngIf="userForm.get('displayName').errors['minlength']">
-                    <i class="feather icon-alert-circle"></i> {{'generale.errori.caratteriminimi' | translate}} 8
+                  <p class="text-danger mt-1" *ngIf="userForm.get('displayName')?.errors?.['minlength']">
+                    <i class="feather icon-alert-circle"></i> {{'generale.errori.caratteriminimi' | translate}} 6
                   </p>
                 </div>
               </div>
               <div class="mb-3">
-                <label>{{'profiloUtente.email' | translate}}</label>
-                <input type="text" class="form-control form-group" formControlName="email" autocomplete="off"
+                <label class="form-label">{{'profiloUtente.email' | translate}}</label>
+                <input type="text" class="form-control" formControlName="email" autocomplete="off"
                   placeholder="{{'profiloUtente.email-set' | translate}}" />
-                <div *ngIf="userForm.get('email').touched && !userForm.get('email').valid">
-                  <p class="text-danger mt-1" *ngIf="userForm.get('email').errors['required']">
-                    <i class="feather icon-alert-circle"></i> {{'generale.errori.camporichiesto' | translate}}
-                  </p>
-                  <p class="text-danger mt-1" *ngIf="userForm.get('email').errors['email']">
-                    <i class="link-icon feather icon-alert-circle"></i> {{'generale.errori.mailvalida' | translate}}
+              </div>
+              <div class="mb-3">
+                <label class="form-label">{{'profiloUtente.cellulare' | translate}}</label>
+                <input type="number" class="form-control" formControlName="cellulare" autocomplete="off"
+                  placeholder="{{'profiloUtente.cellulare-set' | translate}}">
+                <div *ngIf="userForm.get('cellulare')?.touched && userForm.get('cellulare')?.invalid">
+                  <p class="text-danger mt-1" *ngIf="userForm.get('cellulare')?.errors?.['minlength']">
+                    <i class="feather icon-alert-circle"></i> {{'generale.errori.caratteriminimi' | translate}} 10
                   </p>
                 </div>
               </div>
               <div class="mb-3">
-                <label>{{'profiloUtente.cellulare' | translate}}</label>
-                <input type="number" class="form-control" formControlName="cellulare" autocomplete="off"
-                  placeholder="{{'generale.errori.nonsupportato' | translate}}">
-              </div>
-              <div class="mb-3">
-                <label>{{'profiloUtente.indirizzo' | translate}}</label>
+                <label class="form-label">{{'profiloUtente.indirizzo' | translate}}</label>
                 <input type="text" class="form-control" formControlName="indirizzo" autocomplete="off"
-                  placeholder="{{'generale.errori.nonsupportato' | translate}}">
+                  placeholder="{{'profiloUtente.indirizzo-set' | translate}}">
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label d-block mb-1">{{'profiloUtente.ruolo' | translate}}</label>
+                <div class="form-switch">
+                  <input class="form-check-input" type="checkbox" role="switch" id="roleSwitch"
+                    formControlName="isAdminRole">
+                  <label class="form-check-label" for="roleSwitch">
+                    {{ userForm.get('isAdminRole')?.value ? 'Admin' : 'Cliente' }}
+                  </label>
+                </div>
+                <small class="form-text text-muted">
+                  Seleziona per rendere l'utente un Amministratore, deseleziona per renderlo un Cliente.
+                </small>
               </div>
               <div class="my-3">
-                <button type="submit" class="btn btn-primary mr-0" name="changeUser">{{'profiloUtente.aggiornaprofilo' |
+                <button type="submit" class="btn btn-primary" name="changeUser">{{'profiloUtente.aggiornaprofilo' |
                   translate}}</button>
               </div>
             </div>
             <div class="col-6">
               <div class="mb-3">
-                <label>
+                <label class="form-label">
                   <p class="mb-0">{{'profiloUtente.password' | translate}}</p>
                 </label>
-                <input type="password" class="form-control form-group" formControlName="passwordnew"
-                  placeholder="{{'profiloUtente.password-set' | translate}}">
-                <input type="password" class="form-control form-group" formControlName="passwordnewre"
-                  placeholder="{{'profiloUtente.password-setre' | translate}}">
-                <div class="alert alert-danger" style="animation: horizontal-shaking 0.35s linear 0.2s;" role="alert"
-                  *ngIf="errorMessage$ | async as error"><i class="feather icon-alert-circle"></i> {{error}}</div>
-                <!--<div *ngIf="userForm.get('passwordnew').touched && !userForm.get('passwordnew').valid">
-                  <p class="text-danger mt-1" *ngIf="userForm.get('passwordnew').errors['required']">
-                    <i class="feather icon-alert-circle"></i> {{'generale.errori.camporichiesto' | translate}}
-                  </p>
-                  <p class="text-danger mt-1" *ngIf="userForm.get('passwordnew').errors['pattern']">
+                <input type="password" class="form-control mb-2" formControlName="passwordnew"
+                  autocomplete="new-password" placeholder="{{'profiloUtente.password-set' | translate}}">
+                <div *ngIf="userForm.get('passwordnew')?.touched && userForm.get('passwordnew')?.invalid">
+                  <p class="text-danger mt-1" *ngIf="userForm.get('passwordnew')?.errors?.['pattern']">
                     <i class="feather icon-alert-circle"></i> {{'generale.errori.passpatt' | translate}}
                   </p>
-                  <p class="text-danger mt-1" *ngIf="userForm.get('passwordnew').errors['minlength']">
+                  <p class="text-danger mt-1" *ngIf="userForm.get('passwordnew')?.errors?.['minlength']">
                     <i class="feather icon-alert-circle"></i> {{'generale.errori.pass8car' | translate}}
                   </p>
-                </div> -->
+                </div>
+                <input type="password" class="form-control" formControlName="passwordnewre" autocomplete="new-password"
+                  placeholder="{{'profiloUtente.password-setre' | translate}}">
+                <div
+                  *ngIf="userForm.get('passwordnewre')?.touched && userForm.get('passwordnewre')?.errors?.['mismatch']">
+                  <p class="text-danger mt-1">
+                    <i class="feather icon-alert-circle"></i> Le password non coincidono.
+                  </p>
+                </div>
+                <div class="alert alert-danger mt-2" style="animation: horizontal-shaking 0.35s linear 0.2s;"
+                  role="alert" *ngIf="errorMessage$ | async as error"><i class="feather icon-alert-circle"></i>
+                  {{error}}</div>
               </div>
               <div class="my-3">
-                <button type="submit" class="btn btn-primary mr-0"
-                  name="changePassword">{{'profiloUtente.aggiornapassword' |
+                <button type="submit" class="btn btn-primary" name="changePassword">{{'profiloUtente.aggiornapassword' |
                   translate}}</button>
               </div>
 
               <div class="mb-3">
-                <label>
+                <label class="form-label">
                   <p class="mb-0">{{'tabella.head.mailverificata' | translate}}</p>
                 </label>
-                <label class="form-control">
-                  <input type="checkbox" name="checkbox" formControlName="emailverified" />
-                  {{(emailVerifiedForm ?'tabella.head.mailverificata' : 'profiloUtente.mailnonverificata')
-                  | translate}}
-                </label>
+                <div class="form-check form-switch mt-1"> <input type="checkbox" class="form-check-input"
+                    formControlName="emailverified" id="emailVerifiedCheck" />
+                  <label class="form-check-label" for="emailVerifiedCheck">
+                    {{ (userForm.get('emailverified')?.value ? 'tabella.head.mailverificata' :
+                    'profiloUtente.mailnonverificata') | translate }}
+                  </label>
+                </div>
               </div>
             </div>
           </div>

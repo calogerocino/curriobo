@@ -57,11 +57,18 @@
 	"profiloUtente.profilo": "Profile",
 	"profiloUtente.ruolo": "Role",
 	"profiloUtente.ruolo-set": "Role to set",
+"profiloUtente.avvisoModificheNonSalvate": "Remember to save the information before closing the page.",
 	"tabella.head.Azioni": "Actions",
 	"tabella.head.idlocale": "User ID",
 	"tabella.head.immagine": "Image",
 	"tabella.head.mailverificata": "Email Verified",
 	"tabella.head.nome": "First Name",
   	"tabella.head.stato": "State",
-	"tabella.head.descrizione": "Description"
+	"tabella.head.descrizione": "Description",
+  "tabella.head.stato": "Status",
+  "status.nuova_richiesta": "New Request",
+  "status.invito_spedito": "Invitation Sent",
+  "status.attivo": "Active",
+  "status.archiviato": "Archived",
+  "status.sconosciuto": "Unknown"
 }

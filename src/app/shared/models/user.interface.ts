@@ -5,7 +5,7 @@ export interface User {
   expirationDate?: Date;
   displayName?: string;
   photoURL?: string;
-  ruolo?: string;
+  ruolo?: 'admin' | 'cliente';
   emailVerified?: boolean;
   cellulare?: string;
 }

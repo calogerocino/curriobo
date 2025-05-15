@@ -57,6 +57,7 @@
 	"profiloUtente.profilo": "Profil",
 	"profiloUtente.ruolo": "Rôle",
 	"profiloUtente.ruolo-set": "Rôle à définir",
+  "profiloUtente.avvisoModificheNonSalvate": "N'oubliez pas d'enregistrer les informations avant de fermer la page.",
 	"tabella.head.Azioni": "Actes",
 	"tabella.head.idlocale": "Identifiant utilisateur",
 	"tabella.head.immagine": "Image",

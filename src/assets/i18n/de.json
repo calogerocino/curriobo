@@ -57,6 +57,7 @@
 	"profiloUtente.profilo": "Profil",
 	"profiloUtente.ruolo": "Rolle",
 	"profiloUtente.ruolo-set": "Zu setzende Rolle",
+  "profiloUtente.avvisoModificheNonSalvate": "Denken Sie daran, die Informationen zu speichern, bevor Sie die Seite schließen.",
 	"tabella.head.Azioni": "Aktionen",
 	"tabella.head.idlocale": "Benutzer-ID",
 	"tabella.head.immagine": "Bild",

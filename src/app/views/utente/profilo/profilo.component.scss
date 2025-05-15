@@ -1,0 +1,89 @@
+$switch-width: 50px;
+$switch-height: 26px;
+$switch-padding: 2px;
+$switch-border-radius: $switch-height;
+$switch-circle-size: $switch-height - ($switch-padding * 2);
+
+$custom-switch-bg-off: #ced4da;
+$custom-switch-bg-on: #0d6efd;
+$custom-switch-circle-color: #ffffff;
+$custom-switch-focus-shadow: rgba($custom-switch-bg-on, 0.25);
+$custom-switch-transition-duration: 0.2s;
+
+.form-switch {
+  display: flex;
+  align-items: center;
+  padding-left: 0;
+
+  .form-check-input {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-color: $custom-switch-bg-off;
+    background-image: none;
+    border: none;
+    border-radius: $switch-border-radius;
+    width: $switch-width;
+    height: $switch-height;
+    position: relative;
+    cursor: pointer;
+    transition: background-color $custom-switch-transition-duration ease-in-out;
+    vertical-align: top; // Allineamento con la label
+    margin-right: 0.75rem;
+    flex-shrink: 0;
+
+    &:focus, &:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 0.2rem $custom-switch-focus-shadow;
+      background-image: none;
+    }
+
+    &::before {
+      content: "";
+      position: absolute;
+      width: $switch-circle-size;
+      height: $switch-circle-size;
+      border-radius: 50%;
+      background-color: $custom-switch-circle-color;
+      top: $switch-padding;
+      left: $switch-padding;
+      transition: transform $custom-switch-transition-duration ease-in-out, background-color $custom-switch-transition-duration ease-in-out;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+      pointer-events: none;
+    }
+
+    &:checked {
+      background-color: $custom-switch-bg-on;
+      border-color: $custom-switch-bg-on;
+      background-image: none;
+
+      &::before {
+        transform: translateX($switch-width - $switch-circle-size - ($switch-padding * 2));
+      }
+    }
+
+    &:disabled {
+      background-color: #e9ecef;
+      cursor: not-allowed;
+      opacity: 0.7;
+
+      &::before {
+        background-color: #adb5bd;
+      }
+
+      ~ .form-check-label {
+        opacity: 0.7;
+        cursor: not-allowed;
+      }
+    }
+  }
+  .form-check-label {
+    cursor: pointer;
+    margin-left: 0;
+    line-height: $switch-height;
+    user-select: none;
+  }
+}
+.form-switch + .form-text {
+  margin-top: 0.25rem;
+}

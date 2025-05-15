@@ -57,6 +57,7 @@
 	"profiloUtente.profilo": "Profilo",
 	"profiloUtente.ruolo": "Ruolo",
 	"profiloUtente.ruolo-set": "Ruolo da impostare",
+  "profiloUtente.avvisoModificheNonSalvate": "Ricordati di salvare le informazioni prima di chiudere la pagina.",
 	"tabella.head.Azioni": "Azioni",
 	"tabella.head.idlocale": "ID Utente",
 	"tabella.head.immagine": "Immagine",
@@ -64,7 +65,12 @@
 	"tabella.head.nome": "Nome",
   "tabella.head.stato": "Stato",
 "tabella.head.descrizione": "Descrizioni",
-
+"tabella.head.stato": "Stato",
+  "status.nuova_richiesta": "Nuova Richiesta",
+  "status.invito_spedito": "Invito Spedito",
+  "status.attivo": "Attivo",
+  "status.archiviato": "Archiviato",
+  "status.sconosciuto": "Sconosciuto",
 
 	"lp.navbar.home": "Nome"
 }

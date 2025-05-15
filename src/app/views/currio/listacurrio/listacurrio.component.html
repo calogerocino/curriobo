@@ -1,17 +1,31 @@
 <div class="row">
   <div class="col-md-12 mt-5">
-    <h4>{{"generale.layout.menu.richieste.listacurrio" | translate}}</h4>
-    <div class="mb-3 text-right">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h4>{{"generale.layout.menu.richieste.listacurrio" | translate}}</h4>
       <button type="button" class="btn btn-primary" (click)="navigateToCreate()">
         <i class="feather icon-plus"></i> Crea Nuovo Curriò
       </button>
     </div>
-    <table class="table table-striped" *ngIf="currios$ | async as currioData else loadingCurrios">
+
+    <div class="row mb-3">
+      <div class="col-md-4">
+        <label for="statusFilter" class="form-label">Filtra per Stato:</label>
+        <select id="statusFilter" class="form-select" [(ngModel)]="selectedStatusFilter" (ngModelChange)="applyFilter()">
+          <option value="">Tutti gli Stati</option>
+          <option value="nuova_richiesta">{{ 'status.nuova_richiesta' | translate }}</option>
+          <option value="invito_spedito">{{ 'status.invito_spedito' | translate }}</option>
+          <option value="attivo">{{ 'status.attivo' | translate }}</option>
+          <option value="archiviato">{{ 'status.archiviato' | translate }}</option>
+        </select>
+      </div>
+    </div>
+    <table class="table table-striped" *ngIf="(filteredCurrios$ | async) as currioData else loadingCurrios">
       <thead>
         <tr>
           <th>ID</th>
           <th>{{"tabella.head.nome" | translate}} Portfolio</th>
           <th>{{"generale.layout.menu.dashboard" | translate}} Titolo</th>
+          <th>{{"tabella.head.stato" | translate}}</th>
           <th class="text-center">{{"tabella.head.Azioni"|translate}}</th>
         </tr>
       </thead>
@@ -20,9 +34,17 @@
           <td>{{ currio.id }}</td>
           <td>{{ currio.nomePortfolio }}</td>
           <td>{{ currio.heroTitle }}</td>
+          <td>
+            <span class="badge" [ngClass]="getStatusBadgeClass(currio.status)">
+              {{ formatStatus(currio.status) | translate }}
+            </span>
+          </td>
           <td class="text-center">
-            <button type="button" class="btn btn-icon btn-outline-primary btn-sm me-1" (click)="navigateToEdit(currio.id)" title="{{'generale.shared.modifica' | translate}}">
-              <i class="feather icon-eye"></i>
+            <button type="button" class="btn btn-icon btn-outline-primary btn-sm me-1 mr-2" (click)="navigateToEdit(currio.id)" title="{{'generale.shared.modifica' | translate}}">
+              <i class="feather icon-edit-2"></i>
+            </button>
+            <button type="button" class="btn btn-icon btn-outline-info btn-sm me-1 mr-2" (click)="navigateToPreview(currio.id)" title="Anteprima Completa">
+              <i class="feather icon-external-link"></i>
             </button>
             <button type="button" class="btn btn-icon btn-outline-danger btn-sm" (click)="onDeleteCurrio(currio.id)" title="{{'generale.shared.elimina' | translate}}">
               <i class="feather icon-trash"></i>
@@ -30,7 +52,7 @@
           </td>
         </tr>
         <tr *ngIf="currioData.length === 0">
-          <td colspan="4" class="text-center">Nessun Curriò trovato.</td>
+          <td colspan="5" class="text-center">Nessun Curriò trovato con i filtri applicati.</td>
         </tr>
       </tbody>
     </table>

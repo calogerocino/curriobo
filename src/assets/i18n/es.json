@@ -57,6 +57,7 @@
 	"profiloUtente.profilo": "Perfil",
 	"profiloUtente.ruolo": "Papel",
 	"profiloUtente.ruolo-set": "Rol a establecer",
+  "profiloUtente.avvisoModificheNonSalvate": "Recuerde guardar la información antes de cerrar la página.",
 	"tabella.head.Azioni": "Acciones",
 	"tabella.head.idlocale": "ID DE USUARIO",
 	"tabella.head.immagine": "Imagen",
