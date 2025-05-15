@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { AuthService } from '../../../shared/servizi/auth.service';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { AppState } from 'src/app/shared/app.state';
@@ -17,10 +16,7 @@ export class LoginComponent implements OnInit {
   loginForm: FormGroup;
   errorMessage$: Observable<string | null> = this.store.select(getErrorMessage);
 
-  constructor(
-    private readonly authService: AuthService,
-    private readonly store: Store<AppState>
-  ) {}
+  constructor(private readonly store: Store<AppState>) {}
 
   ngOnInit(): void {
     this.loginForm = new FormGroup({
@@ -30,22 +26,21 @@ export class LoginComponent implements OnInit {
     this.store.dispatch(autoLogin());
   }
 
-  googleAuth() {
-    this.authService.GoogleAuth();
-  }
-
   onLoginSubmit() {
     if (!this.loginForm.valid) {
-      // Aggiungi controllo validità se mancante
       this.loginForm.markAllAsTouched();
       return;
     }
     const email = this.loginForm.value.email;
     const password = this.loginForm.value.password;
     this.store.dispatch(setLoadingSpinner({ status: true }));
-    // Aggiungi redirect: true e isCustomerLogin: false qui
     this.store.dispatch(
-      loginStart({ email, password, isCustomerLogin: false, redirect: true })
+      loginStart({
+        email,
+        password,
+        redirect: true,
+        isCustomerLogin: undefined,
+      })
     );
   }
 }

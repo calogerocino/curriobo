@@ -10,7 +10,6 @@ import { ResetpasswordComponent } from './resetpassword/resetpassword.component'
 import { VerifyemailComponent } from './verifyemail/verifyemail.component';
 import { CompletaRegistrazioneComponent } from './completa-registrazione/completa-registrazione.component';
 import { LoginComponent } from "./login/login.component"; // Login Admin
-import { CustomerLoginComponent } from './customer-login/customer-login.component'; // Login Cliente
 import { AuthEffects } from "./state/auth.effects";
 
 const routes: Routes = [
@@ -20,7 +19,6 @@ const routes: Routes = [
        children: [
       { path: "", redirectTo: "login", pathMatch: "full" }, // Default per /auth -> /auth/login (admin)
       { path: "login", component: LoginComponent, data: { title: "Login Amministrazione" } },
-      { path: "login-cliente", component: CustomerLoginComponent, data: { title: "Login Cliente" } },
       { path: "register", component: RegisterComponent, data: { title: "Registrazione" } }, // Potrebbe non essere usata se la registrazione è solo via invito
       { path: "resetpassword", component: ResetpasswordComponent, data: { title: "Reset Password" } },
       { path: "verifyemail", component: VerifyemailComponent, data: { title: "Verifica Email" } },
@@ -37,7 +35,6 @@ const routes: Routes = [
     ResetpasswordComponent,
     VerifyemailComponent,
     CompletaRegistrazioneComponent,
-    CustomerLoginComponent, // <-- DICHIARA
   ],
   imports: [
     CommonModule,

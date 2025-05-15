@@ -16,12 +16,11 @@ export const CHANGE_INFO_SUCCESS = '[Auth] Change info success';
 
 export const loginStart = createAction(
   LOGIN_START,
-  props<{ email: string; password: string; isCustomerLogin?: boolean; redirect: boolean }>() // redirect è required
+  props<{ email: string; password: string; isCustomerLogin?: boolean; redirect: boolean }>() 
 );
 
 export const loginSuccess = createAction(
   LOGIN_SUCCESS,
-  // 'redirect' e 'isCustomerLogin' vengono da loginStart
   props<{ user: User; redirect: boolean; isCustomerLogin?: boolean }>()
 );
 
@@ -30,13 +29,11 @@ export const autologout = createAction(LOGOUT_ACTION);
 
 export const updateLogin = createAction(
   UPDATE_LOGIN_START,
-  // 'redirect' e 'isCustomerLogin' vengono propagate da loginSuccess (tramite l'effetto loginSuccessTriggerUpdateLogin$)
   props<{ redirect: boolean; isCustomerLogin?: boolean }>()
 );
 
 export const updateLoginSuccess = createAction(
   UPDATE_LOGIN_SUCCESS,
-  // 'redirect' e 'isCustomerLogin' vengono propagate da updateLogin (tramite l'effetto updateLogin$)
   props<{ user: User; redirect: boolean; isCustomerLogin?: boolean }>()
 );
 
