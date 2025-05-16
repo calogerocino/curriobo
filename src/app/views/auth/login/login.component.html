@@ -10,7 +10,10 @@
         </div>
         <div class="col-md-8 pl-md-0">
           <div class="auth-form-wrapper px-4 py-5">
-            <a routerLink="." class="pixel-ui-logo d-block mb-2">Pixel<span>Smart</span></a>
+            <div>
+              <a routerLink="." class="curriodashboard-logo d-block mb-1">Curriò<span>Dashboard</span></a>
+              <div style="font-size: 0.7rem; text-align: center; color: #6c757d;">developed by PixelSmart</div>
+            </div>
             <h5 class="text-muted font-weight-normal mb-4">Bentornato! Inserisci i tuoi dati per accedere.</h5>
             <form [formGroup]="loginForm" (ngSubmit)="onLoginSubmit()">
               <div class="form-group">
@@ -28,7 +31,8 @@
                   <div>La password è obbligatoria</div>
                 </div>
               </div>
-              <p class="text-danger mt-1" style="animation: horizontal-shaking 0.35s linear 0.2s;" *ngIf="errorMessage$ | async as error">
+              <p class="text-danger mt-1" style="animation: horizontal-shaking 0.35s linear 0.2s;"
+                *ngIf="errorMessage$ | async as error">
                 <i class="feather icon-alert-circle"></i> {{error}}
               </p>
               <div class="form-check form-check-flat form-check-primary">
