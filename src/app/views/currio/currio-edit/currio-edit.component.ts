@@ -1,5 +1,3 @@
-// src/app/views/currio/currio-edit/currio-edit.component.ts
-
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import {
   FormGroup,

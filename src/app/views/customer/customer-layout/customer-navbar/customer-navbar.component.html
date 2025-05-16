@@ -1,0 +1,60 @@
+<nav class="navbar">
+  <a href="#" class="sidebar-toggler" (click)="toggleSidebar($event)">
+    <i class="feather icon-menu"></i>
+  </a>
+  <div class="navbar-content">
+    <ul class="navbar-nav">
+      <li class="nav-item" ngbDropdown>
+        <a class="nav-link" ngbDropdownToggle id="languageDropdown" role="button">
+          <i class="flag-icon flag-icon-{{this.currentLang()}} mt-1"></i> <span
+            class="font-weight-medium ml-1 mr-1 d-none d-md-inline-block">{{'generale.layout.linguaa' |
+            translate}}</span>
+        </a>
+        <div ngbDropdownMenu aria-labelledby="languageDropdown">
+          <a ngbDropdownItem class="py-2" (click)="this.switchLanguage($event.target)" id="it"><i class="flag-icon flag-icon-it mr-1"></i> Italiano</a>
+          <a ngbDropdownItem class="py-2" (click)="this.switchLanguage($event.target)" id="en"><i class="flag-icon flag-icon-us mr-1"></i> English </a>
+          </div>
+      </li>
+
+      <li class="nav-item nav-profile" ngbDropdown *ngIf="connectedUser$ | async as userData">
+        <a class="nav-link" ngbDropdownToggle id="profileDropdown">
+          <img [src]="userData.photoURL || 'assets/images/default-avatar.png'" alt="profile">
+        </a>
+        <div ngbDropdownMenu aria-labelledby="profileDropdown">
+          <div class="dropdown-header d-flex flex-column align-items-center">
+            <div class="figure mb-3">
+              <img [src]="userData.photoURL || 'assets/images/default-avatar.png'" alt="User photo">
+            </div>
+            <div class="info text-center">
+              <p class="name font-weight-bold mb-0">
+                {{ userData.displayName || (userData.email | slice:0:userData.email?.indexOf('@')) || ('profiloUtente.nome-set' | translate) }}
+              </p>
+              <p class="email text-muted mb-3">{{userData.email || ('profiloUtente.email-set' | translate)}}</p>
+            </div>
+          </div>
+          <div class="dropdown-body">
+            <ul class="profile-nav p-0 pt-3">
+              <li class="nav-item">
+                <a routerLink="/cliente/account" class="nav-link">
+                  <i class="feather icon-user"></i>
+                  <span>{{'customer.menu.profile' | translate}}</span>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a routerLink="/cliente/currio" class="nav-link">
+                  <i class="feather icon-file-text"></i> <span>{{'customer.menu.currio' | translate}}</span>
+                </a>
+              </li>
+              <li class="nav-item" style="border-top: 1px solid #f2f4f9;">
+                <a href="#" (click)="signOut($event)" class="nav-link">
+                  <i class="feather icon-log-out"></i>
+                  <span>{{'generale.layout.navbar.esci' | translate}}</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </li>
+    </ul>
+  </div>
+</nav>

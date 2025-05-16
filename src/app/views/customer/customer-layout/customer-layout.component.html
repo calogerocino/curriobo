@@ -1,0 +1,12 @@
+<div class="main-wrapper">
+  <app-customer-sidebar></app-customer-sidebar> <div class="page-wrapper">
+    <app-customer-navbar></app-customer-navbar> <div class="page-content">
+      <div *ngIf="isLoading" class="spinner-wrapper">
+        <div class="spinner">Caricamento...</div>
+      </div>
+      <div contentAnimate *ngIf="!isLoading">
+        <router-outlet></router-outlet>
+      </div>
+    </div>
+    <app-customer-footer></app-customer-footer> </div>
+</div>

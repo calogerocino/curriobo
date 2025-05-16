@@ -1,0 +1,27 @@
+<div class="d-flex justify-content-between align-items-center flex-wrap grid-margin">
+  <div>
+    <h4 class="mb-3 mb-md-0">Dashboard</h4>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title" *ngIf="userName$ | async as name">Benvenuto, {{ name }}!</h5>
+      <!-- {{ 'customer.dashboard.intro' | translate }} -->
+        <p class="card-text">Intro</p>
+        <div class="mt-4">
+          <a routerLink="/cliente/account" class="btn btn-primary mr-2 mb-2 mb-md-0">
+            <i class="feather icon-user btn-icon-prepend"></i>
+            <!-- {{ 'customer.menu.profile' | translate }}  --> Profilo
+          </a>
+          <a routerLink="/cliente/currio" class="btn btn-info mb-2 mb-md-0">
+            <i class="feather icon-file-text btn-icon-prepend"></i>
+            <!-- {{ 'customer.menu.currio' | translate }} --> Currio
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

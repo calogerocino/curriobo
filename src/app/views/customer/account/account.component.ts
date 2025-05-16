@@ -1,4 +1,4 @@
-// src/app/views/customer/account/account.component.ts
+
 import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { map, Observable } from 'rxjs';

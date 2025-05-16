@@ -1,0 +1,106 @@
+<div class="row">
+  <div class="col-lg-8 offset-lg-2">
+    <div *ngIf="showUnsavedChangesWarning" class="alert alert-warning d-flex align-items-center" role="alert">
+      <i class="feather icon-alert-triangle me-2"></i>
+      <div>
+        {{ 'profiloUtente.avvisoModificheNonSalvate' | translate }}
+      </div>
+    </div>
+
+    <div class="card mb-4">
+      <div class="card-header">
+        <h5 class="mb-0">{{ 'customer.account.title' | translate }}</h5>
+      </div>
+      <div class="card-body">
+        <div *ngIf="isLoadingAccount" class="text-center my-3">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Caricamento...</span>
+          </div>
+        </div>
+        <form [formGroup]="accountForm" (ngSubmit)="onUpdateAccount()" *ngIf="!isLoadingAccount">
+          <div class="mb-3">
+            <label for="displayName" class="form-label">{{ 'profiloUtente.nome' | translate }}</label>
+            <input type="text" id="displayName" class="form-control" formControlName="displayName"
+                   placeholder="{{ 'profiloUtente.nome-set' | translate }}">
+            <div *ngIf="accountForm.get('displayName')?.touched && accountForm.get('displayName')?.invalid" class="text-danger small mt-1">
+              <div *ngIf="accountForm.get('displayName')?.errors?.['required']">
+                <i class="feather icon-alert-circle"></i> {{ 'generale.errori.camporichiesto' | translate }}
+              </div>
+              <div *ngIf="accountForm.get('displayName')?.errors?.['minlength']">
+                <i class="feather icon-alert-circle"></i> {{ 'generale.errori.caratteriminimi' | translate }} 3
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="cellulare" class="form-label">{{ 'profiloUtente.cellulare' | translate }}</label>
+            <input type="tel" id="cellulare" class="form-control" formControlName="cellulare"
+                   placeholder="{{ 'profiloUtente.cellulare-set' | translate }}">
+            <div *ngIf="accountForm.get('cellulare')?.touched && accountForm.get('cellulare')?.invalid" class="text-danger small mt-1">
+                <div *ngIf="accountForm.get('cellulare')?.errors?.['minlength'] || accountForm.get('cellulare')?.errors?.['maxlength'] || accountForm.get('cellulare')?.errors?.['pattern']">
+                    <i class="feather icon-alert-circle"></i> Inserisci un numero di cellulare valido.
+                </div>
+            </div>
+          </div>
+
+           <div class="mb-3">
+            <label for="photoURL" class="form-label">URL Foto Profilo (opzionale)</label>
+            <input type="url" id="photoURL" class="form-control" formControlName="photoURL"
+                   placeholder="https://example.com/avatar.jpg">
+            </div>
+
+
+          <button type="submit" class="btn btn-primary" [disabled]="!accountForm.valid || !accountForm.dirty || (isLoadingAccount || (isSubmitting$ | async))">
+            <span *ngIf="!(isLoadingAccount || (isSubmitting$ | async))">{{ 'customer.account.updateProfile' | translate }}</span>
+            <span *ngIf="(isLoadingAccount || (isSubmitting$ | async))" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            <span *ngIf="(isLoadingAccount || (isSubmitting$ | async))"> Attendere...</span>
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0">{{ 'customer.account.changePassword' | translate }}</h5>
+      </div>
+      <div class="card-body">
+         <div *ngIf="isLoadingPassword && !isLoadingAccount" class="text-center my-3">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Aggiornamento password...</span>
+          </div>
+        </div>
+        <form [formGroup]="passwordForm" (ngSubmit)="onUpdatePassword()" *ngIf="!isLoadingPassword">
+          <div class="mb-3">
+            <label for="newPassword" class="form-label">{{ 'customer.account.newPassword' | translate }}</label>
+            <input type="password" id="newPassword" class="form-control" formControlName="newPassword" autocomplete="new-password">
+             <div *ngIf="passwordForm.get('newPassword')?.touched && passwordForm.get('newPassword')?.invalid" class="text-danger small mt-1">
+                <div *ngIf="passwordForm.get('newPassword')?.errors?.['required']">Campo obbligatorio.</div>
+                <div *ngIf="passwordForm.get('newPassword')?.errors?.['minlength']">Minimo 8 caratteri.</div>
+                <div *ngIf="passwordForm.get('newPassword')?.errors?.['pattern']">{{'generale.errori.passpatt' | translate}}</div>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="confirmNewPassword" class="form-label">{{ 'customer.account.confirmNewPassword' | translate }}</label>
+            <input type="password" id="confirmNewPassword" class="form-control" formControlName="confirmNewPassword" autocomplete="new-password">
+            <div *ngIf="passwordForm.get('confirmNewPassword')?.touched && passwordForm.hasError('mismatch') && passwordForm.get('confirmNewPassword')?.value" class="text-danger small mt-1">
+                Le password non coincidono.
+            </div>
+             <div *ngIf="passwordForm.get('confirmNewPassword')?.touched && passwordForm.get('confirmNewPassword')?.errors?.['required']" class="text-danger small mt-1">
+                Campo obbligatorio.
+            </div>
+          </div>
+           <div *ngIf="errorMessage$ | async as error" class="alert alert-danger mt-2">
+            {{ error }}
+          </div>
+
+          <button type="submit" class="btn btn-primary" [disabled]="!passwordForm.valid || !passwordForm.dirty || (isLoadingPassword || (isSubmitting$ | async))">
+            <span *ngIf="!(isLoadingPassword || (isSubmitting$ | async))">{{ 'customer.account.changePassword' | translate }}</span>
+            <span *ngIf="(isLoadingPassword || (isSubmitting$ | async))" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            <span *ngIf="(isLoadingPassword || (isSubmitting$ | async))"> Attendere...</span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

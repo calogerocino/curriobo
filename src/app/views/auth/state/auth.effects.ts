@@ -129,45 +129,36 @@ export class AuthEffects {
   loginRedirect$ = createEffect(
     () => {
       return this.actions$.pipe(
-        ofType(updateLoginSuccess), // Assicurati che questa azione contenga l'utente completo con il ruolo
+        ofType(updateLoginSuccess),
         tap((action) => {
-          // console.log('[AuthEffects loginRedirect$] updateLoginSuccess action received for redirect:', JSON.parse(JSON.stringify(action)));
-          const user = action.user; // Questo utente dovrebbe avere il ruolo da Firestore
+          const user = action.user;
           const lastUrl = localStorage.getItem(this.lastUrlKey);
 
           if (action.redirect && user && user.ruolo) {
             let targetUrl: string | null = null;
 
             if (lastUrl && (lastUrl.startsWith('/admin/') || lastUrl.startsWith('/cliente/'))) {
-              // Verifica se l'URL salvato è appropriato per il ruolo dell'utente
               if ((user.ruolo === 'admin' && lastUrl.startsWith('/admin/')) ||
-                  (user.ruolo === 'cliente' && lastUrl.startsWith('/cliente/'))) {
+                  (user.ruolo === 'cliente' && lastUrl.startsWith('/cliente/'))) { // MODIFICA QUI
                 targetUrl = lastUrl;
-                console.log(`[AuthEffects loginRedirect$] Attempting to redirect to saved URL: ${targetUrl}`);
-              } else {
-                console.warn(`[AuthEffects loginRedirect$] Saved URL ${lastUrl} not appropriate for user role ${user.ruolo}. Ignoring.`);
               }
-              localStorage.removeItem(this.lastUrlKey); // Rimuovi sempre dopo averlo letto per il redirect corrente
+              localStorage.removeItem(this.lastUrlKey);
             }
 
             if (targetUrl) {
               this.router.navigateByUrl(targetUrl).catch(err => {
                 console.error(`[AuthEffects loginRedirect$] Error navigating to ${targetUrl}, falling back to role-based default. Error:`, err);
-                this.redirectToRoleDefault(user);
+                this.redirectToRoleDefault(user); // Assicurati che redirectToRoleDefault gestisca 'cliente'
               });
             } else {
-              this.redirectToRoleDefault(user);
+              this.redirectToRoleDefault(user); // Assicurati che redirectToRoleDefault gestisca 'cliente'
             }
 
           } else if (action.redirect && user && !user.ruolo) {
               console.warn(`[AuthEffects loginRedirect$] Utente ${user.email} non ha un ruolo definito in Firestore. Redirecting to login.`);
-              this.store.dispatch(autologout());
+              this.store.dispatch(autologout()); // LOGOUT SE RUOLO MANCA
+              // Reindirizza alla pagina di login principale o specifica per errore
               this.router.navigate(['/auth/login'], { queryParams: { error: 'missing_role' } });
-          } else if (!action.redirect) {
-              // console.log('[AuthEffects loginRedirect$] No redirect needed based on action.redirect flag.');
-          } else if (action.redirect && !user) {
-              console.warn('[AuthEffects loginRedirect$] Tentativo di redirect ma user è null. Redirecting to login.');
-              this.router.navigate(['/auth/login'], { queryParams: { error: 'login_failed_no_user' } });
           }
         })
       );
@@ -175,16 +166,13 @@ export class AuthEffects {
     { dispatch: false }
   );
 
-  private redirectToRoleDefault(user: User): void {
+private redirectToRoleDefault(user: User): void {
     if (user.ruolo === 'cliente') {
-      // console.log('[AuthEffects loginRedirect$] Navigating to /cliente/account (default)');
-      this.router.navigate(['/customer/customer-dashboard']);
+      this.router.navigate(['/cliente/dashboard']); // NUOVA ROTTA CLIENTE
     } else if (user.ruolo === 'admin') {
-      // console.log('[AuthEffects loginRedirect$] Navigating to /admin/dashboard (default)');
-      this.router.navigate(['/admin/dashboard']); // Pagina di default per admin
+      this.router.navigate(['/admin/dashboard']);
     } else {
-      // Questo caso dovrebbe essere già gestito dalla logica precedente, ma per sicurezza:
-      console.warn(`[AuthEffects loginRedirect$] Utente ${user.email} ha un ruolo sconosciuto o indefinito: ${user.ruolo}. Redirecting to login.`);
+      console.warn(`[AuthEffects redirectToRoleDefault] Utente ${user.email} ha un ruolo sconosciuto o indefinito: ${user.ruolo}. Redirecting to login.`);
       this.store.dispatch(autologout());
       this.router.navigate(['/auth/login'], { queryParams: { error: 'unknown_role_default_redirect' } });
     }

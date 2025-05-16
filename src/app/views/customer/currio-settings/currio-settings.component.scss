@@ -1,0 +1,26 @@
+
+
+.card {
+  margin-bottom: 1.5rem;
+}
+
+.form-array-item {
+  border: 1px solid #e8ebf1; // $border-color
+  border-radius: 0.25rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  background-color: #fdfdfd; // Un po' più chiaro del content-bg
+}
+
+.form-array-item h6 {
+  font-size: 0.95rem;
+  color: #333; // $body-color o simile
+  border-bottom: 1px solid #f2f4f9; // $sidebar-light-border-color
+  padding-bottom: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+// Stile per l'avviso di modifiche non salvate
+.alert-warning {
+  // Stili simili a quelli usati in profilo.component.html per l'avviso
+}

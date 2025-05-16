@@ -8,8 +8,8 @@ import { NgbDateStruct, NgbCalendar } from '@ng-bootstrap/ng-bootstrap';
   styleUrls: ['./dashboard.component.scss'],
   preserveWhitespaces: true,
 })
-export class DashboardComponent implements OnInit {
-  /**
+export class DashboardHomeComponent implements OnInit {
+  /**CustomerDashboardHomeComponent
    * NgbDatepicker
    */
   currentDate: NgbDateStruct;

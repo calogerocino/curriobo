@@ -1,0 +1,54 @@
+<nav class="sidebar">
+  <div class="sidebar-header">
+    <a routerLink="/cliente/dashboard" class="sidebar-brand"> Curriò<span>Cliente</span> </a>
+    <div class="sidebar-toggler not-active" #sidebarToggler (click)="toggleSidebar($event)">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </div>
+
+  <div class="sidebar-body" (mouseenter)="operSidebarFolded()" (mouseleave)="closeSidebarFolded()">
+    <ul class="sidebar-nav metismenu" id="sidebar-menu" #sidebarMenu>
+      <ng-container *ngFor="let item of menuItems">
+        <li class="nav-item nav-category" *ngIf="item.isTitle">{{ item.label | translate }}</li>
+        <li class="nav-item" *ngIf="!item.isTitle">
+          <a class="nav-link" *ngIf="hasItems(item)" href="javascript:void(0);" aria-expanded="false">
+            <i class="link-icon" [attr.data-feather]="item.icon" appFeatherIcon *ngIf="item.icon"></i>
+            <span class="link-title"> {{ item.label | translate }}</span>
+            <span class="link-arrow" data-feather="chevron-down" appFeatherIcon></span>
+          </a>
+          <a class="nav-link nav-link-ref" [routerLink]="item.link" *ngIf="!hasItems(item)"
+            [attr.data-parent]="item.parentId" [routerLinkActive]="'mm-active'" [routerLinkActiveOptions]="{exact: item.link === '/cliente/dashboard' ? true : false }">
+            <i class="link-icon" [attr.data-feather]="item.icon" appFeatherIcon *ngIf="item.icon"></i>
+            <span class="link-title"> {{ item.label | translate }}</span>
+            <span class="badge badge-{{item.badge?.variant}}" *ngIf="item.badge">{{item.badge?.text}}</span>
+          </a>
+          <ul class="sidebar-nav sub-menu nav-second-level collapse" *ngIf="hasItems(item)" aria-expanded="false">
+            <li class="nav-item" *ngFor="let subitem of item.subItems" [ngClass]="{'side-nav-item': hasItems(subitem)}">
+              <a class="nav-link side-nav-link-a-ref" *ngIf="hasItems(subitem)" href="javascript:void(0);" aria-expanded="false">
+                <i class="link-icon" [attr.data-feather]="subitem.icon" appFeatherIcon *ngIf="subitem.icon"></i>
+                <span class="link-title"> {{ subitem.label | translate }}</span>
+                <span class="link-arrow" data-feather="chevron-down" appFeatherIcon></span>
+              </a>
+              <a class="nav-link nav-link-ref" [routerLink]="subitem.link" *ngIf="!hasItems(subitem)"
+                [attr.data-parent]="subitem.parentId" [routerLinkActive]="'mm-active'">
+                <i class="link-icon" [attr.data-feather]="subitem.icon" appFeatherIcon *ngIf="subitem.icon"></i>
+                {{ subitem.label | translate }}
+              </a>
+              <ul class="sidebar-nav sub-menu nav-third-level collapse" *ngIf="hasItems(subitem)" aria-expanded="false">
+                <li class="nav-item" *ngFor="let subSubitem of subitem.subItems">
+                  <a class="nav-link nav-link-ref" [routerLink]="subSubitem.link" [routerLinkActive]="'mm-active'"
+                    [attr.data-parent]="subSubitem.parentId">
+                    <i class="link-icon" [attr.data-feather]="subSubitem.icon" appFeatherIcon *ngIf="subSubitem.icon"></i>
+                    {{ subSubitem.label | translate }}
+                  </a>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+      </ng-container>
+    </ul>
+  </div>
+</nav>

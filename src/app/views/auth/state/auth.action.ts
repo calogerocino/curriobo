@@ -1,4 +1,3 @@
-// src/app/views/auth/state/auth.action.ts
 import { User } from 'src/app/shared/models/user.interface';
 import { createAction, props } from '@ngrx/store';
 
@@ -16,7 +15,7 @@ export const CHANGE_INFO_SUCCESS = '[Auth] Change info success';
 
 export const loginStart = createAction(
   LOGIN_START,
-  props<{ email: string; password: string; isCustomerLogin?: boolean; redirect: boolean }>() 
+  props<{ email: string; password: string; isCustomerLogin?: boolean; redirect: boolean }>()
 );
 
 export const loginSuccess = createAction(

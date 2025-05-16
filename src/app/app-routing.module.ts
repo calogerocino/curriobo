@@ -32,29 +32,34 @@ const routes: Routes = [
             (m) => m.DashboardModule
           ),
       },
-       {
+      {
         path: 'utente', // Gestione utenti admin
         loadChildren: () =>
           import('./views/utente/utente.module').then((m) => m.UtenteModule),
       },
       {
-        path: 'currio', // Gestione dei Curriò da parte dell'admin
+        path: 'currio',
         loadChildren: () =>
           import('./views/currio/currio.module').then((m) => m.CurrioModule),
       },
       {
-        path: 'currio', // Il path base per CurrioModule
+        path: 'cliente', // Area riservata ai clienti
         loadChildren: () =>
-          import('./views/currio/currio.module').then((m) => m.CurrioModule), // Questo caricherà le rotte definite in CurrioModule
+          import('./views/customer/customer.module').then(
+            (m) => m.CustomerModule
+          ),
+        canActivate: [AuthGuard], // AuthGuard protegge l'intera area /cliente
+        data: { title: 'Area Cliente' }, // Il titolo qui potrebbe essere sovrascritto dalle rotte figlie
       },
     ],
   },
-{
-   path: 'cliente', // Area riservata ai clienti
-    loadChildren: () => import('./views/customer/customer.module').then(m => m.CustomerModule),
+  {
+    path: 'cliente', // Area riservata ai clienti
+    loadChildren: () =>
+      import('./views/customer/customer.module').then((m) => m.CustomerModule),
     canActivate: [AuthGuard], // AuthGuard protegge l'intera area /cliente
-    data: { title: 'Area Cliente' }
-},
+    data: { title: 'Area Cliente' },
+  },
   {
     path: ':id',
     component: CurrioPreviewComponent,
@@ -73,7 +78,11 @@ const routes: Routes = [
     path: 'error/:type',
     component: ErrorPageComponent,
   },
-  { path: 'cliente', loadChildren: () => import('./views/customer/customer.module').then(m => m.CustomerModule) },
+  {
+    path: 'cliente',
+    loadChildren: () =>
+      import('./views/customer/customer.module').then((m) => m.CustomerModule),
+  },
   { path: '**', redirectTo: 'error', pathMatch: 'full' },
 ];
 

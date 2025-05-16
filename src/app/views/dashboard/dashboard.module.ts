@@ -9,19 +9,19 @@ import {
   NgbDatepickerModule,
 } from '@ng-bootstrap/ng-bootstrap';
 
-import { DashboardComponent } from './dashboard.component';
+import { DashboardHomeComponent } from './dashboard.component';
 import { TranslateModule } from '@ngx-translate/core';
 
 const routes: Routes = [
   {
     path: '',
-    component: DashboardComponent,
+    component: DashboardHomeComponent,
     data: { title: 'Dashboard' },
   },
 ];
 
 @NgModule({
-  declarations: [DashboardComponent],
+  declarations: [DashboardHomeComponent],
   imports: [
     CommonModule,
     RouterModule.forChild(routes),
