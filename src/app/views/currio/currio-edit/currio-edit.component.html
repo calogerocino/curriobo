@@ -9,91 +9,40 @@
   </div>
 </div>
 
-<div class="row mt-4">
-  <div class="col-md-5">
-    <h4>Anteprima Curriò</h4>
-    <div class="card">
-      <div class="card-body">
-        <ng-container *ngIf="currioForm.value as formData">
-          <div class="hero-preview py-3 text-center bg-light mb-3">
-            <h1 class="h4">{{ formData.heroTitle || 'Titolo Hero' }}</h1>
-            <p>{{ formData.heroSubtitle || 'Sottotitolo Hero...' }}</p>
-          </div>
-
-          <h5>{{ formData.nomePortfolio || 'Nome del Tuo Curriò' }}</h5>
-          <hr>
-
-          <div *ngIf="formData.chiSonoDescrizione1" class="mb-3">
-            <h6>Chi Sono:</h6>
-            <p><small>{{ formData.chiSonoDescrizione1 }}</small></p>
-          </div>
-
-          <div *ngIf="formData.contatti && formData.contatti.email" class="mb-3">
-             <h6>Contatti:</h6>
-             <p><small>Email: {{ formData.contatti.email }}</small></p>
-             <p *ngIf="formData.contatti.github"><small>GitHub: {{ formData.contatti.github }}</small></p>
-             <p *ngIf="formData.contatti.linkedin"><small>LinkedIn: {{ formData.contatti.linkedin }}</small></p>
-          </div>
-
-          <div *ngIf="currio?.curriculumUrl" class="mb-3">
-            <h6>Curriculum Allegato:</h6>
-            <p>
-              <a [href]="currio.curriculumUrl" target="_blank" class="btn btn-sm btn-outline-primary">
-                <i class="feather icon-file-text me-1"></i> Visualizza/Scarica CV
-              </a>
-            </p>
-          </div>
-
-        </ng-container>
-        <em *ngIf="!currioForm.value.nomePortfolio">(L'anteprima si aggiornerà con i dati del form)</em>
-      </div>
+<div class="row mb-3">
+  <div class="col-md-12 d-flex justify-content-between align-items-center">
+    <div>
+      <button *ngIf="isEditMode && currio" type="button" (click)="openPreviewInNewTab()" class="btn btn-info me-2">
+          <i class="feather icon-external-link"></i> Anteprima Curriò
+      </button>
+      <button *ngIf="isEditMode && currio?.curriculumUrl" type="button" (click)="openCurriculum()" class="btn btn-outline-secondary">
+          <i class="feather icon-file-text"></i> Visualizza CV
+      </button>
     </div>
-     <button *ngIf="isEditMode && currio" type="button" (click)="openPreviewInNewTab()" class="btn btn-info mt-3 w-100">
-        <i class="feather icon-external-link"></i> Visualizza Anteprima Completa
-    </button>
+    <div>
+      <button type="button" class="btn btn-danger me-2" (click)="onDeleteCurrio()" *ngIf="isEditMode && currio">
+        <i class="feather icon-trash"></i> {{'generale.shared.elimina' | translate}}
+      </button>
+      <button type="button" class="btn btn-secondary me-2" (click)="goBack()">
+        Annulla
+      </button>
+      <button type="submit" form="currioForm" class="btn btn-primary" [disabled]="!currioForm.valid || (isSubmitting$ | async)">
+        <i class="feather icon-save"></i>
+        <span *ngIf="!(isSubmitting$ | async)">
+          {{ (isEditMode ? 'generale.shared.aggiorna' : 'Crea') | translate }} Curriò
+        </span>
+        <span *ngIf="isSubmitting$ | async" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+        <span *ngIf="isSubmitting$ | async"> Salvataggio...</span>
+      </button>
+    </div>
   </div>
+</div>
 
+
+<div class="row mt-4">
   <div class="col-md-7">
-    <div *ngIf="isEditMode && currio && currio.datiCliente" class="card my-3 shadow-sm">
-      <div class="card-header bg-light fw-bold">
-        Gestione Account Cliente
-        <span *ngIf="currio.status === 'nuova_richiesta'" class="badge bg-warning text-dark ms-2">Nuova Richiesta</span>
-        <span *ngIf="currio.status === 'invito_spedito'" class="badge bg-info text-white ms-2">Invito Spedito</span>
-        <span *ngIf="currio.status === 'attivo'" class="badge bg-success text-white ms-2">Account Attivo</span>
-      </div>
-      <div class="card-body">
-        <p>Richiesta da: <strong>{{ currio.datiCliente.nome }}</strong> (<code>{{ currio.datiCliente.email }}</code>)</p>
-
-        <div *ngIf="currio.status === 'nuova_richiesta'">
-          <button type="button" class="btn btn-info btn-sm" (click)="preparaEInviaInvito()">
-            <i class="feather icon-user-plus me-1"></i> Crea Account e Invia Istruzioni
-          </button>
-        </div>
-
-        <div *ngIf="linkRegistrazione && currio.status === 'invito_spedito'" class="mt-3 alert alert-info">
-          <p class="mb-1"><strong>Istruzioni per l'admin:</strong></p>
-          <p class="small">Per favore, invia manualmente il seguente link di registrazione al cliente ({{currio.datiCliente.email}}). Il link scadrà tra 24 ore.</p>
-          <div class="input-group input-group-sm mb-2">
-            <input type="text" class="form-control form-control-sm" [value]="linkRegistrazione" readonly #registrationLinkInput>
-            <button class="btn btn-outline-secondary btn-sm" type="button" (click)="copyToClipboard(registrationLinkInput)">
-              <i class="feather icon-copy"></i> Copia
-            </button>
-          </div>
-          <a href="mailto:{{ currio.datiCliente.email }}?subject=Completa la creazione del tuo Curriò&body=Ciao {{ currio.datiCliente.nome }},%0D%0A%0D%0Acompleta la creazione del tuo account per Curriò al seguente link: {{ encodedLinkRegistrazione }}%0D%0A%0D%0AIl link scadrà tra 24 ore."
-             class="btn btn-sm btn-outline-primary mt-1">
-            <i class="feather icon-mail me-1"></i> Apri bozza email
-          </a>
-        </div>
-
-        <div *ngIf="currio.status === 'attivo' && currio.userId" class="mt-3 alert alert-success small">
-          L'account per <strong>{{ currio.datiCliente.nome }}</strong> è attivo.
-          ID Utente Firebase: <code>{{ currio.userId }}</code>.
-          Il cliente può ora accedere e modificare il suo Curriò.
-        </div>
-      </div>
-    </div>
     <h4>Dati Curriò</h4>
-    <form [formGroup]="currioForm" (ngSubmit)="onSubmit()">
+    <form [formGroup]="currioForm" (ngSubmit)="onSubmit()" id="currioForm">
       <div class="card mb-3">
         <div class="card-header">Informazioni Principali</div>
         <div class="card-body">
@@ -163,22 +112,62 @@
             <label for="contattiLinkedin" class="form-label">Profilo LinkedIn (URL completo)</label>
             <input type="url" id="contattiLinkedin" class="form-control" formControlName="linkedin" placeholder="https://linkedin.com/in/tuoutente" />
           </div>
+           <div class="mb-3"> <label for="contattiInstagram" class="form-label">Profilo Instagram (URL completo)</label>
+            <input type="url" id="contattiInstagram" class="form-control" formControlName="instagram" placeholder="https://instagram.com/tuoutente" />
+          </div>
         </div>
       </div>
+      </form>
+  </div>
 
-      <div class="alert alert-info">
+  <div class="col-md-5">
+    <h4>Altre Informazioni</h4>
+    <div class="alert alert-info">
         Le sezioni Progetti, Esperienze e Competenze saranno implementabili qui con FormArray.
-      </div>
+        Questo spazio è designato per future espansioni del form.
+    </div>
+    </div>
+</div>
 
-      <div class="my-4">
-        <button type="submit" class="btn btn-primary me-2" [disabled]="!currioForm.valid">
-          <i class="feather icon-save"></i>
-          {{ (isEditMode ? 'generale.shared.aggiorna' : 'Crea') | translate }} Curriò
-        </button>
-        <button type="button" class="btn btn-secondary" (click)="goBack()">
-          Annulla
-        </button>
+
+<div class="row mt-4">
+  <div class="col-md-12">
+    <div *ngIf="isEditMode && currio && currio.datiCliente" class="card my-3 shadow-sm">
+      <div class="card-header bg-light fw-bold">
+        Gestione Account Cliente
+        <span *ngIf="currio.status === 'nuova_richiesta'" class="badge bg-warning text-dark ms-2">Nuova Richiesta</span>
+        <span *ngIf="currio.status === 'invito_spedito'" class="badge bg-info text-dark ms-2">Invito Spedito</span> <span *ngIf="currio.status === 'attivo'" class="badge bg-success text-white ms-2">Account Attivo</span>
       </div>
-    </form>
+      <div class="card-body">
+        <p>Richiesta da: <strong>{{ currio.datiCliente.nome }}</strong> (<code>{{ currio.datiCliente.email }}</code>)</p>
+
+        <div *ngIf="currio.status === 'nuova_richiesta'">
+          <button type="button" class="btn btn-info btn-sm" (click)="preparaEInviaInvito()">
+            <i class="feather icon-user-plus me-1"></i> Crea Account e Invia Istruzioni
+          </button>
+        </div>
+
+        <div *ngIf="linkRegistrazione && currio.status === 'invito_spedito'" class="mt-3 alert alert-info">
+          <p class="mb-1"><strong>Istruzioni per l'admin:</strong></p>
+          <p class="small">Per favore, invia manualmente il seguente link di registrazione al cliente ({{currio.datiCliente.email}}). Il link scadrà tra 24 ore.</p>
+          <div class="input-group input-group-sm mb-2">
+            <input type="text" class="form-control form-control-sm" [value]="linkRegistrazione" readonly #registrationLinkInput>
+            <button class="btn btn-outline-secondary btn-sm" type="button" (click)="copyToClipboard(registrationLinkInput)">
+              <i class="feather icon-copy"></i> Copia
+            </button>
+          </div>
+          <a href="mailto:{{ currio.datiCliente.email }}?subject=Completa la creazione del tuo Curriò&body=Ciao {{ currio.datiCliente.nome }},%0D%0A%0D%0Acompleta la creazione del tuo account per Curriò al seguente link: {{ encodedLinkRegistrazione }}%0D%0A%0D%0AIl link scadrà tra 24 ore."
+             class="btn btn-sm btn-outline-primary mt-1">
+            <i class="feather icon-mail me-1"></i> Apri bozza email
+          </a>
+        </div>
+
+        <div *ngIf="currio.status === 'attivo' && currio.userId" class="mt-3 alert alert-success small">
+          L'account per <strong>{{ currio.datiCliente.nome }}</strong> è attivo.
+          ID Utente Firebase: <code>{{ currio.userId }}</code>.
+          Il cliente può ora accedere e modificare il suo Curriò.
+        </div>
+      </div>
+    </div>
   </div>
 </div>

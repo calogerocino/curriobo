@@ -13,15 +13,16 @@ import {
   CurrioContatti,
   DatiClienteCurrio,
 } from 'src/app/shared/models/currio.model'; // Aggiorna import
-import { getCurrioById } from '../state/currio.selector';
+import { getCurrioById, getCurrioLoading } from '../state/currio.selector';
 import { AppState } from 'src/app/shared/app.state';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { Subscription, filter } from 'rxjs';
+import { Observable, Subscription, filter } from 'rxjs';
 import {
   createCurrio,
   updateCurrio,
   loadCurrios,
+  deleteCurrio,
 } from '../state/currio.action';
 import { v4 as uuidv4 } from 'uuid'; // Per generare token
 import Swal from 'sweetalert2'; // Per notifiche
@@ -40,6 +41,7 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
   currioId: string | null = null;
   linkRegistrazione: string | null = null;
   encodedLinkRegistrazione: string | null = null;
+  isSubmitting$: Observable<boolean>;
 
   constructor(
     private readonly route: ActivatedRoute,
@@ -47,6 +49,7 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
     private readonly router: Router,
     private readonly fb: FormBuilder
   ) {
+    this.isSubmitting$ = this.store.select(getCurrioLoading);
     // Inizializza il form qui o in ngOnInit per evitare 'currioForm' is possibly 'undefined'
     this.currioForm = this.fb.group({
       nomePortfolio: ['', Validators.required],
@@ -60,9 +63,10 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
         email: ['', [Validators.required, Validators.email]],
         github: [''],
         linkedin: [''],
-        instagram: [''],
+        instagram: [''], // Aggiunto Instagram se non c'era
       }),
-      // Aggiungi qui altri FormArray o FormControl se necessario
+      // Esempio per Progetti (da decommentare e adattare se necessario)
+      // progetti: this.fb.array([]),
     });
   }
 
@@ -120,9 +124,10 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
         email: this.currio.contatti?.email || '',
         github: this.currio.contatti?.github || '',
         linkedin: this.currio.contatti?.linkedin || '',
-        instagram: this.currio.contatti?.instagram || '',
+        instagram: this.currio.contatti?.instagram || '', // Aggiunto Instagram
       },
     });
+    this.currioForm.markAsPristine(); // Dopo aver popolato, marca come non modificato
   }
 
   private getEmptyCurrio(): Currio {
@@ -200,7 +205,7 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
 
     const currioToSave: Currio = {
       ...baseCurrio,
-      id: this.isEditMode && this.currio ? this.currio.id : undefined, // Mantiene l'ID se in edit mode
+      id: this.isEditMode && this.currio ? this.currio.id : undefined,
       nomePortfolio: formValue.nomePortfolio,
       heroTitle: formValue.heroTitle,
       heroSubtitle: formValue.heroSubtitle,
@@ -209,34 +214,23 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
       chiSonoDescrizione1: formValue.chiSonoDescrizione1,
       chiSonoDescrizione2: formValue.chiSonoDescrizione2,
       contatti: formValue.contatti,
-      // Se lo status era 'invito_spedito', preservalo a meno che non sia stato attivato
-      status: baseCurrio.status, // Mantiene lo status corrente
-      // Preserva userId, tokenRegistrazione, tokenRegistrazioneScadenza se già presenti e non modificati da altre logiche
+      // Includi i FormArray se li hai implementati
+      // progetti: formValue.progetti || [],
+      // esperienze: formValue.esperienze || [],
+      // competenze: formValue.competenze || [],
+      status: baseCurrio.status,
       userId: baseCurrio.userId,
       tokenRegistrazione: baseCurrio.tokenRegistrazione,
       tokenRegistrazioneScadenza: baseCurrio.tokenRegistrazioneScadenza,
-      datiCliente: baseCurrio.datiCliente, // Preserva i dati cliente
+      datiCliente: baseCurrio.datiCliente,
     };
 
     if (this.isEditMode && currioToSave.id) {
       this.store.dispatch(updateCurrio({ currio: currioToSave as Currio }));
-      Swal.fire(
-        'Curriò Aggiornato',
-        'Le modifiche sono state salvate.',
-        'success'
-      );
-      // Considera se reindirizzare o meno, specialmente se è stato appena generato un invito
-      if (!this.linkRegistrazione || this.currio?.status !== 'invito_spedito') {
-        this.router.navigate(['/admin/currio/listacurrio']);
-      }
     } else {
-      // Logica per la creazione di un nuovo Curriò da parte dell'admin (se necessaria)
-      // In questo caso, 'datiCliente' potrebbe dover essere inserito manualmente dall'admin.
-      // const { id, ...currioDataToCreate } = currioToSave;
-      // this.store.dispatch(createCurrio({ currio: currioDataToCreate as Omit<Currio, 'id'> }));
-      // this.router.navigate(['/admin/currio/listacurrio']);
-      console.warn(
-        'Modalità creazione da admin non completamente implementata in questo snippet.'
+      const { id, ...currioDataToCreate } = currioToSave;
+      this.store.dispatch(
+        createCurrio({ currio: currioDataToCreate as Omit<Currio, 'id'> })
       );
     }
   }
@@ -256,6 +250,50 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
       Swal.fire(
         'Errore',
         "ID Curriò non disponibile per l'anteprima.",
+        'error'
+      );
+    }
+  }
+
+  openCurriculum(): void {
+    if (this.currio && this.currio.curriculumUrl) {
+      window.open(this.currio.curriculumUrl, '_blank');
+    } else {
+      Swal.fire(
+        'Attenzione',
+        'Nessun CV allegato per questo Curriò.',
+        'warning'
+      );
+    }
+  }
+
+  onDeleteCurrio(): void {
+    if (this.currio && this.currio.id) {
+      Swal.fire({
+        title: 'Sei sicuro?',
+        text: 'Non potrai annullare questa operazione!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Sì, eliminalo!',
+        cancelButtonText: 'Annulla',
+      }).then((result) => {
+        if (result.isConfirmed) {
+          this.store.dispatch(deleteCurrio({ id: this.currio!.id! }));
+          Swal.fire(
+            'Eliminato!',
+            'Il Curriò è stato eliminato con successo.',
+            'success'
+          ).then(() => {
+            this.router.navigate(['/admin/currio/listacurrio']);
+          });
+        }
+      });
+    } else {
+      Swal.fire(
+        'Errore',
+        "ID del Curriò non disponibile per l'eliminazione.",
         'error'
       );
     }

@@ -9,7 +9,10 @@
         </div>
         <div class="col-md-8 pl-md-0">
           <div class="auth-form-wrapper px-4 py-5">
-            <a routerLink="." class="pixel-ui-logo d-block mb-2">Pixel<span>Smart</span></a>
+            <div>
+              <a routerLink="." class="curriodashboard-logo d-block mb-1">Curriò<span>Dashboard</span></a>
+              <div style="font-size: 0.7rem; text-align: center; color: #6c757d;">developed by PixelSmart</div>
+            </div>
             <h5 class="text-muted font-weight-normal mb-4">Reset Password.</h5>
             <div class="form-group">
               <h3>Grazie per la registrazione</h3>
@@ -20,8 +23,8 @@
               </div>
             </div>
             <div class="mt-3">
-              <button type="submit" class="btn btn-primary mr-2 mb-2 mb-md-0"
-                (click)="sendVerificationMail()">Reinvia mail</button>
+              <button type="submit" class="btn btn-primary mr-2 mb-2 mb-md-0" (click)="sendVerificationMail()">Reinvia
+                mail</button>
             </div>
             <a routerLink="/auth/login" class="d-block mt-3 text-muted">Esegui il login</a>
           </div>
