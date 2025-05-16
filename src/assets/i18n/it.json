@@ -5,7 +5,7 @@
 	"generale.errori.nonsupportato": "Non ancora supportato",
 	"generale.errori.pass8car": "La password deve contenere almeno 8 caratteri",
 	"generale.errori.passpatt": "La password deve contenere una lettera maiuscola, una minuscola e una lettera speciale!",
-	"generale.home": "Benvenuto su PixelSmart",
+	"generale.home": "Benvenuto su CurriòDashboard",
 	"generale.layout.linguaa": "Lingua",
 	"generale.layout.lingua": "Italiano",
 	"generale.layout.menu.catalogo.buonisconto": "Buoni sconto",
@@ -71,6 +71,8 @@
   "status.attivo": "Attivo",
   "status.archiviato": "Archiviato",
   "status.sconosciuto": "Sconosciuto",
-
+  "customer.menu.profile": "Il Mio Profilo",
+  "customer.menu.currio": "Il Mio Curriò",
+  "profiloUtente.mailverificata": "Email Verificata",
 	"lp.navbar.home": "Nome"
 }
