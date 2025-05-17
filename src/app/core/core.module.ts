@@ -35,6 +35,7 @@ import { TranslateModule } from '@ngx-translate/core';
     FeahterIconModule,
     TranslateModule,
   ],
+  exports: [ContentAnimateDirective],
   providers: [],
 })
 export class CoreModule {}
