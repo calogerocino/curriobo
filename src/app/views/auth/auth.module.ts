@@ -9,7 +9,7 @@ import { RegisterComponent } from "./register/register.component";
 import { ResetpasswordComponent } from './resetpassword/resetpassword.component';
 import { VerifyemailComponent } from './verifyemail/verifyemail.component';
 import { CompletaRegistrazioneComponent } from './completa-registrazione/completa-registrazione.component';
-import { LoginComponent } from "./login/login.component"; // Login Admin
+import { LoginComponent } from "./login/login.component"; 
 import { AuthEffects } from "./state/auth.effects";
 
 const routes: Routes = [
@@ -17,9 +17,9 @@ const routes: Routes = [
     path: "",
     component: AuthComponent,
        children: [
-      { path: "", redirectTo: "login", pathMatch: "full" }, // Default per /auth -> /auth/login (admin)
+      { path: "", redirectTo: "login", pathMatch: "full" },
       { path: "login", component: LoginComponent, data: { title: "Login Amministrazione" } },
-      { path: "register", component: RegisterComponent, data: { title: "Registrazione" } }, // Potrebbe non essere usata se la registrazione è solo via invito
+      { path: "register", component: RegisterComponent, data: { title: "Registrazione" } },
       { path: "resetpassword", component: ResetpasswordComponent, data: { title: "Reset Password" } },
       { path: "verifyemail", component: VerifyemailComponent, data: { title: "Verifica Email" } },
       { path: "completa-registrazione", component: CompletaRegistrazioneComponent, data: { title: "Completa Registrazione" }},
@@ -40,7 +40,7 @@ const routes: Routes = [
     CommonModule,
     RouterModule.forChild(routes),
     FormsModule,
-    ReactiveFormsModule, // Assicurati che ReactiveFormsModule sia importato
+    ReactiveFormsModule,
     EffectsModule.forFeature([AuthEffects]),
   ],
 })

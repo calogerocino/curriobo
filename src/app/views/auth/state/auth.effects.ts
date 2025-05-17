@@ -41,15 +41,12 @@ export class AuthEffects {
     this.actions$.pipe(
       ofType(loginStart),
       exhaustMap((action) => {
-        // console.log('[AuthEffects login$] Action received:', JSON.parse(JSON.stringify(action)));
         return this.authService.SignIn(action.email, action.password).pipe(
           map((data: AuthResponseData) => {
-            // console.log('[AuthEffects login$] SignIn success, data:', data);
             this.store.dispatch(setLoadingSpinner({ status: false }));
             this.store.dispatch(setErrorMessage({ message: null }));
             const user = this.authService.formatUser(data);
-            // console.log('[AuthEffects login$] User formatted, before localStorage:', JSON.parse(JSON.stringify(user)));
-            this.authService.setUserInLocalStorage(user); // Salva l'utente base, updateLogin lo arricchirà
+            this.authService.setUserInLocalStorage(user);
             return loginSuccess({ user, redirect: action.redirect, isCustomerLogin: action.isCustomerLogin });
           }),
           catchError((errResp) => {
@@ -68,9 +65,7 @@ export class AuthEffects {
   loginSuccessTriggerUpdateLogin$ = createEffect(() =>
     this.actions$.pipe(
       ofType(loginSuccess),
-      // tap(action => console.log('[AuthEffects loginSuccessTriggerUpdateLogin$] loginSuccess action received. Props from action:', JSON.parse(JSON.stringify(action)))),
       map(action => {
-        // console.log('[AuthEffects loginSuccessTriggerUpdateLogin$] Dispatching updateLogin() with redirect:', action.redirect, 'isCustomerLogin:', action.isCustomerLogin);
         return updateLogin({ redirect: action.redirect, isCustomerLogin: action.isCustomerLogin });
       })
     )
@@ -80,10 +75,9 @@ export class AuthEffects {
   updateLogin$ = createEffect(() =>
     this.actions$.pipe(
       ofType(updateLogin),
-      // tap(action => console.log('[AuthEffects updateLogin$] Effect triggered by updateLogin. Props:', JSON.parse(JSON.stringify(action)))),
       concatLatestFrom(() => [
         this.store.select(getUserlocalId),
-        this.store.select(getUser), // Prende l'utente dallo stato (potrebbe essere quello base da loginSuccess)
+        this.store.select(getUser),
       ]),
       filter(([updateLoginAction, uid, userState]) => {
         const isValid = !!uid && !!userState && !!userState.token;
@@ -93,13 +87,9 @@ export class AuthEffects {
         return isValid;
       }),
       switchMap(([updateLoginAction, uid, userState]) => {
-        // console.log(`[AuthEffects updateLogin$] UID from store (valid): ${uid}`);
-        // console.log('[AuthEffects updateLogin$] User state from store (before merge, valid token):', userState ? JSON.parse(JSON.stringify(userState)) : null);
-        // console.log(`[AuthEffects updateLogin$] Calling MergeDatiUtente with UID: ${uid}`);
-        return this.userService.MergeDatiUtente(uid!, userState!).pipe( // Passa userState che contiene il token
+        return this.userService.MergeDatiUtente(uid!, userState!).pipe(
           map((mergedUser: User) => {
-            // console.log('[AuthEffects updateLogin$] MergeDatiUtente success, mergedUser:', JSON.parse(JSON.stringify(mergedUser)));
-            this.authService.setUserInLocalStorage(mergedUser); // Aggiorna localStorage con l'utente completo (incluso il ruolo)
+            this.authService.setUserInLocalStorage(mergedUser);
             return updateLoginSuccess({
               user: mergedUser,
               redirect: updateLoginAction.redirect,
@@ -108,17 +98,7 @@ export class AuthEffects {
           }),
           catchError(err => {
             console.error("[AuthEffects updateLogin$] Errore durante MergeDatiUtente:", err);
-            // Qui l'utente è loggato in Auth, ma non abbiamo potuto caricare i dati da Firestore.
-            // Potremmo dispatchare autologout o gestire diversamente.
-            // Per ora, mandiamo un errore e l'utente rimane loggato con i dati base.
             this.store.dispatch(setErrorMessage({ message: 'Errore nell\'aggiornamento dei dati utente da Firestore.' }));
-            // Considera di re-dispatchare updateLoginSuccess con userState (dati parziali) se vuoi che l'utente rimanga loggato
-            // return of(updateLoginSuccess({ user: userState!, redirect: updateLoginAction.redirect, isCustomerLogin: updateLoginAction.isCustomerLogin }));
-            // Oppure, se il ruolo è cruciale e non può essere determinato, fai logout:
-            // return of(autologout());
-            // Per ora, lasciamo che l'utente rimanga loggato con i dati parziali e mostriamo errore.
-            // Se si opta per il logout, bisogna gestire il messaggio di errore in modo appropriato.
-            // Ritornare un'azione di errore specifica per questo caso potrebbe essere meglio.
             return of(setErrorMessage({ message: 'Errore CRITICO nel recupero dei dati utente completi. Login parziale.' }));
           })
         );
@@ -139,7 +119,7 @@ export class AuthEffects {
 
             if (lastUrl && (lastUrl.startsWith('/admin/') || lastUrl.startsWith('/cliente/'))) {
               if ((user.ruolo === 'admin' && lastUrl.startsWith('/admin/')) ||
-                  (user.ruolo === 'cliente' && lastUrl.startsWith('/cliente/'))) { // MODIFICA QUI
+                  (user.ruolo === 'cliente' && lastUrl.startsWith('/cliente/'))) {
                 targetUrl = lastUrl;
               }
               localStorage.removeItem(this.lastUrlKey);
@@ -148,16 +128,15 @@ export class AuthEffects {
             if (targetUrl) {
               this.router.navigateByUrl(targetUrl).catch(err => {
                 console.error(`[AuthEffects loginRedirect$] Error navigating to ${targetUrl}, falling back to role-based default. Error:`, err);
-                this.redirectToRoleDefault(user); // Assicurati che redirectToRoleDefault gestisca 'cliente'
+                this.redirectToRoleDefault(user);
               });
             } else {
-              this.redirectToRoleDefault(user); // Assicurati che redirectToRoleDefault gestisca 'cliente'
+              this.redirectToRoleDefault(user);
             }
 
           } else if (action.redirect && user && !user.ruolo) {
               console.warn(`[AuthEffects loginRedirect$] Utente ${user.email} non ha un ruolo definito in Firestore. Redirecting to login.`);
-              this.store.dispatch(autologout()); // LOGOUT SE RUOLO MANCA
-              // Reindirizza alla pagina di login principale o specifica per errore
+              this.store.dispatch(autologout());
               this.router.navigate(['/auth/login'], { queryParams: { error: 'missing_role' } });
           }
         })
@@ -168,7 +147,7 @@ export class AuthEffects {
 
 private redirectToRoleDefault(user: User): void {
     if (user.ruolo === 'cliente') {
-      this.router.navigate(['/cliente/dashboard']); // NUOVA ROTTA CLIENTE
+      this.router.navigate(['/cliente/dashboard']);
     } else if (user.ruolo === 'admin') {
       this.router.navigate(['/admin/dashboard']);
     } else {
@@ -184,19 +163,14 @@ private redirectToRoleDefault(user: User): void {
       ofType(autoLogin),
       map(() => {
         const userFromStorage = this.authService.getUserFromLocalStorage();
-        // console.log('[AuthEffects autoLogin$] User from localStorage:', userFromStorage ? JSON.parse(JSON.stringify(userFromStorage)) : null);
         if (userFromStorage && userFromStorage.expirationDate && new Date(userFromStorage.expirationDate) > new Date()) {
-          // Non avviare il runTimeoutInterval qui se setUserInLocalStorage in updateLogin lo fa già
-          // this.authService.runTimeoutInterval(userFromStorage);
-          // console.log('[AuthEffects autoLogin$] Dispatching loginSuccess for autoLogin. User role from storage:', userFromStorage.ruolo);
-          return loginSuccess({ // loginSuccess triggererà updateLogin -> updateLoginSuccess -> loginRedirect$
+          return loginSuccess({
             user: userFromStorage,
-            redirect: true, // Importante per triggerare la catena di redirect che include il check del lastUrl
+            redirect: true,
             isCustomerLogin: userFromStorage.ruolo === 'cliente'
           });
         }
-        // console.log('[AuthEffects autoLogin$] No valid user found in localStorage or token expired.');
-        return { type: '[Auth] AutoLogin No User Found or Token Expired' }; // Azione che non fa nulla o logga
+        return { type: '[Auth] AutoLogin No User Found or Token Expired' };
       })
     )
   );
@@ -206,10 +180,10 @@ private redirectToRoleDefault(user: User): void {
       return this.actions$.pipe(
         ofType(autologout),
         tap(() => {
-          this.authService.logoutS(); // Questo dovrebbe già pulire i dati utente dal localStorage
-          localStorage.removeItem(this.lastUrlKey); // Rimuovi esplicitamente l'URL salvato al logout
+          this.authService.logoutS();
+          localStorage.removeItem(this.lastUrlKey);
           console.log('[AuthEffects logout$] Last authenticated URL removed from localStorage.');
-          this.router.navigate(['/']); // Reindirizza alla landing page
+          this.router.navigate(['/']);
         })
       );
     },
@@ -224,7 +198,6 @@ private redirectToRoleDefault(user: User): void {
           map((data) => {
             this.store.dispatch(setLoadingSpinner({ status: false }));
             this.store.dispatch(setErrorMessage({ message: null }));
-            // Potresti voler mostrare un messaggio di successo con Swal
             Swal.fire('Successo', 'Password aggiornata con successo!', 'success');
             return changePasswordSuccess();
           }),
@@ -233,7 +206,6 @@ private redirectToRoleDefault(user: User): void {
             const ErrorMessage = this.authService.getErrorMessage(
               errResp.error.error.message
             );
-            // Mostra errore con Swal
             Swal.fire('Errore', ErrorMessage, 'error');
             return of(setErrorMessage({ message: ErrorMessage }));
           })
@@ -246,16 +218,15 @@ private redirectToRoleDefault(user: User): void {
     this.actions$.pipe(
       ofType(changeInfoStart),
       switchMap((action) => {
-        return this.store.select(getUserToken).pipe( // getUserToken qui
-          take(1), // take qui
+        return this.store.select(getUserToken).pipe(
+          take(1),
           switchMap(token => {
             let authUpdateObservable = of(null);
 
             if (action.value.displayName !== undefined && token) {
               const displayName = action.value.displayName!;
-              // Assicurati che photoURL sia una stringa, anche vuota se non definita.
               const photoURLFromStorage = this.authService.getUserFromLocalStorage()?.photoURL;
-              const photoURLValue = action.value.photoURL || photoURLFromStorage || ''; // Correzione qui
+              const photoURLValue = action.value.photoURL || photoURLFromStorage || '';
               authUpdateObservable = this.authService.ChangeInfo(token, displayName, photoURLValue);
             }
 
@@ -266,7 +237,7 @@ private redirectToRoleDefault(user: User): void {
                     this.store.dispatch(setLoadingSpinner({ status: false }));
                     this.store.dispatch(setErrorMessage({ message: null }));
                     this.store.dispatch(updateLogin({ redirect: false, isCustomerLogin: action.value.ruolo === 'cliente' }));
-                    Swal.fire('Successo', 'Profilo aggiornato con successo!', 'success'); // Swal qui
+                    Swal.fire('Successo', 'Profilo aggiornato con successo!', 'success');
                     return changeInfoSuccess();
                   })
                 );
@@ -277,7 +248,7 @@ private redirectToRoleDefault(user: User): void {
                 const errorMessage = this.authService.getErrorMessage(
                   errResp?.error?.error?.message || 'ERRORE_AGGIORNAMENTO_PROFILO'
                 );
-                Swal.fire('Errore', errorMessage, 'error'); // Swal qui
+                Swal.fire('Errore', errorMessage, 'error'); 
                 return of(setErrorMessage({ message: errorMessage }));
               })
             );

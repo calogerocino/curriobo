@@ -6,7 +6,6 @@ import { Directive, AfterViewInit } from '@angular/core';
 })
 export class FeatherIconDirective implements AfterViewInit {
   ngAfterViewInit() {
-     //feather icon
      feather.replace();
   }
 }

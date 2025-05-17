@@ -1,6 +1,5 @@
 import { CurrioState } from './currio.state';
 import { createFeatureSelector, createSelector } from '@ngrx/store';
-import { Currio } from 'src/app/shared/models/currio.model';
 
 export const CURRIO_STATE_NAME = 'currioState';
 const getCurrioFeatureState = createFeatureSelector<CurrioState>(CURRIO_STATE_NAME);

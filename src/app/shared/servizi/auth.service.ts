@@ -73,8 +73,6 @@ export class AuthService {
       .createUserWithEmailAndPassword(email, password)
       .then((result) => {
         if (result.user) {
-          // Passa l'oggetto user di Firebase Auth a SetUserData
-          // e attendi il completamento prima di inviare l'email di verifica.
           return this.SetUserData(result.user).then(() => {
             this.SendVerificationMail();
           });
@@ -88,7 +86,6 @@ export class AuthService {
       });
   }
 
-  // Salva/Aggiorna i dati dell'utente in Firestore
  SetUserData(firebaseUser: FirebaseAuthUserType | any): Promise<void> {
     if (!firebaseUser || !firebaseUser.uid) {
       console.error('[AuthService.SetUserData] Chiamato con un oggetto utente non valido:', firebaseUser);
@@ -96,30 +93,23 @@ export class AuthService {
     }
 
     const userRef: AngularFirestoreDocument<User> = this.afs.doc<User>(
-      `users/${firebaseUser.uid}` // Usa l'UID di Firebase Auth come ID del documento
+      `users/${firebaseUser.uid}`
     );
 
-    // Determina il ruolo. Se firebaseUser.ruolo è fornito (es. da completa-registrazione), usalo.
-    // Altrimenti, se è un login standard, il ruolo dovrebbe essere già in Firestore o dedotto.
-    // Per la registrazione tramite invito, il ruolo sarà 'cliente'.
-    const ruoloDaUsare = firebaseUser.ruolo || 'cliente'; // Default a 'cliente' se non specificato
+    const ruoloDaUsare = firebaseUser.ruolo || 'cliente';
 
     const dataToSet: User = {
-      localId: firebaseUser.uid, // Corrisponde a User.localId
+      localId: firebaseUser.uid,
       email: firebaseUser.email || '',
       displayName: firebaseUser.displayName || '',
-      photoURL: firebaseUser.photoURL || 'assets/images/default-avatar.png', // Un avatar di default
+      photoURL: firebaseUser.photoURL || 'assets/images/default-avatar.png',
       emailVerified: firebaseUser.emailVerified || false,
-      ruolo: ruoloDaUsare, // Imposta il ruolo qui!
-      // Altri campi della tua interfaccia User che potresti voler inizializzare
+      ruolo: ruoloDaUsare,
       cellulare: firebaseUser.cellulare !== undefined ? firebaseUser.cellulare : null,
-      // Non salvare token o expirationDate di Firebase Auth direttamente in Firestore qui,
-      // sono gestiti dallo stato NGRX e/o localStorage per la sessione.
     };
 
     console.log(`[AuthService.SetUserData] Scrittura/Aggiornamento su Firestore per users/${firebaseUser.uid} con payload:`, JSON.parse(JSON.stringify(dataToSet)));
 
-    // Usa { merge: true } per aggiornare i campi esistenti o creare il documento se non esiste.
     return userRef.set(dataToSet, { merge: true })
       .then(() => {
         console.log(`[AuthService.SetUserData] Dati utente per ${firebaseUser.uid} salvati/aggiornati in Firestore.`);
@@ -148,13 +138,12 @@ export class AuthService {
       });
   }
 
-  // Formatta l'utente dalla risposta dell'API per lo store NGRX
   formatUser(data: AuthResponseData): User {
     const now = new Date();
     const expiresInMilliseconds = Number(data.expiresIn) * 1000;
     const expirationDate = new Date(now.getTime() + expiresInMilliseconds);
 
-    const formattedUser: User = { // Rinominato per chiarezza nel log
+    const formattedUser: User = {
       email: data.email,
       token: data.idToken,
       localId: data.localId,
@@ -169,7 +158,6 @@ export class AuthService {
     return formattedUser;
   }
 
-  // Salva i dati utente in localStorage
   setUserInLocalStorage(user: User | null) {
     if (user) {
       localStorage.setItem('userData', JSON.stringify(user));
@@ -179,7 +167,6 @@ export class AuthService {
     }
   }
 
-  // Esegue il timeout per il logout automatico
   runTimeoutInterval(user: User) {
     if (this.timeoutInterval) {
       clearTimeout(this.timeoutInterval);
@@ -191,13 +178,11 @@ export class AuthService {
             this.store.dispatch(autologout());
             }, expiresIn);
         } else {
-            // Token già scaduto
             this.store.dispatch(autologout());
         }
     }
   }
 
-  // Recupera i dati utente da localStorage
   getUserFromLocalStorage(): User | null {
     const userDataString = localStorage.getItem('userData');
     if (userDataString) {
@@ -212,7 +197,6 @@ export class AuthService {
     return null;
   }
 
-  // Mappa i codici di errore Firebase a messaggi user-friendly
   getErrorMessage(message: string): string {
     switch (message) {
       case 'EMAIL_NOT_FOUND':
@@ -246,15 +230,13 @@ export class AuthService {
     }
   }
 
-  // Logout dell'utente
-  SignOut(event?: Event) {
+ SignOut(event?: Event) {
     if (event) {
       event.preventDefault();
     }
     this.store.dispatch(autologout());
   }
 
-  // Logica effettiva di logout (chiamata dall'effect)
   logoutS() {
     this.afAuth.signOut().then(() => {
       localStorage.removeItem('userData');

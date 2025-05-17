@@ -2,51 +2,39 @@
             font-family: 'Inter', sans-serif;
         }
 
-        /* Animazione per lo sfondo della sezione Home - PROGRESSIVA */
         .hero-bg {
-            /* Definiamo un gradiente che include tutti i colori desiderati in sequenza.
-               Ripetiamo il primo colore alla fine per un ciclo fluido.
-               Angolo del gradiente: 45 gradi.
-               Colori: Blu, Rosso, Giallo, Verde, e di nuovo Blu. */
             background-image: linear-gradient(45deg,
-                #4285F4, /* Blu Gemini */
-                #EA4335, /* Rosso Gemini */
-                #FBBC05, /* Giallo Gemini */
-                #34A853, /* Verde Gemini */
-                #4285F4  /* Blu Gemini (ripetuto per il ciclo) */
+                #4285F4,
+                #EA4335,
+                #FBBC05,
+                #34A853,
+                #4285F4
             );
-            background-size: 400% 400%; /* Il gradiente è 4 volte più grande dell'elemento,
-                                           permettendo un ampio scorrimento. */
-            animation: gemini-progressive-animation 20s linear infinite; /* Applica l'animazione */
-            position: relative; /* Utile per il posizionamento di elementi figli */
+            background-size: 400% 400%;
+            animation: gemini-progressive-animation 20s linear infinite;
+            position: relative;
         }
 
         @keyframes gemini-progressive-animation {
             0% {
-                background-position: 0% 50%; /* Il gradiente inizia dalla sua posizione iniziale (sinistra) */
+                background-position: 0% 50%;
             }
             100% {
-                background-position: 100% 50%; /* Il gradiente scorre completamente verso destra,
-                                                  mostrando tutte le sue parti. Poiché il gradiente
-                                                  è ciclico (inizia e finisce con il blu),
-                                                  la transizione al successivo ciclo 0% sarà fluida. */
+                background-position: 100% 50%;
             }
         }
-
-        /* Stili per assicurare la leggibilità del testo sulla sezione Home animata */
-        #home .container > * { /* Applica a tutti i figli diretti del container per semplicità */
-            position: relative; /* Per assicurare che siano sopra lo sfondo */
+        #home .container > * {
+            position: relative;
             z-index: 1;
         }
         #home .container h1 {
-            color: #ffffff; /* Testo bianco per il titolo */
-            text-shadow: 0px 1px 3px rgba(0, 0, 0, 0.3); /* Leggera ombra per migliorare il contrasto */
+            color: #ffffff;
+            text-shadow: 0px 1px 3px rgba(0, 0, 0, 0.3);
         }
         #home .container p {
-            color: #f0f0f0; /* Testo grigio chiaro per il sottotitolo */
-            text-shadow: 0px 1px 3px rgba(0, 0, 0, 0.2); /* Leggera ombra */
+            color: #f0f0f0;
+            text-shadow: 0px 1px 3px rgba(0, 0, 0, 0.2);
         }
-        /* Il bottone ha già classi Tailwind per il colore, che dovrebbero funzionare bene */
 
 
         .project-card:hover {
@@ -92,30 +80,27 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 28px; /* Larghezza fissa */
-            height: 28px; /* Altezza fissa */
+            width: 28px;
+            height: 28px;
         }
 
         .language-selector a svg {
-            width: 20px; /* Larghezza SVG */
-            height: auto; /* Altezza automatica per mantenere le proporzioni */
-            display: block; /* Rimuove spazio extra sotto l'SVG */
+            width: 20px;
+            height: auto;
+            display: block;
         }
 
 
         .language-selector a.active {
-            background-color: #e0e7ff; /* Sfondo per lingua attiva */
-            border-radius: 50%; /* Cerchio per lingua attiva */
+            background-color: #e0e7ff;
+            border-radius: 50%;
         }
 
         .language-selector span.separator {
-            color: #9ca3af; /* Colore del separatore */
-            margin: 0 0.15rem; /* Margine ridotto per il separatore */
-            align-self: center; /* Allinea verticalmente il separatore */
+            color: #9ca3af;
+            margin: 0 0.15rem;
+            align-self: center;
         }
-
-
-        /* Stili per la Timeline del Curriculum */
         .timeline {
             position: relative;
             max-width: 900px;
@@ -123,12 +108,10 @@
         }
 
         .timeline::after {
-            /* Linea centrale della timeline */
             content: '';
             position: absolute;
             width: 6px;
             background-color: #cbd5e1;
-            /* Grigio più chiaro per la linea */
             top: 0;
             bottom: 0;
             left: 50%;
@@ -143,7 +126,6 @@
         }
 
         .timeline-item::after {
-            /* Cerchi sulla timeline */
             content: '';
             position: absolute;
             width: 25px;
@@ -151,7 +133,6 @@
             right: -17px;
             background-color: white;
             border: 4px solid #3b82f6;
-            /* Blu per i cerchi */
             top: 15px;
             border-radius: 50%;
             z-index: 1;
@@ -166,7 +147,6 @@
         }
 
         .timeline-left::before {
-            /* Frecce per i box a sinistra */
             content: " ";
             height: 0;
             position: absolute;
@@ -180,7 +160,6 @@
         }
 
         .timeline-right::before {
-            /* Frecce per i box a destra */
             content: " ";
             height: 0;
             position: absolute;
@@ -212,15 +191,12 @@
         }
 
         .timeline-header {
-            /* L'header rimane per il titolo e la data */
             @apply flex items-center py-2;
         }
 
         .timeline-header-clickable-area {
-            /* Area del titolo */
             @apply flex items-center gap-2;
         }
-
         .timeline-header h3 {
             @apply text-lg font-semibold text-blue-600;
         }
@@ -238,7 +214,6 @@
 
         .expandable-details.expanded {
             @apply pt-2;
-            /* Aggiunge padding quando espanso */
         }
 
         .timeline-content .date {
@@ -253,24 +228,18 @@
             @apply inline-block bg-gray-200 text-gray-700 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded-full mb-1;
         }
 
-        /* Stili per il nuovo trigger di espansione */
         .timeline-expand-trigger {
-            /* Flexbox per allineare testo e freccia. items-center per allineamento verticale. justify-end per posizionare a destra. */
             @apply mt-4 pt-3 border-t border-gray-200 cursor-pointer flex justify-end items-center;
-            /* Il colore qui è generico, le classi Tailwind su span e svg lo sovrascriveranno specificamente */
             color: #3b82f6;
         }
 
         .timeline-expand-trigger span {
-            /* Stili per il testo "ulteriori dettagli" */
             @apply text-sky-500 hover:text-sky-600 underline text-sm font-medium;
         }
 
         .new-timeline-arrow {
-            /* Stili per la freccia SVG. w-4 h-4 per dimensione, ml-1 per spaziatura. */
             @apply inline-block w-4 h-4 ml-1 text-sky-500 transition-transform duration-300;
         }
-
         .new-timeline-arrow.expanded {
             transform: rotate(180deg);
         }
@@ -288,21 +257,16 @@
             }
 
             .timeline-item::before {
-                /* Frecce per i box a sinistra e destra su mobile */
                 left: 60px;
                 border: medium solid white;
                 border-width: 10px 10px 10px 0;
                 border-color: transparent white transparent transparent;
             }
-
             .timeline-left::after,
             .timeline-right::after {
-                /* Cerchi su mobile */
                 left: 15px;
             }
-
             .timeline-right {
-                /* Allinea tutti gli item a sinistra su mobile */
                 left: 0%;
             }
         }

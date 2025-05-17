@@ -3,8 +3,7 @@ import { AuthService } from "../../../shared/servizi/auth.service";
 
 @Component({
   selector: 'app-resetpassword',
-  templateUrl: './resetpassword.component.html',
-  styleUrls: ['./resetpassword.component.scss']
+  templateUrl: './resetpassword.component.html'
 })
 export class ResetpasswordComponent {
 constructor(private readonly authService: AuthService) {}

@@ -3,8 +3,7 @@ import { Router, RouteConfigLoadStart, RouteConfigLoadEnd } from '@angular/route
 
 @Component({
   selector: 'app-base',
-  templateUrl: './base.component.html',
-  styleUrls: ['./base.component.scss']
+  templateUrl: './base.component.html'
 })
 export class BaseComponent {
 
@@ -12,7 +11,6 @@ export class BaseComponent {
 
   constructor(private readonly router: Router) {
 
-    // Spinner for lazyload modules
     this.router.events.forEach((event) => {
       if (event instanceof RouteConfigLoadStart) {
         this.isLoading = true;

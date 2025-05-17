@@ -14,7 +14,6 @@ export class AuthService {
   user: User;
   constructor(private readonly http: HttpClient) {}
 
-// UTENTE
 
   isAuthenticated() {
     return this.isLoggedIn;

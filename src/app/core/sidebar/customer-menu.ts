@@ -1,23 +1,23 @@
-import { MenuItem } from 'src/app/core/sidebar/menu.model'; // Riusa il modello
+import { MenuItem } from 'src/app/core/sidebar/menu.model'; 
 
 export const CUSTOMER_MENU: MenuItem[] = [
   {
-    label: 'generale.layout.menu.main', // Usa chiavi di traduzione
+    label: 'generale.layout.menu.main',
     isTitle: true,
   },
   {
-    label: 'Dashboard', // Potrebbe essere una home della dashboard cliente
+    label: 'Dashboard',
     icon: 'home',
     link: '/cliente/dashboard',
   },
   {
-    label: 'customer.menu.profile', // 'Il Mio Profilo'
+    label: 'customer.menu.profile',
     icon: 'user',
     link: '/cliente/account',
   },
   {
-    label: 'customer.menu.currio', // 'Il Mio Curriò'
-    icon: 'edit-3', // o un'icona più adatta per 'currio'/'portfolio'
+    label: 'customer.menu.currio',
+    icon: 'edit-3',
     link: '/cliente/currio',
   },
 ];

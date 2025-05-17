@@ -10,8 +10,7 @@ import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-navbar',
-  templateUrl: './navbar.component.html',
-  styleUrls: ['./navbar.component.scss'],
+  templateUrl: './navbar.component.html'
 })
 export class NavbarComponent {
   connectedUser$: Observable<User> = this.store.select(getUser);

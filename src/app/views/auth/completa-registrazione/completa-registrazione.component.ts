@@ -15,7 +15,7 @@ import * as CurrioActions from 'src/app/views/currio/state/currio.action';
 import Swal from 'sweetalert2';
 import { Subscription, firstValueFrom, timeout, catchError, of } from 'rxjs';
 import { setLoadingSpinner } from 'src/app/shared/store/shared.actions';
-import { User as FirebaseAuthUserType } from '@firebase/auth-types'; // O da 'firebase/auth' per v9+
+import { User as FirebaseAuthUserType } from '@firebase/auth-types';
 import { Actions, ofType } from '@ngrx/effects';
 
 @Component({
@@ -92,10 +92,6 @@ export class CompletaRegistrazioneComponent implements OnInit, OnDestroy {
     this.isLoading = true;
     this.errorMessage = null;
     this.store.dispatch(setLoadingSpinner({ status: true }));
-
-    // Cerca il Currio con il token specificato
-    // Nota: getCurrios() potrebbe non essere efficiente per un singolo token.
-    // Se possibile, implementa un getCurrioByToken(token) nel servizio.
     this.curriosSub = this.currioService.getCurrios().subscribe({
       next: (currios) => {
         const currio = currios.find(
@@ -161,10 +157,9 @@ export class CompletaRegistrazioneComponent implements OnInit, OnDestroy {
 
     const email = this.currioData.datiCliente.email;
     const password = this.registrationForm.value.password;
-    const displayName = this.currioData.datiCliente.nome; // Nome del cliente
+    const displayName = this.currioData.datiCliente.nome;
 
     try {
-      // 1. Crea utente in Firebase Auth
       const result =
         await this.authService.afAuth.createUserWithEmailAndPassword(
           email,
@@ -176,42 +171,38 @@ export class CompletaRegistrazioneComponent implements OnInit, OnDestroy {
         throw new Error('Creazione utente Firebase Auth fallita.');
       }
 
-      // 2. Aggiorna il profilo Firebase Auth con il displayName
       if (displayName) {
         await newAuthUser.updateProfile({ displayName: displayName });
       }
-      // Considera l'invio dell'email di verifica qui: await newAuthUser.sendEmailVerification();
 
-      // 3. Salva/Aggiorna dati utente in Firestore "users" collection con ruolo 'cliente'
       await this.authService.SetUserData({
         uid: newAuthUser.uid,
         email: newAuthUser.email,
         displayName: displayName || newAuthUser.displayName || '',
-        photoURL: newAuthUser.photoURL || 'assets/images/default-avatar.png', // Avatar di default
-        emailVerified: newAuthUser.emailVerified, // Inizialmente false
-        ruolo: 'cliente', // RUOLO CLIENTE
+        photoURL: newAuthUser.photoURL || 'assets/images/default-avatar.png',
+        emailVerified: newAuthUser.emailVerified,
+        ruolo: 'cliente',
       });
 
-      // 4. Aggiorna il documento Currio
       if (this.currioData && this.currioData.id) {
         const updatedCurrio: Currio = {
           ...this.currioData,
-          userId: newAuthUser.uid, // Associa l'ID utente Firebase al Currio
-          status: 'attivo', // Imposta lo status del Currio ad attivo
-          tokenRegistrazione: undefined, // Rimuovi il token
-          tokenRegistrazioneScadenza: undefined, // Rimuovi la scadenza del token
+          userId: newAuthUser.uid,
+          status: 'attivo',
+          tokenRegistrazione: undefined,
+          tokenRegistrazioneScadenza: undefined,
         };
         this.store.dispatch(
           CurrioActions.updateCurrio({ currio: updatedCurrio })
         );
-        // Attendi il successo dell'azione se necessario per un feedback più preciso
+
         await firstValueFrom(
           this.actions$.pipe(
             ofType(
               CurrioActions.updateCurrioSuccess,
               CurrioActions.updateCurrioFailure
             ),
-            timeout(10000), // Timeout di 10 secondi
+            timeout(10000),
             catchError((err) => {
               console.warn(
                 "Timeout o errore nell'ascolto dell'azione updateCurrio:",
@@ -228,7 +219,7 @@ export class CompletaRegistrazioneComponent implements OnInit, OnDestroy {
         'Il tuo account è stato creato con successo. Ora puoi effettuare il login.',
         'success'
       );
-      this.router.navigate(['/auth/login-cliente']); // Reindirizza al login cliente
+      this.router.navigate(['/auth/login-cliente']); 
     } catch (error: any) {
       this.errorMessage = this.authService.getErrorMessage(
         error.code || error.message

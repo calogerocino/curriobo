@@ -2,7 +2,6 @@ import { createAction, props } from '@ngrx/store';
 import { Currio } from 'src/app/shared/models/currio.model';
 import { CurrioSubmission } from 'src/app/shared/models/currio-submission.model';
 
-// Azioni per i Currio
 export const LOAD_CURRIOS = '[Currio Page] Load Currios';
 export const LOAD_CURRIOS_SUCCESS = '[Currio API] Load Currios Success';
 export const LOAD_CURRIOS_FAILURE = '[Currio API] Load Currios Failure';
@@ -23,12 +22,10 @@ export const DELETE_CURRIO = '[Currio Page] Delete Currio';
 export const DELETE_CURRIO_SUCCESS = '[Currio API] Delete Currio Success';
 export const DELETE_CURRIO_FAILURE = '[Currio API] Delete Currio Failure';
 
-// Azioni per Currio Submissions (già esistenti, verifica i nomi)
 export const LOAD_CURRIO_SUBMISSIONS = '[Events Page] load currio submissions';
 export const LOAD_CURRIO_SUBMISSIONS_SUCCESS = '[Events Page] load currio submissions success';
 
 
-// Implementazioni Azioni Currio
 export const loadCurrios = createAction(LOAD_CURRIOS);
 export const loadCurriosSuccess = createAction(LOAD_CURRIOS_SUCCESS, props<{ currios: Currio[] }>());
 export const loadCurriosFailure = createAction(LOAD_CURRIOS_FAILURE, props<{ error: any }>());

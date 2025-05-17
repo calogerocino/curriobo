@@ -4,11 +4,10 @@ import { AuthService } from '../../../shared/servizi/auth.service';
 
 @Component({
   selector: 'app-verifyemail',
-  templateUrl: './verifyemail.component.html',
-  styleUrls: ['./verifyemail.component.scss'],
+  templateUrl: './verifyemail.component.html'
 })
 export class VerifyemailComponent {
-  user: any; // TODO remove type any
+  user: any;
 
   constructor(private readonly authService: AuthService) {}
 

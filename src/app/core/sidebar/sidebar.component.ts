@@ -18,8 +18,7 @@ import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-sidebar',
-  templateUrl: './sidebar.component.html',
-  styleUrls: ['./sidebar.component.scss'],
+  templateUrl: './sidebar.component.html'
 })
 export class SidebarComponent implements OnInit, AfterViewInit {
   @ViewChild('sidebarToggler') sidebarToggler: ElementRef;
@@ -68,35 +67,18 @@ export class SidebarComponent implements OnInit, AfterViewInit {
     }
   }
 
-  /**
-   * Toggle settings-sidebar
-   */
-  // toggleSettingsSidebar(e) {
-  //   e.preventDefault();
-  //   this.document.body.classList.toggle('settings-open');
-  // }
-
-  /**
-   * Open sidebar when hover (in folded folded state)
-   */
   operSidebarFolded() {
     if (this.document.body.classList.contains('sidebar-folded')) {
       this.document.body.classList.add('open-sidebar-folded');
     }
   }
 
-  /**
-   * Fold sidebar after mouse leave (in folded state)
-   */
-  closeSidebarFolded() {
+   closeSidebarFolded() {
     if (this.document.body.classList.contains('sidebar-folded')) {
       this.document.body.classList.remove('open-sidebar-folded');
     }
   }
 
-  /**
-   * Sidebar-folded on desktop (min-width:992px and max-width: 1199px)
-   */
   iconSidebar(e) {
     if (e.matches) {
       this.document.body.classList.add('sidebar-folded');
@@ -105,34 +87,17 @@ export class SidebarComponent implements OnInit, AfterViewInit {
     }
   }
 
-  /**
-   * Switching sidebar light/dark
-   */
-  // onSidebarThemeChange(event) {
-  //   this.document.body.classList.remove('sidebar-light', 'sidebar-dark');
-  //   this.document.body.classList.add(event.target.value);
-  //   this.document.body.classList.remove('settings-open');
-  // }
 
-  /**
-   * Returns true or false if given menu item has child or not
-   * @param item menuItem
-   */
   hasItems(item: MenuItem) {
     return item.subItems !== undefined ? item.subItems.length > 0 : false;
   }
 
-  /**
-   * Reset the menus then hilight current active menu item
-   */
+
   _activateMenuDropdown() {
     this.resetMenuItems();
     this.activateMenuItems();
   }
 
-  /**
-   * Resets the menus
-   */
   resetMenuItems() {
     const links = document.getElementsByClassName('nav-link-ref');
 
@@ -175,16 +140,12 @@ export class SidebarComponent implements OnInit, AfterViewInit {
     }
   }
 
-  /**
-   * Toggles the menu items
-   */
   activateMenuItems() {
     const links = document.getElementsByClassName('nav-link-ref');
 
     let menuItemEl = null;
 
     for (let i = 0; i < links.length; i++) {
-      // tslint:disable-next-line: no-string-literal
       if (window.location.pathname === links[i]['pathname']) {
         menuItemEl = links[i];
 

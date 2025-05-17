@@ -11,13 +11,13 @@ import { environment } from 'src/environments/environment';
   providedIn: 'root',
 })
 export class CurrioService {
-  private currioDbPath = 'currios'; // Path in Firebase per i Currio
+  private currioDbPath = 'currios';
 
   constructor(private readonly http: HttpClient) {}
 
   getCurrios(): Observable<Currio[]> {
     return this.http
-      .get<{ [key: string]: Omit<Currio, 'id'> }>( // Tipizzazione per la risposta da RTDB
+      .get<{ [key: string]: Omit<Currio, 'id'> }>(
         `${environment.firebase.databaseURL}/${this.currioDbPath}.json`
       )
       .pipe(
@@ -26,7 +26,7 @@ export class CurrioService {
           if (data) {
             for (const key in data) {
               if (data.hasOwnProperty(key)) {
-                currios.push({ ...(data[key] as any), id: key }); // Aggiunge l'ID (chiave) all'oggetto
+                currios.push({ ...(data[key] as any), id: key });
               }
             }
           }
@@ -35,17 +35,17 @@ export class CurrioService {
       );
   }
 
-    getCurrioById(id: string): Observable<Currio | undefined> { // Modifica il tipo restituito
+    getCurrioById(id: string): Observable<Currio | undefined> {
     return this.http
       .get<Omit<Currio, 'id'> | null>(`${environment.firebase.databaseURL}/${this.currioDbPath}/${id}.json`)
       .pipe(
         map(data => {
-            if (data === null) { // Gestisci esplicitamente il caso null da Firebase
+            if (data === null) {
               console.warn(`[CurrioService] Nessun dato trovato per l'ID Curriò: ${id}. Restituisco undefined.`);
-              return undefined; // Restituisci undefined se nessun dato viene trovato
+              return undefined;
             }
-            // Se data non è null, procedi a mappare i dati come prima
-            const currioFromDb = data as any; // Cast ad any per flessibilità con i dati parziali
+
+            const currioFromDb = data as any;
             return {
                 id: id,
                 nomePortfolio: currioFromDb.nomePortfolio || '',
@@ -71,9 +71,9 @@ export class CurrioService {
       );
   }
 
-  createCurrio(currioData: Omit<Currio, 'id'>): Observable<{ name: string }> { // Firebase RTDB restituisce un oggetto con la chiave 'name' (l'ID generato)
+  createCurrio(currioData: Omit<Currio, 'id'>): Observable<{ name: string }> {
     return this.http.post<{ name: string }>(
-      `${environment.firebase.databaseURL}/${this.currioDbPath}.json`, // Aggiungi .json per RTDB
+      `${environment.firebase.databaseURL}/${this.currioDbPath}.json`,
       currioData
     );
   }
@@ -81,24 +81,16 @@ export class CurrioService {
   updateCurrio(currio: Currio): Observable<any> {
     const { id, ...currioDataFromModel } = currio;
 
-    // Creiamo un oggetto pulito per il PATCH, convertendo undefined in null
-    // per i campi che vogliamo esplicitamente rimuovere o resettare in RTDB.
     const dataForPatch: { [key: string]: any } = {};
 
-    // Itera sulle proprietà del modello Currio passato
     for (const key in currioDataFromModel) {
       if (currioDataFromModel.hasOwnProperty(key)) {
         const modelKey = key as keyof typeof currioDataFromModel;
         const value = currioDataFromModel[modelKey];
-        // Se il valore è undefined, lo impostiamo a null per RTDB (per cancellare il campo)
-        // Altrimenti, usiamo il valore così com'è.
         dataForPatch[modelKey] = value === undefined ? null : value;
       }
     }
 
-    // Assicurati che i campi specifici da nullificare siano gestiti correttamente
-    // se erano undefined nel modello `currio` originale.
-    // La logica sopra dovrebbe già coprire questo, ma per chiarezza:
     if (currio.tokenRegistrazione === undefined) {
         dataForPatch['tokenRegistrazione'] = null;
     }
@@ -106,8 +98,6 @@ export class CurrioService {
         dataForPatch['tokenRegistrazioneScadenza'] = null;
     }
 
-    // Se alcuni campi non devono MAI essere null e hanno un default, assicurati che siano presenti
-    // Esempio: se status non è in currioDataFromModel, ma deve essere inviato
     if (dataForPatch['status'] === undefined && currio.status) {
         dataForPatch['status'] = currio.status;
     }

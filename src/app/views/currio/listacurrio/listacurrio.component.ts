@@ -1,6 +1,6 @@
-import { Component, OnInit, OnDestroy } from "@angular/core"; // Aggiunto OnDestroy
-import { Observable, Subject, Subscription } from "rxjs"; // Aggiunto Subject e Subscription
-import { map, startWith, takeUntil } from 'rxjs/operators'; // Aggiunto operatori RxJS
+import { Component, OnInit, OnDestroy } from "@angular/core";
+import { Observable, Subject, Subscription } from "rxjs";
+import { map,  takeUntil } from 'rxjs/operators';
 import { Currio } from "src/app/shared/models/currio.model";
 import { CurrioSubmission } from "src/app/shared/models/currio-submission.model";
 import { Store } from "@ngrx/store";
@@ -18,70 +18,50 @@ type CurrioStatusType = 'nuova_richiesta' | 'invito_spedito' | 'attivo' | 'archi
   styleUrls: ["./listacurrio.component.scss"],
 })
 export class ListaCurrioComponent implements OnInit, OnDestroy {
-  currios$: Observable<Currio[]>; // Osservabile originale dei Curriò
-  filteredCurrios$: Observable<Currio[]>; // Osservabile per i Curriò filtrati
+  currios$: Observable<Currio[]>;
+  filteredCurrios$: Observable<Currio[]>;
   currioSubmissions$: Observable<CurrioSubmission[]>;
 
-  selectedStatusFilter: CurrioStatusType | "" = ""; // Proprietà per il valore del filtro, "" per "tutti"
+  selectedStatusFilter: CurrioStatusType | "" = "";
 
-  private allCurrios: Currio[] = []; // Per mantenere la lista completa dei curriò
+  private allCurrios: Currio[] = [];
   private curriosSubscription: Subscription | undefined;
-  private destroy$ = new Subject<void>(); // Per pulire le sottoscrizioni
+  private destroy$ = new Subject<void>();
 
   constructor(
     private readonly store: Store<AppState>,
     private readonly router: Router
   ) {
     this.currios$ = this.store.select(getCurrios);
-    this.currioSubmissions$ = this.store.select(getCurrioSubmissions); // Mantenuto se usato
+    this.currioSubmissions$ = this.store.select(getCurrioSubmissions);
   }
 
   ngOnInit(): void {
     this.store.dispatch(loadCurrios());
     this.store.dispatch(loadCurrioSubmissions());
 
-    // Sottoscrivi a currios$ per ottenere la lista completa e inizializzare filteredCurrios$
     this.curriosSubscription = this.currios$.pipe(
-        takeUntil(this.destroy$) // Esegue l'unsubscribe quando destroy$ emette
+        takeUntil(this.destroy$)
     ).subscribe(currios => {
       this.allCurrios = currios;
-      this.applyFilter(); // Applica il filtro iniziale (che sarà "tutti")
+      this.applyFilter();
     });
 
-    // Inizializza filteredCurrios$ per evitare errori nel template prima che currios$ emetta
-    // Questo può essere un BehaviorSubject o un ReplaySubject nel componente per una gestione più avanzata,
-    // ma per ora lo impostiamo qui e aggiorniamo in applyFilter.
-    // Un approccio più reattivo sarebbe derivare filteredCurrios$ direttamente da currios$ e da un Subject per il filtro.
-    // Per semplicità, useremo una variabile e la riassegneremo.
-    // Modifichiamo per un approccio più reattivo:
     this.filteredCurrios$ = this.currios$.pipe(
       map(currios => this.filterCurrios(currios, this.selectedStatusFilter)),
       takeUntil(this.destroy$)
     );
   }
 
-  /**
-   * Applica il filtro alla lista dei Curriò.
-   * Questo metodo viene chiamato quando cambia il valore del dropdown.
-   */
   applyFilter(): void {
-    // L'aggiornamento di filteredCurrios$ ora avviene reattivamente
-    // grazie al pipe in ngOnInit.
-    // Abbiamo solo bisogno di triggerare un ricalcolo se selectedStatusFilter cambia.
-    // Questo è già gestito da (ngModelChange) che chiama questo metodo,
-    // e il pipe su currios$ si riattiverà o ricalcolerà.
-    // Per forzare un re-emit se currios$ non cambia ma il filtro sì:
     this.filteredCurrios$ = this.currios$.pipe(
         map(currios => this.filterCurrios(currios, this.selectedStatusFilter)),
         takeUntil(this.destroy$)
     );
   }
 
-  /**
-   * Funzione helper per filtrare i curriò.
-   */
   private filterCurrios(currios: Currio[], statusFilter: CurrioStatusType | ""): Currio[] {
-    if (!statusFilter) { // Se il filtro è "" (Tutti gli Stati)
+    if (!statusFilter) {
       return currios;
     }
     return currios.filter(currio => currio.status === statusFilter);
@@ -176,9 +156,5 @@ export class ListaCurrioComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
-    // Non è più necessario l'unsubscribe manuale se usi takeUntil
-    // if (this.curriosSubscription) {
-    //   this.curriosSubscription.unsubscribe();
-    // }
   }
 }

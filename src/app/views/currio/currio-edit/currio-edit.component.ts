@@ -1,16 +1,12 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import {
   FormGroup,
-  FormControl,
   Validators,
-  FormArray,
   FormBuilder,
 } from '@angular/forms';
 import {
-  Currio,
-  CurrioContatti,
-  DatiClienteCurrio,
-} from 'src/app/shared/models/currio.model'; // Aggiorna import
+  Currio
+} from 'src/app/shared/models/currio.model';
 import { getCurrioById, getCurrioLoading } from '../state/currio.selector';
 import { AppState } from 'src/app/shared/app.state';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -22,17 +18,16 @@ import {
   loadCurrios,
   deleteCurrio,
 } from '../state/currio.action';
-import { v4 as uuidv4 } from 'uuid'; // Per generare token
-import Swal from 'sweetalert2'; // Per notifiche
+import { v4 as uuidv4 } from 'uuid';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-currio-edit',
-  templateUrl: './currio-edit.component.html',
-  styleUrls: ['./currio-edit.component.scss'],
+  templateUrl: './currio-edit.component.html'
 })
 export class CurrioEditComponent implements OnInit, OnDestroy {
   currio: Currio | undefined;
-  currioForm: FormGroup; // Deve essere inizializzata
+  currioForm: FormGroup;
   private currioSubscription: Subscription | undefined;
   private routeSubscription: Subscription | undefined;
   isEditMode = false;
@@ -48,7 +43,6 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
     private readonly fb: FormBuilder
   ) {
     this.isSubmitting$ = this.store.select(getCurrioLoading);
-    // Inizializza il form qui o in ngOnInit per evitare 'currioForm' is possibly 'undefined'
     this.currioForm = this.fb.group({
       nomePortfolio: ['', Validators.required],
       heroTitle: ['', Validators.required],
@@ -61,10 +55,8 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
         email: ['', [Validators.required, Validators.email]],
         github: [''],
         linkedin: [''],
-        instagram: [''], // Aggiunto Instagram se non c'era
+        instagram: [''],
       }),
-      // Esempio per Progetti (da decommentare e adattare se necessario)
-      // progetti: this.fb.array([]),
     });
   }
 
@@ -73,14 +65,13 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
       this.currioId = params.get('id');
       if (this.currioId && this.currioId !== 'new') {
         this.isEditMode = true;
-        this.store.dispatch(loadCurrios()); // Carica tutti i currios per trovare quello specifico
-        // o usa un'azione specifica loadCurrioById se disponibile e funzionante
+        this.store.dispatch(loadCurrios());
         if (this.currioSubscription) {
           this.currioSubscription.unsubscribe();
         }
         this.currioSubscription = this.store
-          .select(getCurrioById, { id: this.currioId }) // Passa l'id come props
-          .pipe(filter((data): data is Currio => !!data)) // Assicura che data non sia undefined
+          .select(getCurrioById, { id: this.currioId })
+          .pipe(filter((data): data is Currio => !!data))
           .subscribe((data) => {
             this.currio = data;
             this.initializeForm();
@@ -122,22 +113,22 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
         email: this.currio.contatti?.email || '',
         github: this.currio.contatti?.github || '',
         linkedin: this.currio.contatti?.linkedin || '',
-        instagram: this.currio.contatti?.instagram || '', // Aggiunto Instagram
+        instagram: this.currio.contatti?.instagram || '',
       },
     });
-    this.currioForm.markAsPristine(); // Dopo aver popolato, marca come non modificato
+    this.currioForm.markAsPristine();
   }
 
   private getEmptyCurrio(): Currio {
     return {
-      id: '', // Sarà generato da Firebase o non necessario per la creazione
+      id: '',
       nomePortfolio: '',
       heroTitle: '',
       heroSubtitle: '',
       linguaDefault: 'it',
       contatti: { email: '', github: '', linkedin: '', instagram: '' },
-      status: 'nuova_richiesta', // Default per un currio creato dall'admin
-    } as Currio; // Cast parziale, assicurati che tutti i campi obbligatori siano presenti
+      status: 'nuova_richiesta',
+    } as Currio;
   }
 
   preparaEInviaInvito(): void {
@@ -155,7 +146,7 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
     this.linkRegistrazione = `${baseUrl}/auth/completa-registrazione?token=${token}`;
     this.encodedLinkRegistrazione = encodeURIComponent(this.linkRegistrazione);
 
-    const scadenzaTimestamp = Date.now() + 24 * 60 * 60 * 1000; // Token valido per 24 ore
+    const scadenzaTimestamp = Date.now() + 24 * 60 * 60 * 1000;
 
     const currioAggiornato: Currio = {
       ...this.currio,
@@ -212,10 +203,6 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
       chiSonoDescrizione1: formValue.chiSonoDescrizione1,
       chiSonoDescrizione2: formValue.chiSonoDescrizione2,
       contatti: formValue.contatti,
-      // Includi i FormArray se li hai implementati
-      // progetti: formValue.progetti || [],
-      // esperienze: formValue.esperienze || [],
-      // competenze: formValue.competenze || [],
       status: baseCurrio.status,
       userId: baseCurrio.userId,
       tokenRegistrazione: baseCurrio.tokenRegistrazione,
@@ -240,7 +227,6 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
   openPreviewInNewTab(): void {
     if (this.currio && this.currio.id) {
       const url = this.router.serializeUrl(
-        // this.router.createUrlTree(['/admin/currio/preview', this.currio.id]) // URL corretto
         this.router.createUrlTree([this.currio.id])
       );
       window.open(url, '_blank');
