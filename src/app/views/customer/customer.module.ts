@@ -2,14 +2,14 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Routes } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { TranslateModule } from '@ngx-translate/core'; // Import principale
+import { TranslateModule } from '@ngx-translate/core';
 import { FeahterIconModule } from 'src/app/shared/feather-icon/feather-icon.module';
 import {
   NgbDropdownModule,
   NgbCollapseModule,
   NgbTooltipModule,
 } from '@ng-bootstrap/ng-bootstrap';
-import { CoreModule } from '../../core/core.module'; // Importa CoreModule
+import { CoreModule } from '../../core/core.module';
 
 // Layout Cliente
 import { CustomerLayoutComponent } from './customer-layout/customer-layout.component';
@@ -18,7 +18,7 @@ import { CustomerNavbarComponent } from './customer-layout/customer-navbar/custo
 import { CustomerFooterComponent } from './customer-layout/customer-footer/customer-footer.component';
 
 // Pagine specifiche
-import { CustomerDashboardHomeComponent } from './dashboard-home/dashboard-home.component'; // L'import corretto
+import { CustomerDashboardHomeComponent } from './dashboard-home/dashboard-home.component';
 import { AccountInfoComponent } from './account-info/account-info.component';
 import { CurrioSettingsComponent } from './currio-settings/currio-settings.component';
 
@@ -53,7 +53,7 @@ const routes: Routes = [
     CustomerSidebarComponent,
     CustomerNavbarComponent,
     CustomerFooterComponent,
-    CustomerDashboardHomeComponent, // Dichiarazione corretta
+    CustomerDashboardHomeComponent,
     AccountInfoComponent,
     CurrioSettingsComponent,
   ],
@@ -62,7 +62,7 @@ const routes: Routes = [
     RouterModule.forChild(routes),
     FormsModule,
     ReactiveFormsModule,
-    TranslateModule.forChild(), // Usa forChild() qui!
+    TranslateModule.forChild(),
     FeahterIconModule,
     NgbDropdownModule,
     NgbCollapseModule,

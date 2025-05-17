@@ -6,7 +6,7 @@ import { filter } from 'rxjs/operators';
 @Component({
   selector: 'app-customer-layout',
   templateUrl: './customer-layout.component.html',
-  styleUrls: ['./customer-layout.component.scss'] // Potresti creare o riusare base.component.scss
+  styleUrls: ['./customer-layout.component.scss']
 })
 export class CustomerLayoutComponent implements OnInit, OnDestroy {
   isLoading: boolean;
@@ -23,10 +23,7 @@ export class CustomerLayoutComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    // Aggiungi/rimuovi classi dal body se necessario per lo stile specifico del cliente
-    this.renderer.addClass(document.body, 'sidebar-dark'); // Esempio, se vuoi lo stesso tema sidebar admin
-
-    // Per gestire la chiusura della sidebar su navigazione in mobile (come in BaseComponent)
+    this.renderer.addClass(document.body, 'sidebar-dark');
     this.routerSubscription.add(
       this.router.events.pipe(
         filter((event: RouterEvent): event is NavigationEnd => event instanceof NavigationEnd)
@@ -39,7 +36,7 @@ export class CustomerLayoutComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.renderer.removeClass(document.body, 'sidebar-dark'); // Pulisci la classe
+    this.renderer.removeClass(document.body, 'sidebar-dark');
     if (this.routerSubscription) {
       this.routerSubscription.unsubscribe();
     }

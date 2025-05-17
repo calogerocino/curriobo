@@ -1,17 +1,17 @@
-import { Component, OnInit, OnDestroy } from '@angular/core'; // Aggiungi OnDestroy
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { User } from 'src/app/shared/models/user.interface';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router'; // Aggiungi Router
+import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { AppState } from 'src/app/shared/app.state';
-import { Observable, of, Subscription, take } from 'rxjs'; // Aggiungi Subscription
-import { getUser, getUserToken } from '../../auth/state/auth.selector'; // getUserToken se serve per changePassword
+import { Observable, of, Subscription, take } from 'rxjs';
+import { getUser, getUserToken } from '../../auth/state/auth.selector';
 import { UserService } from 'src/app/shared/servizi/user.service';
 import {
   changeInfoStart,
-  changeInfoSuccess, // Importa changeInfoSuccess se vuoi resettare il form dopo
+  changeInfoSuccess,
   changePasswordStart,
-  changePasswordSuccess, // Importa changePasswordSuccess se vuoi resettare il form dopo
+  changePasswordSuccess,
 } from '../../auth/state/auth.action';
 import {
   setErrorMessage,
@@ -20,14 +20,14 @@ import {
 import { getErrorMessage } from 'src/app/shared/store/shared.selectors';
 import { AuthService } from 'src/app/shared/servizi/auth.service';
 import Swal from 'sweetalert2';
-import { Actions, ofType } from '@ngrx/effects'; // Importa Actions e ofType
+import { Actions, ofType } from '@ngrx/effects'
 
 @Component({
   selector: 'app-profilo',
   templateUrl: './profilo.component.html',
   styleUrls: ['./profilo.component.scss'],
 })
-export class ProfiloComponent implements OnInit, OnDestroy { // Implementa OnDestroy
+export class ProfiloComponent implements OnInit, OnDestroy {
   connectedUser$: Observable<User | null> = this.store.select(getUser);
   errorMessage$: Observable<string | null> = this.store.select(getErrorMessage);
   localId: string = '';
@@ -37,15 +37,15 @@ export class ProfiloComponent implements OnInit, OnDestroy { // Implementa OnDes
 
   showUnsavedChangesWarning = false;
   private formChangesSubscription: Subscription | undefined;
-  private actionsSubscription: Subscription | undefined; // Per ascoltare le azioni di successo
+  private actionsSubscription: Subscription | undefined;
 
   constructor(
     private readonly route: ActivatedRoute,
-    private readonly router: Router, // Inietta Router
+    private readonly router: Router,
     private readonly store: Store<AppState>,
     private readonly userService: UserService,
     private readonly authService: AuthService,
-    private readonly actions$: Actions // Inietta Actions
+    private readonly actions$: Actions
   ) {}
 
   ngOnInit(): void {
@@ -57,17 +57,16 @@ export class ProfiloComponent implements OnInit, OnDestroy { // Implementa OnDes
       } else {
         console.error("ID utente non trovato nei parametri della rotta.");
         Swal.fire('Errore', 'ID utente mancante nella rotta.', 'error');
-        this.router.navigate(['/admin/utente/utenti']); // Reindirizza se ID manca
+        this.router.navigate(['/admin/utente/utenti']);
       }
     });
 
-    // Ascolta le azioni di successo per resettare lo stato dirty del form
     this.actionsSubscription = this.actions$.pipe(
       ofType(changeInfoSuccess, changePasswordSuccess)
     ).subscribe(() => {
       if (this.userForm) {
-        this.userForm.markAsPristine(); // Resetta lo stato "dirty" del form
-        this.updateWarningState(); // Aggiorna la visibilità del warning
+        this.userForm.markAsPristine();
+        this.updateWarningState();
       }
     });
   }
@@ -82,13 +81,13 @@ export class ProfiloComponent implements OnInit, OnDestroy { // Implementa OnDes
         } else {
           console.error(`Utente con ID ${userId} non trovato in Firestore.`);
           Swal.fire('Errore', 'Utente non trovato.', 'error')
-            .then(() => this.router.navigate(['/admin/utente/utenti'])); // Reindirizza se utente non trovato
+            .then(() => this.router.navigate(['/admin/utente/utenti']));
         }
       },
       error: (err) => {
         console.error('Errore nel caricamento dati utente da Firestore:', err);
         Swal.fire('Errore Server', 'Impossibile caricare i dati utente.', 'error')
-          .then(() => this.router.navigate(['/admin/utente/utenti'])); // Reindirizza in caso di errore
+          .then(() => this.router.navigate(['/admin/utente/utenti']));
       }
     });
   }
@@ -99,7 +98,7 @@ export class ProfiloComponent implements OnInit, OnDestroy { // Implementa OnDes
         Validators.required,
         Validators.minLength(6),
       ]),
-      email: new FormControl({value: userData.email || '', disabled: true}, [Validators.required, Validators.email]), // Email solitamente non modificabile direttamente
+      email: new FormControl({value: userData.email || '', disabled: true}, [Validators.required, Validators.email]),
       cellulare: new FormControl(userData.cellulare || '', [
         Validators.minLength(10),
       ]),
@@ -118,14 +117,12 @@ export class ProfiloComponent implements OnInit, OnDestroy { // Implementa OnDes
       ]),
     }, { validators: this.passwordMatchValidator });
 
-    // Sottoscrizione ai cambiamenti del form per mostrare/nascondere l'avviso
     if (this.formChangesSubscription) {
       this.formChangesSubscription.unsubscribe();
     }
     this.formChangesSubscription = this.userForm.valueChanges.subscribe(() => {
       this.updateWarningState();
     });
-    // Imposta lo stato iniziale del warning (dovrebbe essere false)
     this.updateWarningState();
   }
 
@@ -141,21 +138,17 @@ export class ProfiloComponent implements OnInit, OnDestroy { // Implementa OnDes
     const newPass = fg.get('passwordnew')?.value;
     const confirmPass = fg.get('passwordnewre')?.value;
 
-    // Solo se si sta cercando di cambiare la password (almeno uno dei due campi è compilato)
     if (newPass || confirmPass) {
         if (newPass !== confirmPass) {
             fg.get('passwordnewre')?.setErrors({ mismatch: true });
             return { 'mismatch': true };
         } else {
-            // Se le password coincidono e c'era un errore di mismatch, puliscilo
-            // ma solo se il campo passwordnewre esiste e ha quell'errore
             const confirmPassControl = fg.get('passwordnewre');
             if (confirmPassControl && confirmPassControl.hasError('mismatch')) {
                 confirmPassControl.setErrors(null);
             }
         }
     } else {
-        // Se entrambi i campi sono vuoti, nessun errore di mismatch
         const confirmPassControl = fg.get('passwordnewre');
         if (confirmPassControl && confirmPassControl.hasError('mismatch')) {
             confirmPassControl.setErrors(null);
@@ -173,7 +166,6 @@ export class ProfiloComponent implements OnInit, OnDestroy { // Implementa OnDes
     const submitEvent = event as SubmitEvent;
     const submitter = submitEvent.submitter as HTMLButtonElement | null;
 
-    // Validazione specifica per il cambio password
     if (submitter && submitter.name === 'changePassword') {
       const newPassControl = this.userForm.get('passwordnew');
       const newRePassControl = this.userForm.get('passwordnewre');
@@ -188,20 +180,16 @@ export class ProfiloComponent implements OnInit, OnDestroy { // Implementa OnDes
          return;
       }
        if (!newPassControl?.value && !newRePassControl?.value) {
-        // Se entrambi i campi password sono vuoti, non tentare di cambiare la password
-        // e considera il submit come aggiornamento profilo generale se altri campi sono validi
-        // Oppure mostra un errore se si è cliccato specificamente "Aggiorna password"
          Swal.fire('Info', 'Nessuna nuova password inserita.', 'info');
          this.store.dispatch(setLoadingSpinner({ status: false }));
-         return; // Interrompi se l'intento era solo cambiare password e non è stata inserita
+         return;
       }
     } else if (submitter && submitter.name === 'changeUser') {
-        // Per "Aggiorna Profilo", controlla solo i campi del profilo, non la password
-        const profileControls = ['displayName', 'cellulare', 'isAdminRole']; // Aggiungi 'email' se modificabile
+        const profileControls = ['displayName', 'cellulare', 'isAdminRole'];
         let profileFormValid = true;
         profileControls.forEach(controlName => {
             const control = this.userForm.get(controlName);
-            control?.markAsTouched(); // Segna come toccati per mostrare errori
+            control?.markAsTouched();
             if (control?.invalid) {
                 profileFormValid = false;
             }
@@ -215,7 +203,6 @@ export class ProfiloComponent implements OnInit, OnDestroy { // Implementa OnDes
 
 
     if (!this.userForm.valid && !(submitter && submitter.name === 'changeUser' && !this.userForm.get('passwordnew')?.value && !this.userForm.get('passwordnewre')?.value) ) {
-        // Se il form generale non è valido E non stiamo ignorando i campi password vuoti per un aggiornamento del profilo
         this.userForm.markAllAsTouched();
         Swal.fire('Attenzione', 'Per favore, correggi gli errori nel form.', 'warning');
         this.store.dispatch(setLoadingSpinner({ status: false }));
@@ -233,7 +220,6 @@ export class ProfiloComponent implements OnInit, OnDestroy { // Implementa OnDes
 
     if (submitter && submitter.name === 'changePassword') {
       const passwordNew = this.userForm.value.passwordnew;
-      // L'uguaglianza è già verificata dal validatore a livello di form
 
       this.store.select(getUserToken).pipe(take(1)).subscribe(token => {
           if (token) {
@@ -246,7 +232,6 @@ export class ProfiloComponent implements OnInit, OnDestroy { // Implementa OnDes
 
     } else if (submitter && submitter.name === 'changeUser') {
       const displayName: string = this.userForm.value.displayName;
-      // const email: string = this.userForm.value.email; // L'email è disabilitata, quindi il suo valore non cambia qui
       const cellulare: string = this.userForm.value.cellulare;
       const isAdminRole: boolean = this.userForm.value.isAdminRole;
       const newRole = isAdminRole ? 'admin' : 'cliente';
@@ -255,9 +240,9 @@ export class ProfiloComponent implements OnInit, OnDestroy { // Implementa OnDes
         displayName: displayName,
         cellulare: cellulare,
         ruolo: newRole,
-        photoURL: this.ffuser?.photoURL, // Mantenere photoURL esistente
-        email: this.ffuser?.email, // Mantenere email esistente (non modificabile)
-        emailVerified: this.ffuser?.emailVerified // Mantenere emailVerified esistente
+        photoURL: this.ffuser?.photoURL,
+        email: this.ffuser?.email,
+        emailVerified: this.ffuser?.emailVerified
       };
 
       this.store.dispatch(changeInfoStart({ localId: this.localId, value: updatedUserData as User }));

@@ -1,4 +1,3 @@
-// src/app/views/customer/account-info/account-info.component.ts
 
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -12,7 +11,7 @@ import { changeInfoStart, changePasswordStart, updateLogin, changeInfoSuccess, c
 import { setLoadingSpinner, setErrorMessage } from 'src/app/shared/store/shared.actions';
 import Swal from 'sweetalert2';
 import { Actions, ofType } from '@ngrx/effects';
-import { getErrorMessage, getLoading } from 'src/app/shared/store/shared.selectors'; // Importa getLoading
+import { getErrorMessage, getLoading } from 'src/app/shared/store/shared.selectors';
 
 @Component({
   selector: 'app-account-info',
@@ -25,7 +24,7 @@ export class AccountInfoComponent implements OnInit, OnDestroy {
   accountForm: FormGroup;
   passwordForm: FormGroup;
 
-  isSubmitting$: Observable<boolean>; // << DICHIARA LA PROPRIETÀ QUI
+  isSubmitting$: Observable<boolean>;
 
   private subscriptions: Subscription = new Subscription();
   private localId: string | undefined;
@@ -38,7 +37,7 @@ export class AccountInfoComponent implements OnInit, OnDestroy {
     private store: Store<AppState>,
     private actions$: Actions
   ) {
-    this.isSubmitting$ = this.store.select(getLoading); // << INIZIALIZZA NEL COSTRUTTORE
+    this.isSubmitting$ = this.store.select(getLoading);
   }
 
   ngOnInit(): void {
@@ -98,9 +97,8 @@ export class AccountInfoComponent implements OnInit, OnDestroy {
     ).subscribe(() => {
       this.accountForm.markAsPristine();
       this.passwordForm.markAsPristine();
-      this.passwordForm.reset(); // Resetta i valori del form password
+      this.passwordForm.reset();
       this.updateWarningState();
-      // Ricarica i dati utente per riflettere le modifiche
       this.store.dispatch(updateLogin({redirect: false, isCustomerLogin: true }));
     });
     this.subscriptions.add(successSub);
@@ -130,8 +128,6 @@ export class AccountInfoComponent implements OnInit, OnDestroy {
       Swal.fire('Attenzione', 'Correggi gli errori nel form del profilo.', 'warning');
       return;
     }
-    // Non impostare isLoadingAccount a true qui, perché isSubmitting$ (che è getLoading) gestirà lo spinner globale.
-    // this.isLoadingAccount = true; // << RIMUOVI O COMMENTA
     this.store.dispatch(setLoadingSpinner({ status: true }));
 
     const updatedUserInfo: Partial<User> = {
@@ -149,8 +145,7 @@ export class AccountInfoComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // Non impostare isLoadingPassword a true qui per lo stesso motivo di sopra.
-    // this.isLoadingPassword = true; // << RIMUOVI O COMMENTA
+
     this.store.dispatch(setLoadingSpinner({ status: true }));
 
     const tokenSub = this.store.select(getUserToken).pipe(take(1)).subscribe(token => {

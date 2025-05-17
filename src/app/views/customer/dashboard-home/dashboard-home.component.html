@@ -8,17 +8,17 @@
   <div class="col-12">
     <div class="card">
       <div class="card-body">
-        <h5 class="card-title" *ngIf="userName$ | async as name">Benvenuto, {{ name }}!</h5>
-      <!-- {{ 'customer.dashboard.intro' | translate }} -->
+        <h5 class="card-title" *ngIf="userName$ | async as name">{{ 'customer.dashboard.intro' | translate }}, {{ name
+          }}!</h5>
         <p class="card-text">Intro</p>
         <div class="mt-4">
           <a routerLink="/cliente/account" class="btn btn-primary mr-2 mb-2 mb-md-0">
             <i class="feather icon-user btn-icon-prepend"></i>
-            <!-- {{ 'customer.menu.profile' | translate }}  --> Profilo
+            {{ 'customer.menu.profile' | translate }}
           </a>
           <a routerLink="/cliente/currio" class="btn btn-info mb-2 mb-md-0">
             <i class="feather icon-file-text btn-icon-prepend"></i>
-            <!-- {{ 'customer.menu.currio' | translate }} --> Currio
+            {{ 'customer.menu.currio' | translate }}
           </a>
         </div>
       </div>

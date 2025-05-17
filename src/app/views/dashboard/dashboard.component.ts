@@ -9,9 +9,6 @@ import { NgbDateStruct, NgbCalendar } from '@ng-bootstrap/ng-bootstrap';
   preserveWhitespaces: true,
 })
 export class DashboardHomeComponent implements OnInit {
-  /**CustomerDashboardHomeComponent
-   * NgbDatepicker
-   */
   currentDate: NgbDateStruct;
 
   constructor(private readonly calendar: NgbCalendar) {}

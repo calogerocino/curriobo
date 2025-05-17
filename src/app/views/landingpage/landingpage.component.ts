@@ -29,7 +29,7 @@ export class LandingpageComponent {
 
   constructor(
     private readonly store: Store<AppState>,
-    private readonly storage: Storage // Per Firebase Storage
+    private readonly storage: Storage
   ) {}
 
   openModal(): void {
@@ -135,15 +135,11 @@ export class LandingpageComponent {
         }
       });
       try {
-        // Crea un nome file univoco per evitare sovrascritture e per organizzazione
         const safeEmailForPath = this.formData.email.replace(/[^a-zA-Z0-9]/g, '_');
         const filePath = `curriculums/${safeEmailForPath}_${Date.now()}/${this.selectedFile.name}`;
         const storageRef = ref(this.storage, filePath);
         const uploadTask = uploadBytesResumable(storageRef, this.selectedFile);
-
-        // Attendi il completamento dell'upload
         await uploadTask;
-        // Ottieni l'URL di download
         curriculumUrl = await getDownloadURL(storageRef);
         Swal.close(); // Chiudi lo Swal di caricamento
       } catch (error) {
@@ -154,34 +150,31 @@ export class LandingpageComponent {
       }
     }
 
-    // Prepara i dati per il Currio
     const datiClienteForm: DatiClienteCurrio = {
       nome: this.formData.nome,
       email: this.formData.email,
     };
 
     const newCurrioData: Omit<Currio, 'id'> = {
-      nomePortfolio: `Curriò per ${this.formData.nome}`, // Nome portfolio di default
-      heroTitle: `Benvenuto ${this.formData.nome}!`, // Titolo hero di default
-      heroSubtitle: this.formData.esperienze, // Sottotitolo hero basato sulle esperienze
-      contatti: { // Contatti di default
+      nomePortfolio: `Curriò per ${this.formData.nome}`,
+      heroTitle: `Benvenuto ${this.formData.nome}!`,
+      heroSubtitle: this.formData.esperienze,
+      contatti: {
         email: this.formData.email,
       } as CurrioContatti,
-      progetti: [], // Array vuoti per le sezioni da popolare
+      progetti: [],
       esperienze: [],
       competenze: [],
-      chiSonoDescrizione1: `Profilo di ${this.formData.nome}. Inserisci qui una tua descrizione.`, // Descrizione di default
-      linguaDefault: 'it', // Lingua di default
-      curriculumUrl: curriculumUrl, // URL del CV caricato (se presente)
-      datiCliente: datiClienteForm, // Dati del cliente dal form
-      status: 'nuova_richiesta', // Stato iniziale della richiesta
-      // Campi che verranno popolati successivamente
+      chiSonoDescrizione1: `Profilo di ${this.formData.nome}. Inserisci qui una tua descrizione.`,
+      linguaDefault: 'it',
+      curriculumUrl: curriculumUrl,
+      datiCliente: datiClienteForm,
+      status: 'nuova_richiesta',
       userId: undefined,
       tokenRegistrazione: undefined,
       tokenRegistrazioneScadenza: undefined,
     };
 
-    // Dispatch dell'azione per creare il Currio
     this.store.dispatch(createCurrio({ currio: newCurrioData }));
 
     Swal.fire({
@@ -191,8 +184,8 @@ export class LandingpageComponent {
       confirmButtonText: 'Fantastico!'
     });
 
-    this.closeModal(); // Chiude il modal
-    form.resetForm(); // Resetta i campi del form
-    this.resetFileState(); // Resetta lo stato del file
+    this.closeModal();
+    form.resetForm();
+    this.resetFileState();
   }
 }

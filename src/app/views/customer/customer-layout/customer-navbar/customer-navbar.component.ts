@@ -6,20 +6,19 @@ import { AppState } from 'src/app/shared/app.state';
 import { getUser } from 'src/app/views/auth/state/auth.selector';
 import { User } from 'src/app/shared/models/user.interface';
 import { TranslateService } from '@ngx-translate/core';
-import { autologout } from 'src/app/views/auth/state/auth.action'; // Per il logout
+import { autologout } from 'src/app/views/auth/state/auth.action';
 
 @Component({
   selector: 'app-customer-navbar',
-  templateUrl: './customer-navbar.component.html',
-  styleUrls: ['./customer-navbar.component.scss'] // Puoi usare src/app/core/navbar/navbar.component.scss
+  templateUrl: './customer-navbar.component.html'
 })
 export class CustomerNavbarComponent implements OnInit {
-  connectedUser$: Observable<User | null>; // Modificato per accettare null
+  connectedUser$: Observable<User | null>;
 
   constructor(
     @Inject(DOCUMENT) private document: Document,
-    private store: Store<AppState>, // Rimosso readonly per dispatch
-    public translate: TranslateService // Reso public per il template
+    private store: Store<AppState>,
+    public translate: TranslateService
   ) {}
 
   ngOnInit(): void {
@@ -36,7 +35,7 @@ export class CustomerNavbarComponent implements OnInit {
     this.store.dispatch(autologout());
   }
 
-  switchLanguage(event: EventTarget | null) { // Accetta null
+  switchLanguage(event: EventTarget | null) {
     if (event) {
       const langId = (event as Element).id;
       if (langId) {

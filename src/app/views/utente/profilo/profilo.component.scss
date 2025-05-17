@@ -28,7 +28,7 @@ $custom-switch-transition-duration: 0.2s;
     position: relative;
     cursor: pointer;
     transition: background-color $custom-switch-transition-duration ease-in-out;
-    vertical-align: top; // Allineamento con la label
+    vertical-align: top;
     margin-right: 0.75rem;
     flex-shrink: 0;
 

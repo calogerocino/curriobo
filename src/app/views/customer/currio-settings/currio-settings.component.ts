@@ -9,7 +9,7 @@ import { User } from 'src/app/shared/models/user.interface';
 import { Currio, CurrioProgetto, CurrioEsperienza, CurrioCompetenza } from 'src/app/shared/models/currio.model';
 import { getUser } from 'src/app/views/auth/state/auth.selector';
 import { getCurrioById, getCurrios, getCurrioLoading, getCurrioError } from 'src/app/views/currio/state/currio.selector';
-import { loadCurrios, updateCurrio, updateCurrioSuccess, loadCurrioById } from 'src/app/views/currio/state/currio.action'; // Assicurati di avere loadCurrioById se necessario
+import { loadCurrios, updateCurrio, updateCurrioSuccess, loadCurrioById } from 'src/app/views/currio/state/currio.action';
 import { setLoadingSpinner, setErrorMessage } from 'src/app/shared/store/shared.actions';
 import Swal from 'sweetalert2';
 import { Actions, ofType } from '@ngrx/effects';
@@ -21,11 +21,11 @@ import { Actions, ofType } from '@ngrx/effects';
 })
 export class CurrioSettingsComponent implements OnInit, OnDestroy {
   currioForm: FormGroup;
-  currentCurrio: Currio | undefined | null; // Può essere null inizialmente
+  currentCurrio: Currio | undefined | null;
   private subscriptions: Subscription = new Subscription();
   currioId: string | undefined;
   isSubmitting$: Observable<boolean>;
-  isLoadingCurrio = true; // Flag per il caricamento iniziale del Curriò
+  isLoadingCurrio = true;
   showUnsavedChangesWarning = false;
 
   constructor(
@@ -70,13 +70,13 @@ export class CurrioSettingsComponent implements OnInit, OnDestroy {
     this.store.dispatch(setLoadingSpinner({ status: true }));
 
     const userSub = this.store.select(getUser).pipe(
-      filter((user): user is User => !!user && !!user.localId), // Assicura che user e user.localId non siano null/undefined
+      filter((user): user is User => !!user && !!user.localId),
       take(1),
-      tap(() => this.store.dispatch(loadCurrios())), // Carica tutti i currios
+      tap(() => this.store.dispatch(loadCurrios())),
       switchMap(user =>
         this.store.select(getCurrios).pipe(
           map(currios => currios.find(c => c.userId === user.localId)),
-          filter((currio): currio is Currio => !!currio && !!currio.id) // Assicura che currio e currio.id non siano null/undefined
+          filter((currio): currio is Currio => !!currio && !!currio.id)
         )
       ),
       take(1)
@@ -84,10 +84,8 @@ export class CurrioSettingsComponent implements OnInit, OnDestroy {
       next: (foundCurrio) => {
         if (foundCurrio) {
           this.currioId = foundCurrio.id;
-          // Dispatch loadCurrioById per assicurarsi che selectedCurrio nello store sia aggiornato
-          // e per triggerare il popolamento del form tramite il selettore getCurrioById
           this.store.dispatch(loadCurrioById({ id: this.currioId! }));
-          this.subscribeToSpecificCurrio(this.currioId!); // Sottoscrivi dopo aver trovato l'ID
+          this.subscribeToSpecificCurrio(this.currioId!);
         } else {
           this.handleCurrioLoadingError('Nessun Curriò trovato per questo account.');
         }
@@ -99,7 +97,7 @@ export class CurrioSettingsComponent implements OnInit, OnDestroy {
 
   private subscribeToSpecificCurrio(id: string): void {
     const currioSub = this.store.select(getCurrioById, { id }).pipe(
-      filter((currio): currio is Currio => !!currio) //  Continua solo se il currio è definito
+      filter((currio): currio is Currio => !!currio)
     ).subscribe(currioDetails => {
         this.currentCurrio = currioDetails;
         this.initializeFormWithCurrioData(currioDetails);
@@ -129,7 +127,7 @@ export class CurrioSettingsComponent implements OnInit, OnDestroy {
       chiSonoDescrizione1: currio.chiSonoDescrizione1 || '',
       chiSonoDescrizione2: currio.chiSonoDescrizione2 || '',
       contatti: {
-        email: currio.contatti?.email || this.currentCurrio?.datiCliente?.email || '', // Prepopola con email cliente se disponibile
+        email: currio.contatti?.email || this.currentCurrio?.datiCliente?.email || '',
         github: currio.contatti?.github || '',
         linkedin: currio.contatti?.linkedin || '',
         instagram: currio.contatti?.instagram || '',
@@ -161,7 +159,6 @@ export class CurrioSettingsComponent implements OnInit, OnDestroy {
     ).subscribe(() => {
       this.currioForm.markAsPristine();
       this.updateWarningState();
-      // Opzionale: ricaricare i dati se l'effect non lo fa o per UI consistency
       if (this.currioId) {
         this.store.dispatch(loadCurrioById({id: this.currioId}));
       }
@@ -177,7 +174,7 @@ export class CurrioSettingsComponent implements OnInit, OnDestroy {
   get progettiFormArray() { return this.currioForm.get('progetti') as FormArray; }
   createProgettoGroup(progetto?: CurrioProgetto): FormGroup {
     return this.fb.group({
-      id: [progetto?.id || new Date().getTime().toString()], // Aggiungi un ID se non presente
+      id: [progetto?.id || new Date().getTime().toString()],
       titolo: [progetto?.titolo || '', Validators.required],
       descrizione: [progetto?.descrizione || '', Validators.required],
       immagineUrl: [progetto?.immagineUrl || ''],
@@ -235,7 +232,7 @@ export class CurrioSettingsComponent implements OnInit, OnDestroy {
 
   onSubmit(): void {
     if (!this.currioForm.valid) {
-      this.currioForm.markAllAsTouched(); // Mostra errori di validazione
+      this.currioForm.markAllAsTouched();
       Swal.fire('Attenzione', 'Per favore, correggi gli errori nel form.', 'warning');
       return;
     }
@@ -248,8 +245,7 @@ export class CurrioSettingsComponent implements OnInit, OnDestroy {
     const formValue = this.currioForm.value;
 
     const currioToUpdate: Currio = {
-      ...this.currentCurrio, // Mantiene ID, userId, status, datiCliente, token, etc. originali
-      // Sovrascrive solo i campi modificabili dal cliente
+      ...this.currentCurrio,
       nomePortfolio: formValue.nomePortfolio,
       heroTitle: formValue.heroTitle,
       heroSubtitle: formValue.heroSubtitle,
@@ -258,13 +254,12 @@ export class CurrioSettingsComponent implements OnInit, OnDestroy {
       chiSonoDescrizione1: formValue.chiSonoDescrizione1,
       chiSonoDescrizione2: formValue.chiSonoDescrizione2,
       contatti: formValue.contatti,
-      progetti: formValue.progetti.map(p => ({...p, id: p.id || new Date().getTime().toString()})), // Assicura ID
+      progetti: formValue.progetti.map(p => ({...p, id: p.id || new Date().getTime().toString()})),
       esperienze: formValue.esperienze.map(e => ({...e, id: e.id || new Date().getTime().toString()})),
       competenze: formValue.competenze.map(c => ({...c, id: c.id || new Date().getTime().toString()}))
     };
 
     this.store.dispatch(updateCurrio({ currio: currioToUpdate }));
-    // Successo gestito da effect
   }
 
   ngOnDestroy(): void {

@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 import MetisMenu from 'metismenujs';
-import { Router, NavigationEnd, Event as RouterEvent } from '@angular/router'; // Importa Event
+import { Router, NavigationEnd, Event as RouterEvent } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { CUSTOMER_MENU } from 'src/app/core/sidebar/customer-menu';
 import { MenuItem } from 'src/app/core/sidebar/menu.model';
@@ -18,7 +18,6 @@ import { filter } from 'rxjs/operators';
 @Component({
   selector: 'app-customer-sidebar',
   templateUrl: './customer-sidebar.component.html',
-  styleUrls: ['./customer-sidebar.component.scss'] // Puoi usare src/app/core/sidebar/sidebar.component.scss
 })
 export class CustomerSidebarComponent implements OnInit, AfterViewInit {
   @ViewChild('sidebarToggler') sidebarToggler!: ElementRef;

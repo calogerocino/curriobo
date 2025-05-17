@@ -5,7 +5,6 @@ import { AuthGuard } from './shared/guard/auth.guard';
 import { ErrorPageComponent } from './views/error-page/error-page.component';
 import { LandingpageComponent } from './views/landingpage/landingpage.component';
 import { CurrioPreviewComponent } from './views/currio/currio-preview/currio-preview.component';
-// Rimuovi l'import di CurrioPreviewComponent da qui se era solo per la rotta autonoma
 
 const routes: Routes = [
   {
@@ -33,7 +32,7 @@ const routes: Routes = [
           ),
       },
       {
-        path: 'utente', // Gestione utenti admin
+        path: 'utente',
         loadChildren: () =>
           import('./views/utente/utente.module').then((m) => m.UtenteModule),
       },
@@ -42,19 +41,19 @@ const routes: Routes = [
         loadChildren: () =>
           import('./views/currio/currio.module').then((m) => m.CurrioModule),
       },
-      {
-        path: 'cliente', // Area riservata ai clienti
-        loadChildren: () =>
-          import('./views/customer/customer.module').then(
-            (m) => m.CustomerModule
-          ),
-        canActivate: [AuthGuard], // AuthGuard protegge l'intera area /cliente
-        data: { title: 'Area Cliente' }, // Il titolo qui potrebbe essere sovrascritto dalle rotte figlie
-      },
+      // {
+      //   path: 'cliente',
+      //   loadChildren: () =>
+      //     import('./views/customer/customer.module').then(
+      //       (m) => m.CustomerModule
+      //     ),
+      //   canActivate: [AuthGuard],
+      //   data: { title: 'Area Cliente' },
+      // },
     ],
   },
   {
-    path: 'cliente', // Area riservata ai clienti
+    path: 'cliente',
     loadChildren: () =>
       import('./views/customer/customer.module').then((m) => m.CustomerModule),
     canActivate: [AuthGuard], // AuthGuard protegge l'intera area /cliente
