@@ -4,8 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-error-page',
-  templateUrl: './error-page.component.html',
-  styleUrls: ['./error-page.component.scss']
+  templateUrl: './error-page.component.html'
 })
 export class ErrorPageComponent implements OnInit, OnDestroy {
 
@@ -47,6 +46,14 @@ export class ErrorPageComponent implements OnInit, OnDestroy {
         }
         if (!this.desc) {
           this.desc = 'Oopps!! C\'e stato un errore imprevisto. Perfavore, riprova più tardi.'
+        }
+        break;
+          case 'int':
+        if (!this.title) {
+          this.title = 'Errore interno'
+        }
+        if (!this.desc) {
+          this.desc = 'Impossibile caricare i dati dell\'anteprima del Curriò o il Curriò richiesto non è stato trovato.'
         }
         break;
       default:

@@ -5,7 +5,7 @@ import { AuthGuard } from './shared/guard/auth.guard';
 import { ErrorPageComponent } from './views/error-page/error-page.component';
 import { LandingpageComponent } from './views/landingpage/landingpage.component';
 import { CurrioPreviewComponent } from './views/currio/currio-preview/currio-preview.component';
-
+ import { CurrioIdCheckGuard } from './shared/guard/curriocheckid.guard';
 const routes: Routes = [
   {
     path: '',
@@ -60,8 +60,9 @@ const routes: Routes = [
     data: { title: 'Area Cliente' },
   },
   {
-    path: ':id',
+    path: ':id', // Rotta per CurrioPreviewComponent
     component: CurrioPreviewComponent,
+    canActivate: [CurrioIdCheckGuard], // Applica il guard qui
     data: { title: 'Anteprima Curriò' },
   },
   {

@@ -24,6 +24,7 @@ export class CurrioPreviewComponent implements OnInit, OnDestroy {
   currentYear: number = new Date().getFullYear();
 
   constructor(
+    private readonly router: Router,
     private route: ActivatedRoute,
     private store: Store<AppState>,
     private titleService: Title

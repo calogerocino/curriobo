@@ -219,7 +219,7 @@ export class CompletaRegistrazioneComponent implements OnInit, OnDestroy {
         'Il tuo account è stato creato con successo. Ora puoi effettuare il login.',
         'success'
       );
-      this.router.navigate(['/auth/login-cliente']); 
+      this.router.navigate(['/auth/login']);
     } catch (error: any) {
       this.errorMessage = this.authService.getErrorMessage(
         error.code || error.message
