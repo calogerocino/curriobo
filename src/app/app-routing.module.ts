@@ -56,13 +56,13 @@ const routes: Routes = [
     path: 'cliente',
     loadChildren: () =>
       import('./views/customer/customer.module').then((m) => m.CustomerModule),
-    canActivate: [AuthGuard], // AuthGuard protegge l'intera area /cliente
+    canActivate: [AuthGuard], 
     data: { title: 'Area Cliente' },
   },
   {
-    path: ':id', // Rotta per CurrioPreviewComponent
+    path: ':id',
     component: CurrioPreviewComponent,
-    canActivate: [CurrioIdCheckGuard], // Applica il guard qui
+    // canActivate: [CurrioIdCheckGuard],
     data: { title: 'Anteprima Curriò' },
   },
   {
