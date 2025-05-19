@@ -16,6 +16,7 @@ export interface CurrioEsperienza {
   descrizioneBreve: string;
   dettagli?: string[];
   competenzeAcquisite?: string[];
+  expanded?: boolean;
 }
 
 export interface CurrioCompetenza {
@@ -55,5 +56,5 @@ export interface Currio {
   status?: 'nuova_richiesta' | 'invito_spedito' | 'attivo' | 'archiviato';
   datiCliente?: DatiClienteCurrio;
   tokenRegistrazione?: string;
-  tokenRegistrazioneScadenza?: number; 
+  tokenRegistrazioneScadenza?: number;
 }

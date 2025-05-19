@@ -2,15 +2,13 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Routes, RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
-
 import { CurrioComponent } from './currio.component';
 import { ListaCurrioComponent } from './listacurrio/listacurrio.component';
 import { CurrioEditComponent } from './currio-edit/currio-edit.component';
 import { CurrioPreviewComponent } from './currio-preview/currio-preview.component';
-
 import { TranslateModule } from '@ngx-translate/core';
+import { SafeHtmlPipe } from 'src/app/shared/pipes/safe-html.pipe';
 
 const routes: Routes = [
   {
@@ -29,10 +27,9 @@ const routes: Routes = [
       },
       {
         path: 'edit/:id',
-        component: CurrioEditComponent, // Questo è il componente unificato
+        component: CurrioEditComponent,
         data: { title: 'Gestisci Curriò' },
       },
-       // La rotta per l'anteprima del singolo Curriò è gestita a livello di AppRoutingModule o dove definita per /:id
     ],
   },
 ];
@@ -41,8 +38,9 @@ const routes: Routes = [
   declarations: [
     CurrioComponent,
     ListaCurrioComponent,
-    CurrioEditComponent, // Già dichiarato qui
+    CurrioEditComponent,
     CurrioPreviewComponent,
+    SafeHtmlPipe
   ],
   imports: [
     CommonModule,
@@ -50,10 +48,7 @@ const routes: Routes = [
     NgbModule,
     FormsModule,
     ReactiveFormsModule,
-    TranslateModule,
-  ],
-  exports: [ // Esporta il componente se vuoi importarlo direttamente in altri moduli senza importare l'intero CurrioModule
-    // CurrioEditComponent
+    TranslateModule.forChild(),
   ]
 })
 export class CurrioModule {}
