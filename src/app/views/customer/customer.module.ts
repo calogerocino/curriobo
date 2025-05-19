@@ -4,11 +4,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
 import { FeahterIconModule } from 'src/app/shared/feather-icon/feather-icon.module';
-import {
-  NgbDropdownModule,
-  NgbCollapseModule,
-  NgbTooltipModule,
-} from '@ng-bootstrap/ng-bootstrap';
+import { NgbDropdownModule, NgbCollapseModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { CoreModule } from '../../core/core.module';
 
 // Layout Cliente
@@ -20,7 +16,8 @@ import { CustomerFooterComponent } from './customer-layout/customer-footer/custo
 // Pagine specifiche
 import { CustomerDashboardHomeComponent } from './dashboard-home/dashboard-home.component';
 import { AccountInfoComponent } from './account-info/account-info.component';
-import { CurrioSettingsComponent } from './currio-settings/currio-settings.component';
+import { CurrioEditComponent } from 'src/app/views/currio/currio-edit/currio-edit.component';
+import { CurrioModule } from 'src/app/views/currio/currio.module';
 
 const routes: Routes = [
   {
@@ -40,7 +37,7 @@ const routes: Routes = [
       },
       {
         path: 'currio',
-        component: CurrioSettingsComponent,
+        component: CurrioEditComponent,
         data: { title: 'customer.currio.title' },
       },
     ],
@@ -55,7 +52,6 @@ const routes: Routes = [
     CustomerFooterComponent,
     CustomerDashboardHomeComponent,
     AccountInfoComponent,
-    CurrioSettingsComponent,
   ],
   imports: [
     CommonModule,
@@ -68,6 +64,7 @@ const routes: Routes = [
     NgbCollapseModule,
     NgbTooltipModule,
     CoreModule,
+    CurrioModule,
   ],
 })
 export class CustomerModule {}

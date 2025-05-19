@@ -38,6 +38,7 @@
 	"generale.shared.modifica": "EDIT",
 	"generale.shared.aggiorna": "Update",
 	"generale.shared.elimina": "Delete",
+	"generale.shared.elimina": "Cancel",
 	"profiloUtente.aggiornapassword": "Update Password",
 	"profiloUtente.aggiornaprofilo": "Update profile",
 	"profiloUtente.caricamentoimg": "Upload image",

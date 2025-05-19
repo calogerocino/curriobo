@@ -76,9 +76,6 @@ export class ListaCurrioComponent implements OnInit, OnDestroy {
     }
   }
 
-  navigateToCreate(): void {
-    this.router.navigate(['/admin/currio/edit', 'new']);
-  }
 
   navigateToPreview(id: string | undefined): void {
     if (id) {
