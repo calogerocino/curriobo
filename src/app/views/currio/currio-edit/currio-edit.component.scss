@@ -1,0 +1,35 @@
+// src/app/views/currio/currio-edit/currio-edit.component.scss
+.template-option {
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, border-color 0.2s ease-in-out;
+  border: 2px solid #e9ecef; // Bordo di default leggero
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  }
+
+  &.selected {
+    border-color: #198754; // Colore verde di successo di Bootstrap
+    box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.35); // Ombra verde corrispondente
+    transform: translateY(-2px);
+
+    img {
+      opacity: 1; // L'immagine selezionata è completamente opaca
+    }
+  }
+
+  .template-preview-img {
+    max-height: 120px;
+    object-fit: cover;
+    border: 1px solid #dee2e6; // Un leggero bordo per l'immagine stessa
+    border-radius: .25rem; // Bordi arrotondati per l'immagine
+    opacity: 0.85; // Le immagini non selezionate sono leggermente trasparenti
+     transition: opacity 0.2s ease-in-out;
+  }
+
+   p {
+    font-size: 0.875rem; // Testo leggermente più piccolo
+    margin-top: 0.5rem; // Spazio sopra il testo
+  }
+}

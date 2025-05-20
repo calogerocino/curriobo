@@ -34,6 +34,7 @@
     "@ngx-translate/http-loader": "^8.0.0",
     "@popperjs/core": "^2.11.8",
     "@sweetalert2/ngx-sweetalert2": "^12.0.0",
+    "@tailwindcss/postcss": "^4.1.7",
     "animate.css": "^4.1.1",
     "bootstrap": "^4.6.2",
     "feather-icons": "^4.28.0",
@@ -64,7 +65,7 @@
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.0.0",
     "postcss": "^8.5.3",
-    "tailwindcss": "^4.1.6",
+    "tailwindcss": "^4.1.7",
     "typescript": "~5.4.5"
   }
 }

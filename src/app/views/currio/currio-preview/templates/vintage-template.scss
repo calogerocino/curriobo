@@ -1,0 +1,232 @@
+.currio-preview-wrapper.vintage {
+  font-family: 'Georgia', 'Times New Roman', Times, serif;
+  background-color: #f0e6d0;
+  color: #5a3e2b;
+
+  a {
+    color: #8c6f56;
+    text-decoration: none;
+    &:hover {
+      color: #5a3e2b;
+      text-decoration: underline;
+    }
+  }
+
+  .vintage-theme {
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+  }
+
+  .vintage-header {
+    background-color: #d4c3a2;
+    padding: 20px 0;
+    text-align: center;
+    border-bottom: 2px solid #bca88e;
+    h1 {
+      font-family: 'Lobster', cursive;
+      font-size: 2.8em;
+      margin-bottom: 10px;
+      color: #4a3121;
+    }
+    .vintage-nav {
+      a {
+        margin: 0 15px;
+        font-size: 1.1em;
+        font-style: italic;
+      }
+    }
+    .vintage-lang-selector {
+      margin-top: 10px;
+      a { font-weight: bold; padding: 2px 5px; }
+      a.active { background-color: #f0e6d0; border-radius: 3px;}
+      .separator { color: #8c6f56; margin: 0 3px; }
+    }
+  }
+
+  .vintage-hero {
+    padding: 60px 20px;
+    text-align: center;
+    background: url('/assets/images/vintage-paper-texture.jpg') repeat;
+    border-bottom: 2px dashed #bca88e;
+    h2 {
+      font-size: 2.5em;
+      color: #4a3121;
+      margin-bottom: 15px;
+    }
+    p {
+      font-size: 1.2em;
+      margin-bottom: 30px;
+      color: #6e5544;
+    }
+    .vintage-cta {
+      display: inline-block;
+      padding: 12px 25px;
+      background-color: #8c6f56;
+      color: #f0e6d0;
+      font-size: 1.1em;
+      border-radius: 5px;
+      text-decoration: none;
+      transition: background-color 0.3s;
+      &:hover { background-color: #7a5f4a; color: #fff; }
+    }
+  }
+
+  .vintage-section {
+    padding: 40px 0;
+    border-bottom: 1px solid #d4c3a2;
+    &:last-of-type { border-bottom: none; }
+  }
+
+  .vintage-section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.2em;
+    text-align: center;
+    margin-bottom: 30px;
+    color: #4a3121;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #bca88e;
+  }
+
+  .vintage-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+  }
+
+  .vintage-card {
+    background-color: #e9dbc6;
+    padding: 20px;
+    border: 1px solid #d4c3a2;
+    box-shadow: 3px 3px 5px rgba(0,0,0,0.1);
+    img {
+      width: 100%;
+      height: auto;
+      margin-bottom: 15px;
+      border: 5px solid #fff;
+      box-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    }
+    h3 { font-size: 1.5em; margin-bottom: 10px; color: #5a3e2b; }
+    p { font-size: 1em; line-height: 1.6; }
+    .vintage-tags {
+      margin-top: 10px;
+      span {
+        background-color: #d4c3a2;
+        padding: 3px 8px;
+        border-radius: 3px;
+        font-size: 0.8em;
+        margin-right: 5px;
+        display: inline-block;
+        margin-bottom: 5px;
+      }
+    }
+  }
+
+  .vintage-button {
+    display: inline-block;
+    padding: 8px 15px;
+    background-color: #a88b5a;
+    color: #f0e6d0;
+    font-size: 0.9em;
+    border-radius: 3px;
+    text-decoration: none;
+    margin-top: 10px;
+    transition: background-color 0.3s;
+    &:hover { background-color: #91764c; color: #fff;}
+  }
+
+  .vintage-timeline {
+    position: relative;
+    padding-left: 30px;
+    &::before {
+      content: '';
+      position: absolute;
+      left: 10px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background-color: #bca88e;
+    }
+  }
+  .vintage-timeline-item {
+    margin-bottom: 30px;
+    position: relative;
+    &::before {
+      content: '';
+      position: absolute;
+      left: -24px;
+      top: 5px;
+      width: 10px;
+      height: 10px;
+      background-color: #8c6f56;
+      border-radius: 50%;
+      border: 2px solid #f0e6d0;
+    }
+  }
+  .vintage-timeline-content {
+    h3 { font-size: 1.4em; margin-bottom: 5px; }
+    .vintage-date { font-size: 0.9em; color: #7a5f4a; margin-bottom: 5px; font-style: italic; }
+    .vintage-company { font-weight: bold; margin-bottom: 10px; }
+    ul { margin-left: 20px; padding-left: 0;}
+  }
+  .vintage-skills-acquired span { background-color: #e0c7a2; }
+
+
+  .vintage-skills-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+  }
+  .vintage-skill-item {
+    text-align: center;
+    padding: 15px;
+    background-color: #e9dbc6;
+    border: 1px solid #d4c3a2;
+    border-radius: 5px;
+    width: calc(20% - 20px);
+    min-width: 120px;
+    box-shadow: 2px 2px 4px rgba(0,0,0,0.05);
+    .vintage-skill-icon {
+      width: 40px; height: 40px; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center;
+      svg { width: 80%; height: 80%; opacity: 0.7; }
+    }
+     .vintage-skill-icon-placeholder { font-size: 1.5em; font-weight: bold; color: #7a5f4a; background-color: #d4c3a2; border-radius: 50%; }
+    h3 { font-size: 1.1em; margin-bottom: 5px; }
+    p { font-size: 0.9em; color: #7a5f4a; }
+  }
+
+  .vintage-about {
+    text-align: center;
+    .vintage-profile-pic {
+      width: 150px; height: 150px; border-radius: 50%; object-fit: cover;
+      margin-bottom: 20px; border: 5px solid #d4c3a2;
+      filter: sepia(0.3) contrast(0.9) brightness(1.1);
+    }
+    p { margin-bottom: 15px; line-height: 1.7; font-size: 1.1em; }
+  }
+
+  .vintage-contact-button {
+    background-color: #6e5544;
+    padding: 15px 30px;
+    font-size: 1.2em;
+    &:hover { background-color: #5a3e2b; }
+  }
+
+  .vintage-social-links {
+    text-align: center; margin-top: 20px;
+    a { margin: 0 10px; font-style: italic; font-size: 1.1em; }
+  }
+
+  .vintage-footer {
+    text-align: center;
+    padding: 20px;
+    margin-top: 40px;
+    background-color: #d4c3a2;
+    border-top: 2px solid #bca88e;
+    font-size: 0.9em;
+    color: #5a3e2b;
+  }
+}

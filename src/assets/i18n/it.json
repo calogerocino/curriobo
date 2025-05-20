@@ -77,7 +77,11 @@
   "profiloUtente.mailverificata": "Email Verificata",
 	"lp.navbar.home": "Nome",
 
-
+ "customer.currio.form.templateScelto.titolo": "Scegli lo Stile del Tuo Curriò",
+  "customer.currio.form.templateScelto.label": "Seleziona un template:",
+  "customer.currio.form.templateScelto.modern": "Moderno",
+  "customer.currio.form.templateScelto.vintage": "Vintage",
+  "customer.currio.form.templateScelto.classic": "Classico",
   "customer.dashboard.welcome": "Benvenuto nella tua Area Personale",
   "customer.dashboard.intro": "Da qui puoi gestire le informazioni del tuo account e del tuo Curriò.",
   "customer.account.title": "Informazioni Account",

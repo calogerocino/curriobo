@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, Renderer2, Inject, PLATFORM_ID, AfterViewInit, Pipe, PipeTransform, ElementRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, Renderer2, Inject, PLATFORM_ID, AfterViewInit, ElementRef } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { TranslateService } from '@ngx-translate/core';
 import { Currio, CurrioEsperienza } from 'src/app/shared/models/currio.model';
@@ -8,24 +8,15 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription, Observable } from 'rxjs';
 import { loadCurrioById } from 'src/app/views/currio/state/currio.action';
 import { getCurrioById, getCurrioLoading, getCurrioError } from 'src/app/views/currio/state/currio.selector';
-import { Title, DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { getUser } from '../../auth/state/auth.selector';
+import { Title } from '@angular/platform-browser';
 import { User } from 'src/app/shared/models/user.interface';
+import { getUser } from '../../auth/state/auth.selector';
 import { filter, map } from 'rxjs/operators';
-
-@Pipe({ name: 'safeHtml'})
-export class SafeHtmlPipe implements PipeTransform  {
-  constructor(private sanitized: DomSanitizer) {}
-  transform(value: string | undefined | null): SafeHtml {
-    return this.sanitized.bypassSecurityTrustHtml(value || '');
-  }
-}
 
 @Component({
   selector: 'app-currio-preview',
   templateUrl: './currio-preview.component.html',
   styleUrls: ['./currio-preview.component.scss']
-  // L'incapsulamento di default (Emulated) è attivo
 })
 export class CurrioPreviewComponent implements OnInit, AfterViewInit, OnDestroy {
   currio: Currio | undefined;
@@ -63,7 +54,6 @@ export class CurrioPreviewComponent implements OnInit, AfterViewInit, OnDestroy 
         this.store.dispatch(loadCurrioById({ id }));
         this.subscribeToCurrioData(id);
       } else {
-        console.error("ID del Curriò non fornito nella rotta.");
         this.isLoading = false;
         this.router.navigate(['/error'], { queryParams: { type: '404', message: 'currio_id_missing' }});
       }
@@ -78,8 +68,6 @@ export class CurrioPreviewComponent implements OnInit, AfterViewInit, OnDestroy 
 
   ngAfterViewInit(): void {
     if (isPlatformBrowser(this.platformId)) {
-      // Smooth scrolling non più necessario qui se gestito da (click) nel template
-      // this.setupSmoothScrolling();
       if (this.currio) {
          setTimeout(() => this.setupExpandableTimeline(), 0);
       }
@@ -100,7 +88,8 @@ export class CurrioPreviewComponent implements OnInit, AfterViewInit, OnDestroy 
         if (currioData && currioData.id) {
           this.currio = {
             ...currioData,
-            esperienze: currioData.esperienze?.map(e => ({ ...e, expanded: e.expanded || false }))
+            esperienze: currioData.esperienze?.map(e => ({ ...e, expanded: e.expanded || false })),
+            templateScelto: currioData.templateScelto || 'modern'
           };
           this.titleService.setTitle(this.currio.nomePortfolio || 'Anteprima Curriò');
           const currioLang = this.currio.linguaDefault || (isPlatformBrowser(this.platformId) ? localStorage.getItem('preferredLanguage') : null) || this.translate.getDefaultLang() || 'it';
@@ -116,7 +105,6 @@ export class CurrioPreviewComponent implements OnInit, AfterViewInit, OnDestroy 
 
     this.errorSub = this.store.select(getCurrioError).subscribe(error => {
       if (error) {
-        console.error("Errore nel caricamento del Curriò:", error);
         this.isLoading = false;
         this.currio = undefined;
         this.router.navigate(['/error'], { queryParams: { type: '500', message: 'currio_load_error' }});
@@ -134,13 +122,13 @@ export class CurrioPreviewComponent implements OnInit, AfterViewInit, OnDestroy 
   toggleMobileMenu() {
     this.isMobileMenuOpen = !this.isMobileMenuOpen;
     if (isPlatformBrowser(this.platformId)) {
-        const mobileMenuEl = this.elRef.nativeElement.querySelector('#mobile-menu');
+        const mobileMenuModernEl = this.elRef.nativeElement.querySelector('#mobile-menu-modern');
         const mobileMenuButtonEl = this.elRef.nativeElement.querySelector('#mobile-menu-button');
-        if (mobileMenuEl && mobileMenuButtonEl) {
+        if (mobileMenuModernEl && mobileMenuButtonEl) {
             if (this.isMobileMenuOpen) {
-                this.renderer.removeClass(mobileMenuEl, 'hidden');
+                this.renderer.removeClass(mobileMenuModernEl, 'hidden');
             } else {
-                this.renderer.addClass(mobileMenuEl, 'hidden');
+                this.renderer.addClass(mobileMenuModernEl, 'hidden');
             }
             mobileMenuButtonEl.setAttribute('aria-expanded', String(this.isMobileMenuOpen));
         }
@@ -158,7 +146,7 @@ export class CurrioPreviewComponent implements OnInit, AfterViewInit, OnDestroy 
     if (isPlatformBrowser(this.platformId)) {
         const targetElement = this.elRef.nativeElement.querySelector(targetId);
         if (targetElement) {
-            targetElement.scrollIntoView({ behavior: 'smooth' });
+            targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
     }
   }

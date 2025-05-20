@@ -1,0 +1,156 @@
+.currio-preview-wrapper.classic {
+  font-family: 'Times New Roman', Times, serif;
+  background-color: #fdfcf8;
+  color: #333333;
+  line-height: 1.7;
+
+  .classic-theme {
+    .container {
+      max-width: 850px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+  }
+
+  .classic-header {
+    background-color: #e8e8e8;
+    padding: 30px 20px;
+    text-align: center;
+    border-bottom: 1px solid #cccccc;
+    h1 {
+      font-size: 2.5em;
+      margin-bottom: 5px;
+      font-weight: normal;
+    }
+    .classic-tagline {
+      font-size: 1.2em;
+      color: #555555;
+      font-style: italic;
+    }
+  }
+
+  .classic-main {
+    padding-top: 30px;
+    padding-bottom: 30px;
+  }
+
+  .classic-nav {
+    text-align: center;
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 1px dashed #dddddd;
+    a {
+      margin: 0 10px;
+      font-size: 1.1em;
+      color: #444444;
+      text-decoration: none;
+      &:hover { color: #000000; text-decoration: underline;}
+    }
+    .classic-lang-selector {
+        display: inline-block; margin-left: 20px;
+        a { padding: 3px 6px; font-size: 0.9em;}
+        a.active { background-color: #ddd; border-radius: 2px;}
+    }
+  }
+
+  .classic-section {
+    margin-bottom: 40px;
+    h2 {
+      font-size: 1.8em;
+      color: #222222;
+      border-bottom: 1px solid #cccccc;
+      padding-bottom: 10px;
+      margin-bottom: 20px;
+      font-weight: bold;
+    }
+    p { margin-bottom: 15px; font-size: 1em; }
+    ul {
+      list-style-type: disc;
+      margin-left: 20px;
+      margin-bottom: 15px;
+      li { margin-bottom: 5px; }
+    }
+  }
+  .classic-button {
+     display: inline-block; padding: 10px 20px; background-color: #555; color: #fff;
+     text-decoration: none; border: 1px solid #333; border-radius: 3px;
+     transition: background-color 0.2s;
+     &:hover { background-color: #333; }
+  }
+   .classic-download-cv { margin-top: 10px; }
+
+  .classic-about-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    .classic-profile-pic {
+      width: 100px; height: 100px; object-fit: cover;
+      border: 1px solid #ccc; padding: 3px;
+      margin-right: 15px;
+      float: left; /* For older browser compatibility if flex gap is not supported */
+    }
+    div p:first-child { margin-top:0;}
+  }
+
+
+  .classic-cv-item {
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 1px dotted #eeeeee;
+    &:last-child { border-bottom: none; margin-bottom: 0;}
+    h3 { font-size: 1.4em; margin-bottom: 5px; color: #444444; }
+    .classic-cv-meta { font-size: 0.9em; color: #666666; margin-bottom: 10px; font-style: italic; }
+  }
+
+  .classic-project-item {
+    margin-bottom: 25px;
+    h3 { font-size: 1.3em; margin-bottom: 8px; }
+    .classic-project-image {
+        max-width: 250px; height: auto; float: right; margin-left: 15px; margin-bottom: 10px;
+        border: 1px solid #ddd; padding: 3px;
+    }
+    &:after { content: ""; display: table; clear: both; }
+  }
+
+  .classic-link {
+    color: #0066cc;
+    text-decoration: underline;
+    &:hover { color: #004c99; }
+  }
+
+  .classic-skills-list {
+    list-style: none; padding-left: 0;
+    li {
+      margin-bottom: 8px; display: flex; align-items: center;
+      .classic-skill-icon {
+        margin-right: 8px;
+        svg { width: 18px; height: 18px; vertical-align: middle; opacity: 0.8; }
+      }
+      .classic-skill-name { font-weight: bold; }
+      .classic-skill-level { font-size: 0.9em; color: #555; margin-left: 5px; }
+    }
+  }
+
+  .classic-tags {
+    margin-top: 10px; font-size: 0.9em;
+    strong { color: #333; }
+    span {
+      background-color: #f0f0f0; color: #555; padding: 2px 6px;
+      border-radius: 3px; margin-right: 5px; display: inline-block; margin-bottom: 3px;
+    }
+  }
+
+  .classic-social-links {
+    margin-top: 15px;
+    a { margin-right: 15px; color: #333; text-decoration: underline; }
+  }
+
+  .classic-footer {
+    text-align: center;
+    padding: 20px;
+    margin-top: 30px;
+    border-top: 1px solid #cccccc;
+    font-size: 0.9em;
+    color: #666666;
+  }
+}

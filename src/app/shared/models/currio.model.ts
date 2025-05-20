@@ -51,7 +51,7 @@ export interface Currio {
   contatti?: CurrioContatti;
   curriculumUrl?: string;
   linguaDefault?: 'it' | 'en';
-  templateScelto?: string;
+  templateScelto?: 'modern' | 'vintage' | 'classic';
   userId?: string;
   status?: 'nuova_richiesta' | 'invito_spedito' | 'attivo' | 'archiviato';
   datiCliente?: DatiClienteCurrio;

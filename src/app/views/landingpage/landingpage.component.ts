@@ -156,8 +156,8 @@ export class LandingpageComponent {
     };
 
     const newCurrioData: Omit<Currio, 'id'> = {
-      nomePortfolio: `Curriò per ${this.formData.nome}`,
-      heroTitle: `Benvenuto ${this.formData.nome}!`,
+      nomePortfolio: `Il mio Curriò ${this.formData.nome}`,
+      heroTitle: `Ciao, sono ${this.formData.nome}!`,
       heroSubtitle: this.formData.esperienze,
       contatti: {
         email: this.formData.email,

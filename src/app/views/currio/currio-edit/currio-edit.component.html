@@ -1,10 +1,12 @@
 <div class="row">
   <div class="col-md-12">
     <h3 *ngIf="currio && currio.id && currioForm.get('nomePortfolio')?.value">
-      {{(isUserAdmin ? 'generale.shared.modifica' : 'customer.currio.title') | translate}} Curriò: {{ currioForm.get('nomePortfolio')?.value }}
-      <span *ngIf="isUserAdmin && currio?.status" class="badge bg-info text-white ms-2 text-capitalize">{{ currio.status.replace('_', ' ') }}</span>
+      {{(isUserAdmin ? 'generale.shared.modifica' : 'customer.currio.title') | translate}} Curriò: {{
+      currioForm.get('nomePortfolio')?.value }}
+      <span *ngIf="isUserAdmin && currio?.status" class="badge bg-info text-white ms-2 text-capitalize">{{
+        currio.status.replace('_', ' ') }}</span>
     </h3>
-    <hr *ngIf="currio && currio.id"/>
+    <hr *ngIf="currio && currio.id" />
   </div>
 </div>
 
@@ -12,19 +14,22 @@
   <div class="col-md-12 d-flex justify-content-between align-items-center">
     <div>
       <button type="button" (click)="openPreviewInNewTab()" class="btn btn-info me-2 mr-2">
-          <i class="feather icon-external-link"></i> Anteprima Curriò
+        <i class="feather icon-external-link"></i> Anteprima Curriò
       </button>
-      <button *ngIf="isUserAdmin && currio?.curriculumUrl" type="button" (click)="openCurriculum()" class="btn btn-outline-secondary">
-          <i class="feather icon-file-text"></i> Visualizza CV
+      <button *ngIf="isUserAdmin && currio?.curriculumUrl" type="button" (click)="openCurriculum()"
+        class="btn btn-outline-secondary">
+        <i class="feather icon-file-text"></i> Visualizza CV
       </button>
     </div>
     <div>
-      <button type="submit" form="currioUnifiedForm" class="btn btn-primary mr-2" [disabled]="!currioForm.valid || (isSubmitting$ | async) || !currioForm.dirty">
+      <button type="submit" form="currioUnifiedForm" class="btn btn-primary mr-2"
+        [disabled]="!currioForm.valid || (isSubmitting$ | async) || !currioForm.dirty">
         <i class="feather icon-save"></i>
         <span *ngIf="!(isSubmitting$ | async)">
           {{ 'generale.shared.salva' | translate }}
         </span>
-        <span *ngIf="isSubmitting$ | async" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+        <span *ngIf="isSubmitting$ | async" class="spinner-border spinner-border-sm" role="status"
+          aria-hidden="true"></span>
         <span *ngIf="isSubmitting$ | async"> Salvataggio...</span>
       </button>
       <button type="button" class="btn btn-secondary me-2 mr-2" (click)="goBack()">
@@ -46,7 +51,8 @@
 </div>
 
 <div *ngIf="!isLoadingCurrio && currio && currio.id">
-  <div *ngIf="showUnsavedChangesWarning && currioForm.dirty" class="alert alert-warning d-flex align-items-center mb-3" role="alert">
+  <div *ngIf="showUnsavedChangesWarning && currioForm.dirty" class="alert alert-warning d-flex align-items-center mb-3"
+    role="alert">
     <i class="feather icon-alert-triangle me-2"></i>
     <div>
       {{ 'profiloUtente.avvisoModificheNonSalvate' | translate }}
@@ -60,16 +66,19 @@
           <div class="card-header">{{ 'Informazioni Principali' | translate }}</div>
           <div class="card-body">
             <div class="mb-3">
-              <label for="nomePortfolio" class="form-label">{{ 'customer.currio.form.nomePortfolio' | translate }}</label>
+              <label for="nomePortfolio" class="form-label">{{ 'customer.currio.form.nomePortfolio' | translate
+                }}</label>
               <input type="text" id="nomePortfolio" class="form-control" formControlName="nomePortfolio" />
-              <div *ngIf="currioForm.get('nomePortfolio')?.invalid && currioForm.get('nomePortfolio')?.touched" class="text-danger small">
+              <div *ngIf="currioForm.get('nomePortfolio')?.invalid && currioForm.get('nomePortfolio')?.touched"
+                class="text-danger small">
                 {{ 'generale.errori.camporichiesto' | translate }}
               </div>
             </div>
             <div class="mb-3">
               <label for="heroTitle" class="form-label">{{ 'customer.currio.form.heroTitle' | translate }}</label>
               <input type="text" id="heroTitle" class="form-control" formControlName="heroTitle" />
-              <div *ngIf="currioForm.get('heroTitle')?.invalid && currioForm.get('heroTitle')?.touched" class="text-danger small">
+              <div *ngIf="currioForm.get('heroTitle')?.invalid && currioForm.get('heroTitle')?.touched"
+                class="text-danger small">
                 {{ 'generale.errori.camporichiesto' | translate }}
               </div>
             </div>
@@ -78,7 +87,8 @@
               <textarea id="heroSubtitle" class="form-control" formControlName="heroSubtitle" rows="2"></textarea>
             </div>
             <div class="mb-3">
-              <label for="linguaDefault" class="form-label">{{ 'customer.currio.form.linguaDefault' | translate }}</label>
+              <label for="linguaDefault" class="form-label">{{ 'customer.currio.form.linguaDefault' | translate
+                }}</label>
               <select id="linguaDefault" class="form-select" formControlName="linguaDefault">
                 <option value="it">Italiano</option>
                 <option value="en">Inglese</option>
@@ -86,21 +96,73 @@
             </div>
           </div>
         </div>
-
+        <div class="card mb-3">
+          <div class="card-header">{{ 'customer.currio.form.templateScelto.titolo' | translate }}</div>
+          <div class="card-body">
+            <div class="mb-3">
+              <label class="form-label">{{ 'customer.currio.form.templateScelto.label' | translate }}</label>
+              <div class="row">
+                <div class="col-md-4">
+                  <div class="template-option text-center p-2 border rounded"
+                    [class.selected]="currioForm.get('templateScelto')?.value === 'modern'"
+                    (click)="selectTemplate('modern')">
+                    <img src="assets/images/template-modern-preview.png"
+                      alt="{{ 'customer.currio.form.templateScelto.modern' | translate }}"
+                      class="img-fluid mb-2 template-preview-img">
+                    <p class="mb-0 fw-semibold">{{ 'customer.currio.form.templateScelto.modern' | translate }}</p>
+                    <input type="radio" formControlName="templateScelto" value="modern" class="d-none">
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="template-option text-center p-2 border rounded"
+                    [class.selected]="currioForm.get('templateScelto')?.value === 'vintage'"
+                    (click)="selectTemplate('vintage')">
+                    <img src="assets/images/template-vintage-preview.png"
+                      alt="{{ 'customer.currio.form.templateScelto.vintage' | translate }}"
+                      class="img-fluid mb-2 template-preview-img">
+                    <p class="mb-0 fw-semibold">{{ 'customer.currio.form.templateScelto.vintage' | translate }}</p>
+                    <input type="radio" formControlName="templateScelto" value="vintage" class="d-none">
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="template-option text-center p-2 border rounded"
+                    [class.selected]="currioForm.get('templateScelto')?.value === 'classic'"
+                    (click)="selectTemplate('classic')">
+                    <img src="assets/images/template-classic-preview.png"
+                      alt="{{ 'customer.currio.form.templateScelto.classic' | translate }}"
+                      class="img-fluid mb-2 template-preview-img">
+                    <p class="mb-0 fw-semibold">{{ 'customer.currio.form.templateScelto.classic' | translate }}</p>
+                    <input type="radio" formControlName="templateScelto" value="classic" class="d-none">
+                  </div>
+                </div>
+              </div>
+              <div *ngIf="currioForm.get('templateScelto')?.invalid && currioForm.get('templateScelto')?.touched"
+                class="text-danger small mt-2">
+                {{ 'generale.errori.camporichiesto' | translate }}
+              </div>
+            </div>
+          </div>
+        </div>
         <div class="card mb-3">
           <div class="card-header">{{ 'Chi Sono' | translate }}</div>
           <div class="card-body">
             <div class="mb-3">
-              <label for="chiSonoFotoUrl" class="form-label">{{ 'customer.currio.form.chiSonoFotoUrl' | translate }}</label>
-              <input type="url" id="chiSonoFotoUrl" class="form-control" formControlName="chiSonoFotoUrl" placeholder="https://example.com/foto.jpg" />
+              <label for="chiSonoFotoUrl" class="form-label">{{ 'customer.currio.form.chiSonoFotoUrl' | translate
+                }}</label>
+              <input type="url" id="chiSonoFotoUrl" class="form-control" formControlName="chiSonoFotoUrl"
+                placeholder="https://example.com/foto.jpg" />
             </div>
             <div class="mb-3">
-              <label for="chiSonoDescrizione1" class="form-label">{{ 'customer.currio.form.chiSonoDescrizione1' | translate }}</label>
-              <textarea id="chiSonoDescrizione1" class="form-control" formControlName="chiSonoDescrizione1" rows="3"></textarea>
+              <label for="chiSonoDescrizione1" class="form-label">{{ 'customer.currio.form.chiSonoDescrizione1' |
+                translate }}</label>
+              <textarea id="chiSonoDescrizione1" class="form-control" formControlName="chiSonoDescrizione1"
+                rows="3"></textarea>
             </div>
             <div class="mb-3">
-              <label for="chiSonoDescrizione2" class="form-label">{{ 'customer.currio.form.chiSonoDescrizione2' | translate }}</label>
-              <textarea id="chiSonoDescrizione2" class="form-control" formControlName="chiSonoDescrizione2" rows="2"></textarea>
+              <label for="chiSonoDescrizione2" class="form-label">{{ 'customer.currio.form.chiSonoDescrizione2' |
+                translate }}</label>
+              <textarea id="chiSonoDescrizione2" class="form-control" formControlName="chiSonoDescrizione2"
+                rows="2"></textarea>
             </div>
           </div>
         </div>
@@ -109,23 +171,31 @@
           <div class="card-header">{{ 'Contatti Pubblici del Curriò' | translate }}</div>
           <div class="card-body">
             <div class="mb-3">
-              <label for="contattiEmail" class="form-label">{{ 'customer.currio.form.contattiEmail' | translate }}</label>
+              <label for="contattiEmail" class="form-label">{{ 'customer.currio.form.contattiEmail' | translate
+                }}</label>
               <input type="email" id="contattiEmail" class="form-control" formControlName="email" />
-              <div *ngIf="currioForm.get('contatti.email')?.invalid && currioForm.get('contatti.email')?.touched" class="text-danger small">
+              <div *ngIf="currioForm.get('contatti.email')?.invalid && currioForm.get('contatti.email')?.touched"
+                class="text-danger small">
                 {{ 'generale.errori.mailvalida' | translate }}
               </div>
             </div>
             <div class="mb-3">
-              <label for="contattiGithub" class="form-label">{{ 'customer.currio.form.contattiGithub' | translate }}</label>
-              <input type="url" id="contattiGithub" class="form-control" formControlName="github" placeholder="https://github.com/tuoutente" />
+              <label for="contattiGithub" class="form-label">{{ 'customer.currio.form.contattiGithub' | translate
+                }}</label>
+              <input type="url" id="contattiGithub" class="form-control" formControlName="github"
+                placeholder="https://github.com/tuoutente" />
             </div>
             <div class="mb-3">
-              <label for="contattiLinkedin" class="form-label">{{ 'customer.currio.form.contattiLinkedin' | translate }}</label>
-              <input type="url" id="contattiLinkedin" class="form-control" formControlName="linkedin" placeholder="https://linkedin.com/in/tuoutente" />
+              <label for="contattiLinkedin" class="form-label">{{ 'customer.currio.form.contattiLinkedin' | translate
+                }}</label>
+              <input type="url" id="contattiLinkedin" class="form-control" formControlName="linkedin"
+                placeholder="https://linkedin.com/in/tuoutente" />
             </div>
             <div class="mb-3">
-              <label for="contattiInstagram" class="form-label">{{ 'customer.currio.form.contattiInstagram' | translate }}</label>
-              <input type="url" id="contattiInstagram" class="form-control" formControlName="instagram" placeholder="https://instagram.com/tuoutente" />
+              <label for="contattiInstagram" class="form-label">{{ 'customer.currio.form.contattiInstagram' | translate
+                }}</label>
+              <input type="url" id="contattiInstagram" class="form-control" formControlName="instagram"
+                placeholder="https://instagram.com/tuoutente" />
             </div>
           </div>
         </div>
@@ -140,7 +210,8 @@
             </button>
           </div>
           <div class="card-body" formArrayName="progetti">
-            <div *ngFor="let progettoCtrl of progettiFormArray.controls; let i = index" [formGroupName]="i" class="mb-3 p-3 border rounded">
+            <div *ngFor="let progettoCtrl of progettiFormArray.controls; let i = index" [formGroupName]="i"
+              class="mb-3 p-3 border rounded">
               <h6 class="d-flex justify-content-between align-items-center">
                 {{ 'Progetto' | translate }} {{i + 1}}
                 <button type="button" class="btn btn-sm btn-outline-danger" (click)="removeProgetto(i)">
@@ -165,11 +236,14 @@
               </div>
               <div formArrayName="tags">
                 <label class="form-label">{{ 'customer.currio.form.progetto.tags' | translate }}</label>
-                <div *ngFor="let tagCtrl of getTags(i).controls; let tagIndex = index" class="input-group input-group-sm mb-1">
-                    <input type="text" class="form-control" [formControlName]="tagIndex">
-                    <button class="btn btn-outline-danger btn-sm" type="button" (click)="removeTag(i, tagIndex)"><i class="feather icon-x"></i></button>
+                <div *ngFor="let tagCtrl of getTags(i).controls; let tagIndex = index"
+                  class="input-group input-group-sm mb-1">
+                  <input type="text" class="form-control" [formControlName]="tagIndex">
+                  <button class="btn btn-outline-danger btn-sm" type="button" (click)="removeTag(i, tagIndex)"><i
+                      class="feather icon-x"></i></button>
                 </div>
-                <button type="button" class="btn btn-outline-secondary btn-sm mt-1" (click)="addTag(i)">Aggiungi Tag</button>
+                <button type="button" class="btn btn-outline-secondary btn-sm mt-1" (click)="addTag(i)">Aggiungi
+                  Tag</button>
               </div>
             </div>
             <div *ngIf="progettiFormArray.length === 0" class="text-muted text-center py-3">
@@ -182,63 +256,71 @@
           <div class="card-header d-flex justify-content-between align-items-center">
             <span>{{ 'customer.currio.esperienzeTitle' | translate }}</span>
             <button type="button" class="btn btn-sm btn-outline-primary" (click)="addEsperienza()">
-               <i class="feather icon-plus"></i> {{ 'customer.currio.addEsperienza' | translate }}
+              <i class="feather icon-plus"></i> {{ 'customer.currio.addEsperienza' | translate }}
             </button>
           </div>
           <div class="card-body" formArrayName="esperienze">
-             <div *ngFor="let esperienzaCtrl of esperienzeFormArray.controls; let i = index" [formGroupName]="i" class="mb-3 p-3 border rounded">
-                <h6 class="d-flex justify-content-between align-items-center">
-                    Esperienza/Formazione {{i + 1}}
-                    <button type="button" class="btn btn-sm btn-outline-danger" (click)="removeEsperienza(i)">
-                        <i class="feather icon-trash-2"></i> {{ 'customer.currio.remove' | translate }}
-                    </button>
-                </h6>
-                <div class="row">
-                    <div class="col-md-6 mb-2">
-                        <label class="form-label">{{ 'customer.currio.form.esperienza.titolo' | translate }}</label>
-                        <input type="text" class="form-control form-control-sm" formControlName="titolo">
-                    </div>
-                    <div class="col-md-6 mb-2">
-                        <label class="form-label">{{ 'customer.currio.form.esperienza.tipo' | translate }}</label>
-                        <select class="form-select form-select-sm" formControlName="tipo">
-                            <option value="lavoro">Lavoro</option>
-                            <option value="formazione">Formazione</option>
-                        </select>
-                    </div>
+            <div *ngFor="let esperienzaCtrl of esperienzeFormArray.controls; let i = index" [formGroupName]="i"
+              class="mb-3 p-3 border rounded">
+              <h6 class="d-flex justify-content-between align-items-center">
+                Esperienza/Formazione {{i + 1}}
+                <button type="button" class="btn btn-sm btn-outline-danger" (click)="removeEsperienza(i)">
+                  <i class="feather icon-trash-2"></i> {{ 'customer.currio.remove' | translate }}
+                </button>
+              </h6>
+              <div class="row">
+                <div class="col-md-6 mb-2">
+                  <label class="form-label">{{ 'customer.currio.form.esperienza.titolo' | translate }}</label>
+                  <input type="text" class="form-control form-control-sm" formControlName="titolo">
                 </div>
-                <div class="mb-2">
-                    <label class="form-label">{{ 'customer.currio.form.esperienza.aziendaScuola' | translate }}</label>
-                    <input type="text" class="form-control form-control-sm" formControlName="aziendaScuola">
+                <div class="col-md-6 mb-2">
+                  <label class="form-label">{{ 'customer.currio.form.esperienza.tipo' | translate }}</label>
+                  <select class="form-select form-select-sm" formControlName="tipo">
+                    <option value="lavoro">Lavoro</option>
+                    <option value="formazione">Formazione</option>
+                  </select>
                 </div>
-                <div class="mb-2">
-                    <label class="form-label">{{ 'customer.currio.form.esperienza.date' | translate }}</label>
-                    <input type="text" class="form-control form-control-sm" formControlName="date">
-                </div>
-                <div class="mb-2">
-                    <label class="form-label">{{ 'customer.currio.form.esperienza.descrizioneBreve' | translate }}</label>
-                    <textarea class="form-control form-control-sm" formControlName="descrizioneBreve" rows="2"></textarea>
-                </div>
+              </div>
+              <div class="mb-2">
+                <label class="form-label">{{ 'customer.currio.form.esperienza.aziendaScuola' | translate }}</label>
+                <input type="text" class="form-control form-control-sm" formControlName="aziendaScuola">
+              </div>
+              <div class="mb-2">
+                <label class="form-label">{{ 'customer.currio.form.esperienza.date' | translate }}</label>
+                <input type="text" class="form-control form-control-sm" formControlName="date">
+              </div>
+              <div class="mb-2">
+                <label class="form-label">{{ 'customer.currio.form.esperienza.descrizioneBreve' | translate }}</label>
+                <textarea class="form-control form-control-sm" formControlName="descrizioneBreve" rows="2"></textarea>
+              </div>
 
-                <div formArrayName="dettagli">
-                    <label class="form-label">{{ 'customer.currio.form.esperienza.dettagli' | translate }}</label>
-                    <div *ngFor="let dettaglioCtrl of getDettagli(i).controls; let detIndex = index" class="input-group input-group-sm mb-1">
-                        <input type="text" class="form-control" [formControlName]="detIndex">
-                        <button class="btn btn-outline-danger btn-sm" type="button" (click)="removeDettaglio(i, detIndex)"><i class="feather icon-x"></i></button>
-                    </div>
-                    <button type="button" class="btn btn-outline-secondary btn-sm mt-1" (click)="addDettaglio(i)">Aggiungi Dettaglio</button>
+              <div formArrayName="dettagli">
+                <label class="form-label">{{ 'customer.currio.form.esperienza.dettagli' | translate }}</label>
+                <div *ngFor="let dettaglioCtrl of getDettagli(i).controls; let detIndex = index"
+                  class="input-group input-group-sm mb-1">
+                  <input type="text" class="form-control" [formControlName]="detIndex">
+                  <button class="btn btn-outline-danger btn-sm" type="button" (click)="removeDettaglio(i, detIndex)"><i
+                      class="feather icon-x"></i></button>
                 </div>
+                <button type="button" class="btn btn-outline-secondary btn-sm mt-1" (click)="addDettaglio(i)">Aggiungi
+                  Dettaglio</button>
+              </div>
 
-                <div formArrayName="competenzeAcquisite" class="mt-2">
-                    <label class="form-label">{{ 'customer.currio.form.esperienza.competenzeAcquisite' | translate }}</label>
-                    <div *ngFor="let compCtrl of getCompetenzeAcquisite(i).controls; let compIndex = index" class="input-group input-group-sm mb-1">
-                        <input type="text" class="form-control" [formControlName]="compIndex">
-                        <button class="btn btn-outline-danger btn-sm" type="button" (click)="removeCompetenzaAcquisita(i, compIndex)"><i class="feather icon-x"></i></button>
-                    </div>
-                    <button type="button" class="btn btn-outline-secondary btn-sm mt-1" (click)="addCompetenzaAcquisita(i)">Aggiungi Competenza</button>
+              <div formArrayName="competenzeAcquisite" class="mt-2">
+                <label class="form-label">{{ 'customer.currio.form.esperienza.competenzeAcquisite' | translate
+                  }}</label>
+                <div *ngFor="let compCtrl of getCompetenzeAcquisite(i).controls; let compIndex = index"
+                  class="input-group input-group-sm mb-1">
+                  <input type="text" class="form-control" [formControlName]="compIndex">
+                  <button class="btn btn-outline-danger btn-sm" type="button"
+                    (click)="removeCompetenzaAcquisita(i, compIndex)"><i class="feather icon-x"></i></button>
                 </div>
+                <button type="button" class="btn btn-outline-secondary btn-sm mt-1"
+                  (click)="addCompetenzaAcquisita(i)">Aggiungi Competenza</button>
+              </div>
             </div>
             <div *ngIf="esperienzeFormArray.length === 0" class="text-muted text-center py-3">
-                Nessuna esperienza aggiunta.
+              Nessuna esperienza aggiunta.
             </div>
           </div>
         </div>
@@ -251,29 +333,31 @@
             </button>
           </div>
           <div class="card-body" formArrayName="competenze">
-            <div *ngFor="let competenzaCtrl of competenzeFormArray.controls; let i = index" [formGroupName]="i" class="mb-3 p-3 border rounded">
-                <h6 class="d-flex justify-content-between align-items-center">
-                    Competenza {{i + 1}}
-                    <button type="button" class="btn btn-sm btn-outline-danger" (click)="removeCompetenza(i)">
-                        <i class="feather icon-trash-2"></i> {{ 'customer.currio.remove' | translate }}
-                    </button>
-                </h6>
-                <div class="mb-2">
-                    <label class="form-label">{{ 'customer.currio.form.competenza.nome' | translate }}</label>
-                    <input type="text" class="form-control form-control-sm" formControlName="nome">
-                </div>
-                 <div class="mb-2">
-                    <label class="form-label">{{ 'customer.currio.form.competenza.livello' | translate }}</label>
-                    <input type="text" class="form-control form-control-sm" formControlName="livello">
-                </div>
-                 <div class="mb-2">
-                    <label class="form-label">{{ 'customer.currio.form.competenza.icona' | translate }}</label>
-                    <textarea class="form-control form-control-sm" formControlName="icona" rows="2" placeholder='<svg>...</svg>'></textarea>
-                    <small class="form-text text-muted">Incolla qui il codice SVG completo per l'icona (opzionale).</small>
-                </div>
+            <div *ngFor="let competenzaCtrl of competenzeFormArray.controls; let i = index" [formGroupName]="i"
+              class="mb-3 p-3 border rounded">
+              <h6 class="d-flex justify-content-between align-items-center">
+                Competenza {{i + 1}}
+                <button type="button" class="btn btn-sm btn-outline-danger" (click)="removeCompetenza(i)">
+                  <i class="feather icon-trash-2"></i> {{ 'customer.currio.remove' | translate }}
+                </button>
+              </h6>
+              <div class="mb-2">
+                <label class="form-label">{{ 'customer.currio.form.competenza.nome' | translate }}</label>
+                <input type="text" class="form-control form-control-sm" formControlName="nome">
+              </div>
+              <div class="mb-2">
+                <label class="form-label">{{ 'customer.currio.form.competenza.livello' | translate }}</label>
+                <input type="text" class="form-control form-control-sm" formControlName="livello">
+              </div>
+              <div class="mb-2">
+                <label class="form-label">{{ 'customer.currio.form.competenza.icona' | translate }}</label>
+                <textarea class="form-control form-control-sm" formControlName="icona" rows="2"
+                  placeholder='<svg>...</svg>'></textarea>
+                <small class="form-text text-muted">Incolla qui il codice SVG completo per l'icona (opzionale).</small>
+              </div>
             </div>
             <div *ngIf="competenzeFormArray.length === 0" class="text-muted text-center py-3">
-                Nessuna competenza aggiunta.
+              Nessuna competenza aggiunta.
             </div>
           </div>
         </div>
@@ -293,7 +377,8 @@
         <span *ngIf="currio.status === 'attivo'" class="badge bg-success text-white ms-2">Account Attivo</span>
       </div>
       <div class="card-body">
-        <p>Richiesta da: <strong>{{ currio.datiCliente.nome }}</strong> (<code>{{ currio.datiCliente.email }}</code>)</p>
+        <p>Richiesta da: <strong>{{ currio.datiCliente.nome }}</strong> (<code>{{ currio.datiCliente.email }}</code>)
+        </p>
 
         <div *ngIf="currio.status === 'nuova_richiesta'">
           <button type="button" class="btn btn-info btn-sm" (click)="preparaEInviaInvito()">
@@ -303,13 +388,16 @@
 
         <div *ngIf="linkRegistrazione && currio.status === 'invito_spedito'" class="mt-3 alert alert-info">
           <p class="mb-1"><strong>Istruzioni per l'admin:</strong></p>
-          <p class="small">Per favore, invia manualmente il seguente link di registrazione al cliente ({{currio.datiCliente.email}}). Il link scadrà tra 24 ore.</p>
+          <p class="small">Per favore, invia manualmente il seguente link di registrazione al cliente
+            ({{currio.datiCliente.email}}). Il link scadrà tra 24 ore.</p>
           <div class="input-group input-group-sm mb-2">
-            <input type="text" class="form-control form-control-sm" [value]="linkRegistrazione" readonly #registrationLinkInput>
-            <button class="btn btn-outline-secondary btn-sm" type="button" id="copyLinkBtnUnified"><i class="feather icon-copy"></i> Copia</button>
+            <input type="text" class="form-control form-control-sm" [value]="linkRegistrazione" readonly
+              #registrationLinkInput>
+            <button class="btn btn-outline-secondary btn-sm" type="button" id="copyLinkBtnUnified"><i
+                class="feather icon-copy"></i> Copia</button>
           </div>
           <a href="mailto:{{ currio.datiCliente.email }}?subject=Completa la creazione del tuo Curriò&body=Ciao {{ currio.datiCliente.nome }},%0D%0A%0D%0Acompleta la creazione del tuo account per Curriò al seguente link: {{ encodedLinkRegistrazione }}%0D%0A%0D%0AIl link scadrà tra 24 ore."
-             class="btn btn-sm btn-outline-primary mt-1">
+            class="btn btn-sm btn-outline-primary mt-1">
             <i class="feather icon-mail me-1"></i> Apri bozza email
           </a>
         </div>

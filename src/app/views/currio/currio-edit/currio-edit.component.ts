@@ -18,8 +18,10 @@ import { AuthService } from 'src/app/shared/servizi/auth.service';
 
 @Component({
   selector: 'app-currio-edit',
-  templateUrl: './currio-edit.component.html'
+  templateUrl: './currio-edit.component.html',
+    styleUrls: ['./currio-edit.component.scss']
 })
+
 export class CurrioEditComponent implements OnInit, OnDestroy {
   currio: Currio | undefined | null;
   currioForm: FormGroup;
@@ -42,14 +44,14 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
     private readonly router: Router,
     private readonly fb: FormBuilder,
     private readonly actions$: Actions,
-    private readonly authService: AuthService // Assicurati sia importato e iniettato se necessario per ruoli
+    private readonly authService: AuthService
   ) {
     this.isSubmitting$ = this.store.select(getCurrioLoading);
   }
 
   ngOnInit(): void {
     this.initForm();
-    this.subscribeToUserRole(); // Questo chiamerà determineLoadStrategy
+    this.subscribeToUserRole();
     this.subscribeToFormChanges();
     this.subscribeToSuccessActions();
   }
@@ -61,7 +63,7 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
         this.isUserAdmin = user.ruolo === 'admin';
         this.currentUserId = user.localId;
       } else {
-        this.isUserAdmin = false; // Default a non-admin se ruolo non definito
+        this.isUserAdmin = false;
       }
       this.determineLoadStrategy();
     });
@@ -109,8 +111,8 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
 
   private subscribeToSpecificCurrio(id: string): void {
     const currioSub = this.store.select(getCurrioById, { id }).pipe(
-      filter((currioLoaded): currioLoaded is Currio => !!currioLoaded && !!currioLoaded.id), // Assicura che il currio e il suo ID siano validi
-      take(1) // Prendi solo il primo valore valido per evitare reinizializzazioni multiple
+      filter((currioLoaded): currioLoaded is Currio => !!currioLoaded && !!currioLoaded.id),
+      take(1)
     ).subscribe(currioDetails => {
         this.currio = currioDetails;
         this.initializeForm();
@@ -128,10 +130,8 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
         this.handleCurrioLoadingError('Errore durante il recupero dei dettagli del Curriò.', error);
     });
 
-    // Fallback se il currio non viene trovato o l'ID non è valido dopo un timeout (opzionale)
     const timeoutSub = of(null).pipe(take(1), tap(() => {
-        if (!this.currio && this.isLoadingCurrio) { // Se dopo un po' non abbiamo ancora un currio
-           // this.handleCurrioLoadingError(`Timeout o Curriò non trovato per ID: ${id}.`);
+        if (!this.currio && this.isLoadingCurrio) {
         }
     })).subscribe();
 
@@ -145,6 +145,7 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
       heroTitle: ['', Validators.required],
       heroSubtitle: [''],
       linguaDefault: ['it', Validators.required],
+      templateScelto: ['modern', Validators.required],
       chiSonoFotoUrl: [''],
       chiSonoDescrizione1: [''],
       chiSonoDescrizione2: [''],
@@ -170,6 +171,7 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
       heroTitle: this.currio.heroTitle || '',
       heroSubtitle: this.currio.heroSubtitle || '',
       linguaDefault: this.currio.linguaDefault || 'it',
+      templateScelto: this.currio.templateScelto || 'modern',
       chiSonoFotoUrl: this.currio.chiSonoFotoUrl || '',
       chiSonoDescrizione1: this.currio.chiSonoDescrizione1 || '',
       chiSonoDescrizione2: this.currio.chiSonoDescrizione2 || '',
@@ -214,6 +216,11 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
 
   updateWarningState(): void {
     this.showUnsavedChangesWarning = this.currioForm && this.currioForm.dirty;
+  }
+
+  selectTemplate(templateName: 'modern' | 'vintage' | 'classic'): void {
+    this.currioForm.get('templateScelto')?.setValue(templateName);
+    this.currioForm.markAsDirty();
   }
 
   get progettiFormArray() { return this.currioForm.get('progetti') as FormArray; }
@@ -343,13 +350,14 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
       heroTitle: formValue.heroTitle,
       heroSubtitle: formValue.heroSubtitle,
       linguaDefault: formValue.linguaDefault,
+      templateScelto: formValue.templateScelto,
       chiSonoFotoUrl: formValue.chiSonoFotoUrl,
       chiSonoDescrizione1: formValue.chiSonoDescrizione1,
       chiSonoDescrizione2: formValue.chiSonoDescrizione2,
       contatti: formValue.contatti,
-      progetti: formValue.progetti.map(p => ({...p, id: p.id || uuidv4()})),
-      esperienze: formValue.esperienze.map(e => ({...e, id: e.id || uuidv4()})),
-      competenze: formValue.competenze.map(c => ({...c, id: c.id || uuidv4()}))
+      progetti: formValue.progetti.map((p:CurrioProgetto) => ({...p, id: p.id || uuidv4()})),
+      esperienze: formValue.esperienze.map((e:CurrioEsperienza) => ({...e, id: e.id || uuidv4()})),
+      competenze: formValue.competenze.map((c:CurrioCompetenza) => ({...c, id: c.id || uuidv4()}))
     };
     this.store.dispatch(updateCurrio({ currio: currioToUpdate }));
   }

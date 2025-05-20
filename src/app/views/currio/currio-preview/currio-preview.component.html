@@ -1,179 +1,692 @@
-<div class="currio-preview-wrapper">
-    <div *ngIf="isLoading" class="loading-spinner-overlay">
-        <div class="loading-spinner"></div>
-    </div>
+<div class="currio-preview-wrapper" [ngClass]="currio?.templateScelto || 'modern'">
+  <div *ngIf="isLoading" class="loading-spinner-overlay">
+    <div class="loading-spinner"></div>
+  </div>
 
-    <div *ngIf="!isLoading && !currio" class="error-container">
-        <h2 class="error-title">{{ 'currioPreview.errorTitle' | translate }}</h2>
-        <p class="error-message">{{ 'currioPreview.errorMessage' | translate }}</p>
-        <a routerLink="/admin/currio/listacurrio" *ngIf="isUserAdmin$ | async" class="button button-primary">
-            {{ 'currioPreview.backToList' | translate }}
-        </a>
-    </div>
+  <div *ngIf="!isLoading && !currio" class="error-container">
+    <h2 class="error-title">{{ 'currioPreview.errorTitle' | translate }}</h2>
+    <p class="error-message">{{ 'currioPreview.errorMessage' | translate }}</p>
+    <a routerLink="/admin/currio/listacurrio" *ngIf="isUserAdmin$ | async" class="button button-primary">
+      {{ 'currioPreview.backToList' | translate }}
+    </a>
+  </div>
 
-    <div *ngIf="!isLoading && currio">
-        <header class="preview-header">
-            <nav class="preview-nav-container">
-                <a href="#" (click)="$event.preventDefault(); smoothScrollTo('#preview-home')" class="nav-logo">{{ currio.nomePortfolio }}</a>
-                <div class="nav-links-menu">
-                    <div class="nav-links-desktop">
-                        <a href="#preview-home" (click)="$event.preventDefault(); smoothScrollTo('#preview-home')" class="nav-link">{{ 'currioPreview.navHome' | translate }}</a>
-                        <a href="#preview-progetti" (click)="$event.preventDefault(); smoothScrollTo('#preview-progetti')" class="nav-link">{{ 'currioPreview.navProjects' | translate }}</a>
-                        <a href="#preview-curriculum" (click)="$event.preventDefault(); smoothScrollTo('#preview-curriculum')" class="nav-link">{{ 'currioPreview.navCV' | translate }}</a>
-                        <a href="#preview-competenze" (click)="$event.preventDefault(); smoothScrollTo('#preview-competenze')" class="nav-link">{{ 'currioPreview.navSkills' | translate }}</a>
-                        <a href="#preview-chi-sono" (click)="$event.preventDefault(); smoothScrollTo('#preview-chi-sono')" class="nav-link">{{ 'currioPreview.navAbout' | translate }}</a>
-                        <a href="#preview-contatti" (click)="$event.preventDefault(); smoothScrollTo('#preview-contatti')" class="nav-link">{{ 'currioPreview.navContact' | translate }}</a>
-                    </div>
-                    <div class="language-selector">
-                        <a id="lang-it" (click)="setLanguage('it')" title="Italiano" [class.active]="translate.currentLang === 'it'">
-                            <svg viewBox="0 0 30 20" xmlns="http://www.w3.org/2000/svg"><path fill="#009246" d="M0 0h10v20H0z" /><path fill="#fff" d="M10 0h10v20H10z" /><path fill="#ce2b37" d="M20 0h10v20H20z" /></svg>
-                        </a>
-                        <span class="separator">|</span>
-                        <a id="lang-en" (click)="setLanguage('en')" title="English" [class.active]="translate.currentLang === 'en'">
-                            <svg viewBox="0 0 60 30" xmlns="http://www.w3.org/2000/svg"><rect width="60" height="30" fill="#012169"/><path fill="#FFFFFF" d="M0,0 L6,0 L30,12 L54,0 L60,0 L60,6 L36,15 L60,24 L60,30 L54,30 L30,18 L6,30 L0,30 L0,24 L24,15 L0,6 Z"/><path fill="#C8102E" d="M0,2 L2,0 L30,10 L28,12 Z M32,18 L30,20 L58,30 L60,28 Z M58,0 L60,2 L32,12 L30,10 Z M2,30 L0,28 L28,18 L30,20 Z"/><path fill="#FFFFFF" d="M25,0 L35,0 L35,10 L60,10 L60,20 L35,20 L35,30 L25,30 L25,20 L0,20 L0,10 L25,10 Z"/><path fill="#C8102E" d="M27,0 L33,0 L33,12 L60,12 L60,18 L33,18 L33,30 L27,30 L27,18 L0,18 L0,12 L27,12 Z"/></svg>
-                        </a>
-                    </div>
-                    <div class="mobile-menu-button-container">
-                        <button id="mobile-menu-button" (click)="toggleMobileMenu()" [attr.aria-expanded]="isMobileMenuOpen" aria-label="Apri menu" class="mobile-menu-button">
-                            <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
-                        </button>
-                    </div>
-                </div>
-            </nav>
-            <div id="mobile-menu" class="nav-links-mobile" [class.hidden]="!isMobileMenuOpen" [attr.aria-hidden]="!isMobileMenuOpen">
-                <a href="#preview-home" (click)="closeMobileMenuAndScroll('#preview-home')" class="nav-link-mobile">{{ 'currioPreview.navHomeMobile' | translate }}</a>
-                <a href="#preview-progetti" (click)="closeMobileMenuAndScroll('#preview-progetti')" class="nav-link-mobile">{{ 'currioPreview.navProjectsMobile' | translate }}</a>
-                <a href="#preview-curriculum" (click)="closeMobileMenuAndScroll('#preview-curriculum')" class="nav-link-mobile">{{ 'currioPreview.navCVMobile' | translate }}</a>
-                <a href="#preview-competenze" (click)="closeMobileMenuAndScroll('#preview-competenze')" class="nav-link-mobile">{{ 'currioPreview.navSkillsMobile' | translate }}</a>
-                <a href="#preview-chi-sono" (click)="closeMobileMenuAndScroll('#preview-chi-sono')" class="nav-link-mobile">{{ 'currioPreview.navAboutMobile' | translate }}</a>
-                <a href="#preview-contatti" (click)="closeMobileMenuAndScroll('#preview-contatti')" class="nav-link-mobile">{{ 'currioPreview.navContactMobile' | translate }}</a>
+  <div *ngIf="!isLoading && currio">
+    <ng-container [ngSwitch]="currio.templateScelto">
+
+      <ng-container *ngSwitchCase="'modern'">
+        <header class="bg-white shadow-md sticky top-0 z-50 modern-header">
+          <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="#" (click)="$event.preventDefault(); smoothScrollTo('#preview-home-modern')"
+              class="text-2xl font-bold text-blue-600">{{ currio.nomePortfolio }}</a>
+            <div class="flex items-center">
+              <div class="hidden md:flex space-x-4">
+                <a href="#preview-home-modern" (click)="$event.preventDefault(); smoothScrollTo('#preview-home-modern')"
+                  class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">{{
+                  'currioPreview.navHome' | translate }}</a>
+                <a href="#preview-progetti-modern"
+                  (click)="$event.preventDefault(); smoothScrollTo('#preview-progetti-modern')"
+                  class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">{{
+                  'currioPreview.navProjects' | translate }}</a>
+                <a href="#preview-curriculum-modern"
+                  (click)="$event.preventDefault(); smoothScrollTo('#preview-curriculum-modern')"
+                  class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">{{
+                  'currioPreview.navCV' | translate }}</a>
+                <a href="#preview-competenze-modern"
+                  (click)="$event.preventDefault(); smoothScrollTo('#preview-competenze-modern')"
+                  class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">{{
+                  'currioPreview.navSkills' | translate }}</a>
+                <a href="#preview-chi-sono-modern"
+                  (click)="$event.preventDefault(); smoothScrollTo('#preview-chi-sono-modern')"
+                  class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">{{
+                  'currioPreview.navAbout' | translate }}</a>
+                <a href="#preview-contatti-modern"
+                  (click)="$event.preventDefault(); smoothScrollTo('#preview-contatti-modern')"
+                  class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">{{
+                  'currioPreview.navContact' | translate }}</a>
+              </div>
+              <div class="language-selector ml-4 flex items-center space-x-1">
+                <a id="lang-it" (click)="setLanguage('it')" title="Italiano"
+                  [class.active]="translate.currentLang === 'it'">
+                  <svg viewBox="0 0 30 20" xmlns="http://www.w3.org/2000/svg">
+                    <path fill="#009246" d="M0 0h10v20H0z" />
+                    <path fill="#fff" d="M10 0h10v20H10z" />
+                    <path fill="#ce2b37" d="M20 0h10v20H20z" />
+                  </svg>
+                </a>
+                <span class="separator">|</span>
+                <a id="lang-en" (click)="setLanguage('en')" title="English"
+                  [class.active]="translate.currentLang === 'en'">
+                  <svg viewBox="0 0 60 30" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="60" height="30" fill="#012169" />
+                    <path fill="#FFFFFF"
+                      d="M0,0 L6,0 L30,12 L54,0 L60,0 L60,6 L36,15 L60,24 L60,30 L54,30 L30,18 L6,30 L0,30 L0,24 L24,15 L0,6 Z" />
+                    <path fill="#C8102E"
+                      d="M0,2 L2,0 L30,10 L28,12 Z M32,18 L30,20 L58,30 L60,28 Z M58,0 L60,2 L32,12 L30,10 Z M2,30 L0,28 L28,18 L30,20 Z" />
+                    <path fill="#FFFFFF"
+                      d="M25,0 L35,0 L35,10 L60,10 L60,20 L35,20 L35,30 L25,30 L25,20 L0,20 L0,10 L25,10 Z" />
+                    <path fill="#C8102E"
+                      d="M27,0 L33,0 L33,12 L60,12 L60,18 L33,18 L33,30 L27,30 L27,18 L0,18 L0,12 L27,12 Z" />
+                  </svg>
+                </a>
+              </div>
+              <div class="md:hidden mobile-menu-button-container">
+                <button id="mobile-menu-button" (click)="toggleMobileMenu()" [attr.aria-expanded]="isMobileMenuOpen"
+                  [attr.aria-label]="(isMobileMenuOpen ? ('currioPreview.closeMenu' | translate) : ('currioPreview.openMenu' | translate))"
+                  class="text-gray-600 hover:text-blue-600 focus:outline-none">
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7">
+                    </path>
+                  </svg>
+                </button>
+              </div>
             </div>
+          </nav>
+          <div id="mobile-menu-modern" class="md:hidden nav-links-mobile" [class.hidden]="!isMobileMenuOpen"
+            [attr.aria-hidden]="!isMobileMenuOpen">
+            <a href="#preview-home-modern" (click)="closeMobileMenuAndScroll('#preview-home-modern')"
+              class="nav-link-mobile">{{ 'currioPreview.navHomeMobile' | translate }}</a>
+            <a href="#preview-progetti-modern" (click)="closeMobileMenuAndScroll('#preview-progetti-modern')"
+              class="nav-link-mobile">{{ 'currioPreview.navProjectsMobile' | translate }}</a>
+            <a href="#preview-curriculum-modern" (click)="closeMobileMenuAndScroll('#preview-curriculum-modern')"
+              class="nav-link-mobile">{{ 'currioPreview.navCVMobile' | translate }}</a>
+            <a href="#preview-competenze-modern" (click)="closeMobileMenuAndScroll('#preview-competenze-modern')"
+              class="nav-link-mobile">{{ 'currioPreview.navSkillsMobile' | translate }}</a>
+            <a href="#preview-chi-sono-modern" (click)="closeMobileMenuAndScroll('#preview-chi-sono-modern')"
+              class="nav-link-mobile">{{ 'currioPreview.navAboutMobile' | translate }}</a>
+            <a href="#preview-contatti-modern" (click)="closeMobileMenuAndScroll('#preview-contatti-modern')"
+              class="nav-link-mobile">{{ 'currioPreview.navContactMobile' | translate }}</a>
+          </div>
         </header>
 
-        <section id="preview-home" class="hero-bg hero-section">
-            <div class="hero-container">
-                <h1 class="hero-title">{{ currio.heroTitle }}</h1>
-                <p class="hero-subtitle">{{ currio.heroSubtitle }}</p>
-                <a href="#preview-progetti" (click)="$event.preventDefault(); smoothScrollTo('#preview-progetti')" class="button button-cta">{{ 'currioPreview.heroCTA' | translate }}</a>
-            </div>
+        <section id="preview-home-modern" class="hero-bg py-20 md:py-32 modern-hero">
+          <div class="container mx-auto px-6 text-center">
+            <h1 class="text-4xl md:text-6xl font-bold mb-4 text-white modern-hero-title"
+              style="text-shadow: 0px 1px 3px rgba(0, 0, 0, 0.3);">
+              {{ currio.heroTitle }}</h1>
+            <p class="text-xl md:text-2xl mb-8 text-gray-100 modern-hero-subtitle"
+              style="text-shadow: 0px 1px 3px rgba(0, 0, 0, 0.2);">{{
+              currio.heroSubtitle }}</p>
+            <a href="#preview-progetti-modern"
+              (click)="$event.preventDefault(); smoothScrollTo('#preview-progetti-modern')"
+              class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg text-lg transition duration-300 modern-hero-cta">{{
+              'currioPreview.heroCTA' | translate }}</a>
+          </div>
         </section>
 
-        <section id="preview-progetti" class="section-padding bg-gray-light" *ngIf="currio.progetti && currio.progetti.length > 0">
-            <div class="section-container">
-                <h2 class="section-title">{{ 'currioPreview.projectsTitle' | translate }}</h2>
-                <div class="projects-grid">
-                    <div *ngFor="let progetto of currio.progetti" class="project-card">
-                        <img [src]="progetto.immagineUrl || 'https://placehold.co/600x400/cccccc/ffffff?text=' + (progetto.titolo || 'Progetto')" [alt]="progetto.titolo" class="project-image">
-                        <div class="project-content">
-                            <h3 class="project-title">{{ progetto.titolo }}</h3>
-                            <p class="project-description">{{ progetto.descrizione }}</p>
-                            <div *ngIf="progetto.tags && progetto.tags.length > 0" class="project-tags">
-                                <span *ngFor="let tag of progetto.tags" class="tag">{{tag}}</span>
-                            </div>
-                            <a *ngIf="progetto.linkProgetto" [href]="progetto.linkProgetto" target="_blank" class="button button-project-details">
-                                {{ 'currioPreview.projectDetailsButton' | translate }}
-                            </a>
-                        </div>
+        <section id="preview-progetti-modern" class="py-16 bg-gray-50 modern-projects"
+          *ngIf="currio.progetti && currio.progetti.length > 0">
+          <div class="container mx-auto px-6">
+            <h2 class="text-3xl font-bold text-center text-gray-800 mb-12">{{ 'currioPreview.projectsTitle' | translate
+              }}</h2>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <div *ngFor="let progetto of currio.progetti"
+                class="bg-white rounded-lg shadow-lg overflow-hidden project-card transition-all duration-300">
+                <img
+                  [src]="progetto.immagineUrl || 'https://placehold.co/600x400/cccccc/ffffff?text=' + (progetto.titolo || 'Progetto')"
+                  [alt]="progetto.titolo" class="w-full h-48 object-cover" />
+                <div class="p-6">
+                  <h3 class="text-xl font-semibold text-gray-800 mb-2">{{ progetto.titolo }}</h3>
+                  <p class="text-gray-600 text-sm mb-4">{{ progetto.descrizione }}</p>
+                  <div *ngIf="progetto.tags && progetto.tags.length > 0" class="mb-3">
+                    <span *ngFor="let tag of progetto.tags"
+                      class="inline-block bg-blue-100 text-blue-600 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded-full">{{tag}}</span>
+                  </div>
+                  <a *ngIf="progetto.linkProgetto" [href]="progetto.linkProgetto" target="_blank"
+                    rel="noopener noreferrer"
+                    class="block text-center bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-300">
+                    {{ 'currioPreview.projectDetailsButton' | translate }}
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="preview-curriculum-modern" class="py-16 bg-white modern-cv"
+          *ngIf="currio.esperienze && currio.esperienze.length > 0">
+          <div class="container mx-auto px-6">
+            <h2 class="text-3xl font-bold text-center text-gray-800 mb-16">{{ 'currioPreview.cvTitle' | translate }}
+            </h2>
+            <div class="timeline mb-16">
+              <ng-container *ngFor="let esperienza of currio.esperienze; let i = index">
+                <div class="timeline-item" [ngClass]="(i % 2 === 0) ? 'timeline-left' : 'timeline-right'">
+                  <div class="timeline-content">
+                    <div class="timeline-header">
+                      <div class="timeline-header-clickable-area">
+                        <h3>{{ esperienza.titolo }} <span class="timeline-type">({{ esperienza.tipo === 'lavoro' ?
+                            ('currioPreview.work' | translate) : ('currioPreview.education' | translate) }})</span></h3>
+                      </div>
                     </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="preview-curriculum" class="section-padding bg-white" *ngIf="currio.esperienze && currio.esperienze.length > 0">
-            <div class="section-container">
-                <h2 class="section-title">{{ 'currioPreview.cvTitle' | translate }}</h2>
-                <div class="timeline">
-                    <ng-container *ngFor="let esperienza of currio.esperienze; let i = index">
-                        <div class="timeline-item" [ngClass]="(i % 2 === 0) ? 'timeline-left' : 'timeline-right'">
-                            <div class="timeline-content">
-                                <div class="timeline-header">
-                                    <div class="timeline-header-clickable-area">
-                                        <h3>{{ esperienza.titolo }} <span class="timeline-type">({{ esperienza.tipo === 'lavoro' ? ('currioPreview.work' | translate) : ('currioPreview.education' | translate) }})</span></h3>
-                                    </div>
-                                </div>
-                                <div class="static-details">
-                                    <div class="timeline-date">{{ esperienza.date }}</div>
-                                    <p class="timeline-company">{{ esperienza.aziendaScuola }}</p>
-                                    <p class="timeline-desc-short">{{ esperienza.descrizioneBreve }}</p>
-                                    <div class="skills-tags" *ngIf="esperienza.competenzeAcquisite && esperienza.competenzeAcquisite.length > 0">
-                                        <span *ngFor="let skill of esperienza.competenzeAcquisite" class="tag-skill">{{ skill }}</span>
-                                    </div>
-                                </div>
-                                <div class="timeline-expand-trigger" role="button" tabindex="0" [attr.aria-expanded]="esperienza.expanded || false" (click)="toggleTimelineDetails($event, esperienza)" *ngIf="esperienza.dettagli && esperienza.dettagli.length > 0">
-                                    <span>{{ 'currioPreview.viewMoreDetails' | translate }}</span>
-                                    <svg class="new-timeline-arrow" [class.expanded]="esperienza.expanded" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                                    </svg>
-                                </div>
-                                <div class="expandable-details" [class.expanded]="esperienza.expanded" [style.maxHeight]="esperienza.expanded ? '1000px' : '0px'">
-                                    <ul class="timeline-details-list">
-                                      <li *ngFor="let dettaglio of esperienza.dettagli">{{ dettaglio }}</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </ng-container>
-                </div>
-            </div>
-        </section>
-
-        <section id="preview-competenze" class="section-padding vintage-animated-bg" *ngIf="currio.competenze && currio.competenze.length > 0">
-            <div class="section-container">
-                <h2 class="section-title">{{ 'currioPreview.skillsTitle' | translate }}</h2>
-                <div class="skills-grid">
-                    <div *ngFor="let competenza of currio.competenze" class="skill-card">
-                        <div *ngIf="competenza.icona" [innerHTML]="competenza.icona | safeHtml" class="skill-icon-wrapper svg-icon-wrapper" [style.background-color]="getSkillBackgroundColor(competenza.nome)">
-                        </div>
-                         <div *ngIf="!competenza.icona" class="skill-icon-wrapper skill-initials" [style.background-color]="getSkillBackgroundColor(competenza.nome)">
-                            {{ getSkillInitials(competenza.nome) }}
-                        </div>
-                        <h3 class="skill-name">{{ competenza.nome }}</h3>
-                        <p *ngIf="competenza.livello" class="skill-level">{{ competenza.livello }}</p>
+                    <div class="static-details">
+                      <div class="date">{{ esperienza.date }}</div>
+                      <p class="font-semibold text-gray-700">{{ esperienza.aziendaScuola }}</p>
+                      <p class="mt-2 text-xs text-gray-600">{{ esperienza.descrizioneBreve }}</p>
+                      <div class="skills-tags mt-2"
+                        *ngIf="esperienza.competenzeAcquisite && esperienza.competenzeAcquisite.length > 0">
+                        <span *ngFor="let skill of esperienza.competenzeAcquisite" class="tag-skill">{{ skill }}</span>
+                      </div>
                     </div>
+                    <div class="timeline-expand-trigger" role="button" tabindex="0"
+                      [attr.aria-expanded]="esperienza.expanded || false"
+                      (click)="toggleTimelineDetails($event, esperienza)"
+                      *ngIf="esperienza.dettagli && esperienza.dettagli.length > 0">
+                      <span>{{ 'currioPreview.viewMoreDetails' | translate }}</span>
+                      <svg class="new-timeline-arrow" [class.expanded]="esperienza.expanded" fill="none"
+                        stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                      </svg>
+                    </div>
+                    <div class="expandable-details" [class.expanded]="esperienza.expanded">
+                      <ul class="list-disc list-inside space-y-1 text-sm text-gray-600 mt-2">
+                        <li *ngFor="let dettaglio of esperienza.dettagli">{{ dettaglio }}</li>
+                      </ul>
+                    </div>
+                  </div>
                 </div>
+              </ng-container>
             </div>
+          </div>
         </section>
 
-        <section id="preview-chi-sono" class="section-padding bg-gray-light" *ngIf="currio.chiSonoDescrizione1">
-            <div class="about-container">
-                <h2 class="section-title">{{ 'currioPreview.aboutTitle' | translate }}</h2>
-                <img [src]="currio.chiSonoFotoUrl || 'https://placehold.co/128x128/e0e0e0/757575?text=Foto'"
-                    alt="{{ 'currioPreview.profilePhotoAlt' | translate }}" class="profile-photo"
-                    onerror="this.onerror=null;this.src='https://placehold.co/128x128/e0e0e0/757575?text=Foto';">
-                <p class="about-description">{{ currio.chiSonoDescrizione1 }}</p>
-                <p *ngIf="currio.chiSonoDescrizione2" class="about-description">{{ currio.chiSonoDescrizione2 }}</p>
+        <section id="preview-competenze-modern" class="py-16 vintage-animated-bg modern-skills"
+          *ngIf="currio.competenze && currio.competenze.length > 0">
+          <div class="container mx-auto px-6">
+            <h2 class="text-3xl font-bold text-center text-gray-800 mb-12">{{ 'currioPreview.skillsTitle' | translate }}
+            </h2>
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6 md:gap-8 text-center">
+              <div *ngFor="let competenza of currio.competenze"
+                class="p-6 bg-gray-50 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300">
+                <div *ngIf="competenza.icona" [innerHTML]="competenza.icona | safeHtml" class="skill-icon-wrapper"
+                  [style.background-color]="getSkillBackgroundColor(competenza.nome || '')"></div>
+                <div *ngIf="!competenza.icona" class="skill-icon-wrapper skill-initials"
+                  [style.background-color]="getSkillBackgroundColor(competenza.nome || '')">
+                  {{ getSkillInitials(competenza.nome || '') }}
+                </div>
+                <h3 class="text-lg font-semibold text-gray-700">{{ competenza.nome }}</h3>
+                <p *ngIf="competenza.livello" class="text-sm text-gray-500">{{ competenza.livello }}</p>
+              </div>
             </div>
+          </div>
         </section>
 
-        <section id="preview-contatti" class="section-padding bg-white" *ngIf="currio.contatti?.email">
-            <div class="contact-container">
-                <h2 class="section-title">{{ 'currioPreview.contactTitle' | translate }}</h2>
-                <p class="contact-subtitle">{{ 'currioPreview.contactSubtitle' | translate }}</p>
-                <a [href]="'mailto:' + currio.contatti.email" class="button button-contact">
-                    {{ 'currioPreview.contactButton' | translate }}
+        <section id="preview-soft-skills-languages-modern" class="py-16 bg-white modern-soft-skills">
+          <div class="container mx-auto px-6">
+            <div class="grid md:grid-cols-2 gap-8 md:gap-12">
+              <div>
+                <h3 class="text-2xl font-semibold text-center text-gray-700 mb-6">{{ 'currioPreview.cvSoftSkillsTitle' |
+                  translate }}</h3>
+                <ul class="list-disc list-inside space-y-2 text-gray-700 bg-white p-6 rounded-lg shadow info-card">
+                  <li>{{ 'currioPreview.cvSoftSkill1' | translate }}</li>
+                  <li>{{ 'currioPreview.cvSoftSkill2' | translate }}</li>
+                  <li>{{ 'currioPreview.cvSoftSkill3' | translate }}</li>
+                  <li>{{ 'currioPreview.cvSoftSkill4' | translate }}</li>
+                  <li>{{ 'currioPreview.cvSoftSkill5' | translate }}</li>
+                  <li>{{ 'currioPreview.cvSoftSkill6' | translate }}</li>
+                </ul>
+              </div>
+              <div>
+                <h3 class="text-2xl font-semibold text-center text-gray-700 mb-6">{{ 'currioPreview.cvLanguagesTitle' |
+                  translate }}</h3>
+                <div class="bg-white p-6 rounded-lg shadow space-y-3 info-card">
+                  <p class="text-gray-700"><strong>{{ 'currioPreview.cvLangItalian' | translate }}:</strong> {{
+                    'currioPreview.cvLangItalianLevel' | translate }}</p>
+                  <p class="text-gray-700"><strong>{{ 'currioPreview.cvLangEnglish' | translate }}:</strong> {{
+                    'currioPreview.cvLangEnglishLevel' | translate }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="preview-chi-sono-modern" class="py-16 bg-gray-50 modern-about" *ngIf="currio.chiSonoDescrizione1">
+          <div class="container mx-auto px-6 md:w-2/3 lg:w-1/2 text-center">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6">{{ 'currioPreview.aboutTitle' | translate }}</h2>
+            <img [src]="currio.chiSonoFotoUrl || 'https://placehold.co/128x128/e0e0e0/757575?text=Foto'"
+              [alt]="'currioPreview.profilePhotoAlt' | translate"
+              class="w-32 h-32 rounded-full mx-auto mb-6 shadow-md object-cover"
+              onerror="this.onerror=null;this.src='https://placehold.co/128x128/e0e0e0/757575?text=Foto';" />
+            <p class="text-gray-600 mb-4">{{ currio.chiSonoDescrizione1 }}</p>
+            <p *ngIf="currio.chiSonoDescrizione2" class="text-gray-600">{{ currio.chiSonoDescrizione2 }}</p>
+          </div>
+        </section>
+
+        <section id="preview-contatti-modern" class="py-16 bg-white modern-contact" *ngIf="currio.contatti?.email">
+          <div class="container mx-auto px-6 text-center">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6">{{ 'currioPreview.contactTitle' | translate }}</h2>
+            <p class="text-gray-600 mb-8">{{ 'currioPreview.contactSubtitle' | translate }}</p>
+            <a [href]="'mailto:' + currio.contatti.email"
+              class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-8 rounded-lg text-lg transition duration-300">
+              {{ 'currioPreview.contactButton' | translate }}
+            </a>
+            <div class="mt-8 flex justify-center space-x-6">
+              <a *ngIf="currio.contatti.github" [href]="currio.contatti.github" target="_blank"
+                rel="noopener noreferrer" class="text-gray-500 hover:text-gray-900" aria-label="GitHub">
+                <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path fill-rule="evenodd"
+                    d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.026 2.747-1.026.546 1.379.201 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.001 10.001 0 0022 12.017C22 6.484 17.522 2 12 2z"
+                    clip-rule="evenodd"></path>
+                </svg>
+                <span class="sr-only">GitHub</span>
+              </a>
+              <a *ngIf="currio.contatti.linkedin" [href]="currio.contatti.linkedin" target="_blank"
+                rel="noopener noreferrer" class="text-gray-500 hover:text-blue-700" aria-label="LinkedIn">
+                <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path
+                    d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z">
+                  </path>
+                </svg>
+                <span class="sr-only">LinkedIn</span>
+              </a>
+              <a *ngIf="currio.contatti.instagram" [href]="currio.contatti.instagram" target="_blank"
+                rel="noopener noreferrer" class="text-gray-500 hover:text-pink-600" aria-label="Instagram">
+                <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path fill-rule="evenodd"
+                    d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.358-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.948-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4s1.791-4 4-4 4 1.79 4 4-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"
+                    clip-rule="evenodd"></path>
+                </svg>
+                <span class="sr-only">Instagram</span>
+              </a>
+            </div>
+          </div>
+        </section>
+      </ng-container> <ng-container *ngSwitchCase="'vintage'">
+        <div class="vintage-theme">
+          <header class="vintage-header">
+            <div class="container">
+              <h1>{{ currio.nomePortfolio }}</h1>
+              <nav class="vintage-nav">
+                <a (click)="$event.preventDefault(); smoothScrollTo('#preview-home-vintage')">{{'currioPreview.navHome'
+                  | translate }}</a>
+                <a (click)="$event.preventDefault(); smoothScrollTo('#preview-progetti-vintage')">{{'currioPreview.navProjects'
+                  | translate }}</a>
+                <a (click)="$event.preventDefault(); smoothScrollTo('#preview-curriculum-vintage')">{{'currioPreview.navCV'
+                  | translate }}</a>
+                <a (click)="$event.preventDefault(); smoothScrollTo('#preview-competenze-vintage')">{{'currioPreview.navSkills'
+                  | translate }}</a>
+                <a (click)="$event.preventDefault(); smoothScrollTo('#preview-chi-sono-vintage')">{{'currioPreview.navAbout'
+                  | translate }}</a>
+                <a (click)="$event.preventDefault(); smoothScrollTo('#preview-contatti-vintage')">{{'currioPreview.navContact'
+                  | translate }}</a>
+                <div class="language-selector vintage-lang-selector">
+                  <a id="lang-it" (click)="setLanguage('it')" title="Italiano"
+                    [class.active]="translate.currentLang === 'it'">IT</a>
+                  <span class="separator">/</span>
+                  <a id="lang-en" (click)="setLanguage('en')" title="English"
+                    [class.active]="translate.currentLang === 'en'">EN</a>
+                </div>
+              </nav>
+            </div>
+          </header>
+
+          <section id="preview-home-vintage" class="vintage-hero">
+            <div class="container">
+              <h2>{{ currio.heroTitle }}</h2>
+              <p>{{ currio.heroSubtitle }}</p>
+              <a (click)="$event.preventDefault(); smoothScrollTo('#preview-progetti-vintage')" class="vintage-cta">{{
+                'currioPreview.heroCTA' | translate }}</a>
+            </div>
+          </section>
+
+          <section id="preview-progetti-vintage" class="vintage-section"
+            *ngIf="currio.progetti && currio.progetti.length > 0">
+            <div class="container">
+              <h2 class="vintage-section-title">{{ 'currioPreview.projectsTitle' | translate }}</h2>
+              <div class="vintage-grid">
+                <div *ngFor="let progetto of currio.progetti" class="vintage-card">
+                  <img
+                    [src]="progetto.immagineUrl || 'https://placehold.co/400x300/a88b5a/f0e6d0?text=' + (progetto.titolo || 'Progetto')"
+                    [alt]="progetto.titolo" />
+                  <h3>{{ progetto.titolo }}</h3>
+                  <p>{{ progetto.descrizione }}</p>
+                  <div class="vintage-tags" *ngIf="progetto.tags && progetto.tags.length > 0">
+                    <span *ngFor="let tag of progetto.tags">{{tag}}</span>
+                  </div>
+                  <a *ngIf="progetto.linkProgetto" [href]="progetto.linkProgetto" target="_blank"
+                    rel="noopener noreferrer" class="vintage-button">{{ 'currioPreview.projectDetailsButton' | translate
+                    }}</a>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section id="preview-curriculum-vintage" class="vintage-section"
+            *ngIf="currio.esperienze && currio.esperienze.length > 0">
+            <div class="container">
+              <h2 class="vintage-section-title">{{ 'currioPreview.cvTitle' | translate }}</h2>
+              <div class="vintage-timeline">
+                <div *ngFor="let esperienza of currio.esperienze" class="vintage-timeline-item">
+                  <div class="vintage-timeline-content">
+                    <h3>{{ esperienza.titolo }} ({{ esperienza.tipo === 'lavoro' ? ('currioPreview.work' | translate) :
+                      ('currioPreview.education' | translate) }})</h3>
+                    <div class="vintage-date">{{ esperienza.date }}</div>
+                    <p class="vintage-company">{{ esperienza.aziendaScuola }}</p>
+                    <p>{{ esperienza.descrizioneBreve }}</p>
+                    <ul *ngIf="esperienza.dettagli && esperienza.dettagli.length > 0">
+                      <li *ngFor="let dettaglio of esperienza.dettagli">{{ dettaglio }}</li>
+                    </ul>
+                    <div class="vintage-tags vintage-skills-acquired"
+                      *ngIf="esperienza.competenzeAcquisite && esperienza.competenzeAcquisite.length > 0">
+                      <span *ngFor="let skill of esperienza.competenzeAcquisite">{{ skill }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section id="preview-competenze-vintage" class="vintage-section"
+            *ngIf="currio.competenze && currio.competenze.length > 0">
+            <div class="container">
+              <h2 class="vintage-section-title">{{ 'currioPreview.skillsTitle' | translate }}</h2>
+              <div class="vintage-skills-grid">
+                <div *ngFor="let competenza of currio.competenze" class="vintage-skill-item">
+                  <div *ngIf="competenza.icona" [innerHTML]="competenza.icona | safeHtml" class="vintage-skill-icon">
+                  </div>
+                  <div *ngIf="!competenza.icona" class="vintage-skill-icon-placeholder">{{
+                    getSkillInitials(competenza.nome || '') }}</div>
+                  <h3>{{ competenza.nome }}</h3>
+                  <p *ngIf="competenza.livello">{{ competenza.livello }}</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section id="preview-chi-sono-vintage" class="vintage-section" *ngIf="currio.chiSonoDescrizione1">
+            <div class="container vintage-about">
+              <h2 class="vintage-section-title">{{ 'currioPreview.aboutTitle' | translate }}</h2>
+              <img [src]="currio.chiSonoFotoUrl || 'https://placehold.co/150x150/a88b5a/f0e6d0?text=Foto'"
+                [alt]="'currioPreview.profilePhotoAlt' | translate" class="vintage-profile-pic" />
+              <p>{{ currio.chiSonoDescrizione1 }}</p>
+              <p *ngIf="currio.chiSonoDescrizione2">{{ currio.chiSonoDescrizione2 }}</p>
+            </div>
+          </section>
+
+          <section id="preview-contatti-vintage" class="vintage-section" *ngIf="currio.contatti?.email">
+            <div class="container">
+              <h2 class="vintage-section-title">{{ 'currioPreview.contactTitle' | translate }}</h2>
+              <p>{{ 'currioPreview.contactSubtitle' | translate }}</p>
+              <a [href]="'mailto:' + currio.contatti.email" class="vintage-button vintage-contact-button">{{
+                'currioPreview.contactButton' | translate }}</a>
+              <div class="vintage-social-links">
+                <a *ngIf="currio.contatti.github" [href]="currio.contatti.github" target="_blank"
+                  rel="noopener noreferrer">GitHub</a>
+                <a *ngIf="currio.contatti.linkedin" [href]="currio.contatti.linkedin" target="_blank"
+                  rel="noopener noreferrer">LinkedIn</a>
+                <a *ngIf="currio.contatti.instagram" [href]="currio.contatti.instagram" target="_blank"
+                  rel="noopener noreferrer">Instagram</a>
+              </div>
+            </div>
+          </section>
+
+          <footer class="vintage-footer">
+            <p>&copy; {{ currentYear }} {{ currio.nomePortfolio }}. {{ 'currioPreview.footerRights' | translate }}</p>
+            <p class="text-sm">{{ 'currioPreview.footerMadeWith' | translate }} (Vintage Style)</p>
+          </footer>
+        </div>
+      </ng-container> <ng-container *ngSwitchCase="'classic'">
+        <div class="classic-theme">
+          <header class="classic-header">
+            <div class="container">
+              <h1>{{ currio.nomePortfolio }}</h1>
+              <p class="classic-tagline">{{ currio.heroTitle }}</p>
+            </div>
+          </header>
+
+          <main class="container classic-main">
+            <nav class="classic-nav">
+              <a (click)="$event.preventDefault(); smoothScrollTo('#preview-home-classic')">{{'currioPreview.navHome' |
+                translate }}</a>
+              <a (click)="$event.preventDefault(); smoothScrollTo('#preview-progetti-classic')">{{'currioPreview.navProjects'
+                | translate }}</a>
+              <a (click)="$event.preventDefault(); smoothScrollTo('#preview-curriculum-classic')">{{'currioPreview.navCV'
+                | translate }}</a>
+              <a (click)="$event.preventDefault(); smoothScrollTo('#preview-competenze-classic')">{{'currioPreview.navSkills'
+                | translate }}</a>
+              <a (click)="$event.preventDefault(); smoothScrollTo('#preview-chi-sono-classic')">{{'currioPreview.navAbout'
+                | translate }}</a>
+              <a (click)="$event.preventDefault(); smoothScrollTo('#preview-contatti-classic')">{{'currioPreview.navContact'
+                | translate }}</a>
+              <div class="language-selector classic-lang-selector">
+                <a id="lang-it" (click)="setLanguage('it')" title="Italiano"
+                  [class.active]="translate.currentLang === 'it'">IT</a>
+                <a id="lang-en" (click)="setLanguage('en')" title="English"
+                  [class.active]="translate.currentLang === 'en'">EN</a>
+              </div>
+            </nav>
+
+            <section id="preview-home-classic" class="classic-section">
+              <h2>{{ 'Benvenuto!' | translate }}</h2>
+              <p>{{ currio.heroSubtitle }}</p>
+              <a *ngIf="currio.curriculumUrl" [href]="currio.curriculumUrl" target="_blank" download
+                class="classic-button classic-download-cv">
+                {{ 'currioPreview.downloadCV' | translate }}
+              </a>
+            </section>
+
+            <section id="preview-chi-sono-classic" class="classic-section" *ngIf="currio.chiSonoDescrizione1">
+              <h2>{{ 'currioPreview.aboutTitle' | translate }}</h2>
+              <div class="classic-about-content">
+                <img *ngIf="currio.chiSonoFotoUrl"
+                  [src]="currio.chiSonoFotoUrl || 'https://placehold.co/100x100/f0f0f0/333333?text=Foto'"
+                  [alt]="'currioPreview.profilePhotoAlt' | translate" class="classic-profile-pic" />
+                <div>
+                  <p>{{ currio.chiSonoDescrizione1 }}</p>
+                  <p *ngIf="currio.chiSonoDescrizione2">{{ currio.chiSonoDescrizione2 }}</p>
+                </div>
+              </div>
+            </section>
+
+            <section id="preview-curriculum-classic" class="classic-section"
+              *ngIf="currio.esperienze && currio.esperienze.length > 0">
+              <h2>{{ 'currioPreview.cvTitle' | translate }}</h2>
+              <div *ngFor="let esperienza of currio.esperienze" class="classic-cv-item">
+                <h3>{{ esperienza.titolo }}</h3>
+                <p class="classic-cv-meta">{{ esperienza.aziendaScuola }} | {{ esperienza.date }} | ({{ esperienza.tipo
+                  === 'lavoro' ? ('currioPreview.work' | translate) : ('currioPreview.education' | translate) }})</p>
+                <p>{{ esperienza.descrizioneBreve }}</p>
+                <ul *ngIf="esperienza.dettagli && esperienza.dettagli.length > 0">
+                  <li *ngFor="let dettaglio of esperienza.dettagli">{{ dettaglio }}</li>
+                </ul>
+                <div class="classic-tags"
+                  *ngIf="esperienza.competenzeAcquisite && esperienza.competenzeAcquisite.length > 0">
+                  <strong>{{ 'Competenze Sviluppate:' | translate }}</strong> <span
+                    *ngFor="let skill of esperienza.competenzeAcquisite">{{ skill }}</span>
+                </div>
+              </div>
+            </section>
+
+            <section id="preview-progetti-classic" class="classic-section"
+              *ngIf="currio.progetti && currio.progetti.length > 0">
+              <h2>{{ 'currioPreview.projectsTitle' | translate }}</h2>
+              <div *ngFor="let progetto of currio.progetti" class="classic-project-item">
+                <h3>{{ progetto.titolo }}</h3>
+                <img *ngIf="progetto.immagineUrl"
+                  [src]="progetto.immagineUrl || 'https://placehold.co/300x200/f0f0f0/333333?text=' + (progetto.titolo || 'Progetto')"
+                  [alt]="progetto.titolo" class="classic-project-image" />
+                <p>{{ progetto.descrizione }}</p>
+                <div class="classic-tags" *ngIf="progetto.tags && progetto.tags.length > 0">
+                  <strong>{{ 'Tecnologie:' | translate }}</strong> <span
+                    *ngFor="let tag of progetto.tags">{{tag}}</span>
+                </div>
+                <a *ngIf="progetto.linkProgetto" [href]="progetto.linkProgetto" target="_blank"
+                  rel="noopener noreferrer" class="classic-link">{{ 'currioPreview.projectDetailsButton' | translate
+                  }}</a>
+              </div>
+            </section>
+
+            <section id="preview-competenze-classic" class="classic-section"
+              *ngIf="currio.competenze && currio.competenze.length > 0">
+              <h2>{{ 'currioPreview.skillsTitle' | translate }}</h2>
+              <ul class="classic-skills-list">
+                <li *ngFor="let competenza of currio.competenze">
+                  <span *ngIf="competenza.icona" [innerHTML]="competenza.icona | safeHtml"
+                    class="classic-skill-icon"></span>
+                  <strong class="classic-skill-name">{{ competenza.nome }}</strong>
+                  <span *ngIf="competenza.livello" class="classic-skill-level"> ({{ competenza.livello }})</span>
+                </li>
+              </ul>
+            </section>
+
+            <section id="preview-contatti-classic" class="classic-section" *ngIf="currio.contatti?.email">
+              <h2>{{ 'currioPreview.contactTitle' | translate }}</h2>
+              <p>{{ 'currioPreview.contactSubtitle' | translate }}</p>
+              <p><a [href]="'mailto:' + currio.contatti.email" class="classic-link">{{ currio.contatti.email }}</a></p>
+              <div class="classic-social-links">
+                <a *ngIf="currio.contatti.github" [href]="currio.contatti.github" target="_blank"
+                  rel="noopener noreferrer">GitHub</a>
+                <a *ngIf="currio.contatti.linkedin" [href]="currio.contatti.linkedin" target="_blank"
+                  rel="noopener noreferrer">LinkedIn</a>
+                <a *ngIf="currio.contatti.instagram" [href]="currio.contatti.instagram" target="_blank"
+                  rel="noopener noreferrer">Instagram</a>
+              </div>
+            </section>
+          </main>
+
+          <footer class="classic-footer">
+            <p>&copy; {{ currentYear }} {{ currio.nomePortfolio }}. {{ 'currioPreview.footerRights' | translate }}</p>
+          </footer>
+        </div>
+      </ng-container> <ng-container *ngSwitchDefault>
+        <p class="p-8 text-center text-red-500">Attenzione: Template non riconosciuto o non specificato. Verrà
+          visualizzato il template Moderno di default.</p>
+        <header class="bg-white shadow-md sticky top-0 z-50 modern-header">
+          <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="#" (click)="$event.preventDefault(); smoothScrollTo('#preview-home-modern')"
+              class="text-2xl font-bold text-blue-600">{{ currio.nomePortfolio }}</a>
+            <div class="flex items-center">
+              <div class="hidden md:flex space-x-4">
+                <a href="#preview-home-modern" (click)="$event.preventDefault(); smoothScrollTo('#preview-home-modern')"
+                  class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">{{
+                  'currioPreview.navHome' | translate }}</a>
+                <a href="#preview-progetti-modern"
+                  (click)="$event.preventDefault(); smoothScrollTo('#preview-progetti-modern')"
+                  class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">{{
+                  'currioPreview.navProjects' | translate }}</a>
+                <a href="#preview-curriculum-modern"
+                  (click)="$event.preventDefault(); smoothScrollTo('#preview-curriculum-modern')"
+                  class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">{{
+                  'currioPreview.navCV' | translate }}</a>
+                <a href="#preview-competenze-modern"
+                  (click)="$event.preventDefault(); smoothScrollTo('#preview-competenze-modern')"
+                  class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">{{
+                  'currioPreview.navSkills' | translate }}</a>
+                <a href="#preview-chi-sono-modern"
+                  (click)="$event.preventDefault(); smoothScrollTo('#preview-chi-sono-modern')"
+                  class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">{{
+                  'currioPreview.navAbout' | translate }}</a>
+                <a href="#preview-contatti-modern"
+                  (click)="$event.preventDefault(); smoothScrollTo('#preview-contatti-modern')"
+                  class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">{{
+                  'currioPreview.navContact' | translate }}</a>
+              </div>
+              <div class="language-selector ml-4 flex items-center space-x-1">
+                <a id="lang-it" (click)="setLanguage('it')" title="Italiano"
+                  [class.active]="translate.currentLang === 'it'">
+                  <svg viewBox="0 0 30 20" xmlns="http://www.w3.org/2000/svg">
+                    <path fill="#009246" d="M0 0h10v20H0z" />
+                    <path fill="#fff" d="M10 0h10v20H10z" />
+                    <path fill="#ce2b37" d="M20 0h10v20H20z" />
+                  </svg>
                 </a>
-                <div class="social-links">
-                    <a *ngIf="currio.contatti.github" [href]="currio.contatti.github" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="GitHub">
-                        <svg class="icon" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.026 2.747-1.026.546 1.379.201 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.001 10.001 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd" /></svg>
-                        <span class="sr-only">GitHub</span>
-                    </a>
-                    <a *ngIf="currio.contatti.linkedin" [href]="currio.contatti.linkedin" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="LinkedIn">
-                        <svg class="icon" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" /></svg>
-                        <span class="sr-only">LinkedIn</span>
-                    </a>
-                     <a *ngIf="currio.contatti.instagram" [href]="currio.contatti.instagram" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Instagram">
-                        <svg class="icon" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.358-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.948-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4s1.791-4 4-4 4 1.79 4 4-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" clip-rule="evenodd" /></svg>
-                        <span class="sr-only">Instagram</span>
-                    </a>
-                </div>
+                <span class="separator">|</span>
+                <a id="lang-en" (click)="setLanguage('en')" title="English"
+                  [class.active]="translate.currentLang === 'en'">
+                  <svg viewBox="0 0 60 30" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="60" height="30" fill="#012169" />
+                    <path fill="#FFFFFF"
+                      d="M0,0 L6,0 L30,12 L54,0 L60,0 L60,6 L36,15 L60,24 L60,30 L54,30 L30,18 L6,30 L0,30 L0,24 L24,15 L0,6 Z" />
+                    <path fill="#C8102E"
+                      d="M0,2 L2,0 L30,10 L28,12 Z M32,18 L30,20 L58,30 L60,28 Z M58,0 L60,2 L32,12 L30,10 Z M2,30 L0,28 L28,18 L30,20 Z" />
+                    <path fill="#FFFFFF"
+                      d="M25,0 L35,0 L35,10 L60,10 L60,20 L35,20 L35,30 L25,30 L25,20 L0,20 L0,10 L25,10 Z" />
+                    <path fill="#C8102E"
+                      d="M27,0 L33,0 L33,12 L60,12 L60,18 L33,18 L33,30 L27,30 L27,18 L0,18 L0,12 L27,12 Z" />
+                  </svg>
+                </a>
+              </div>
+              <div class="md:hidden mobile-menu-button-container">
+                <button id="mobile-menu-button" (click)="toggleMobileMenu()" [attr.aria-expanded]="isMobileMenuOpen"
+                  [attr.aria-label]="(isMobileMenuOpen ? ('currioPreview.closeMenu' | translate) : ('currioPreview.openMenu' | translate))"
+                  class="text-gray-600 hover:text-blue-600 focus:outline-none">
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7">
+                    </path>
+                  </svg>
+                </button>
+              </div>
             </div>
+          </nav>
+          <div id="mobile-menu-modern" class="md:hidden nav-links-mobile" [class.hidden]="!isMobileMenuOpen"
+            [attr.aria-hidden]="!isMobileMenuOpen">
+            <a href="#preview-home-modern" (click)="closeMobileMenuAndScroll('#preview-home-modern')"
+              class="nav-link-mobile">{{ 'currioPreview.navHomeMobile' | translate }}</a>
+            <a href="#preview-progetti-modern" (click)="closeMobileMenuAndScroll('#preview-progetti-modern')"
+              class="nav-link-mobile">{{ 'currioPreview.navProjectsMobile' | translate }}</a>
+            <a href="#preview-curriculum-modern" (click)="closeMobileMenuAndScroll('#preview-curriculum-modern')"
+              class="nav-link-mobile">{{ 'currioPreview.navCVMobile' | translate }}</a>
+            <a href="#preview-competenze-modern" (click)="closeMobileMenuAndScroll('#preview-competenze-modern')"
+              class="nav-link-mobile">{{ 'currioPreview.navSkillsMobile' | translate }}</a>
+            <a href="#preview-chi-sono-modern" (click)="closeMobileMenuAndScroll('#preview-chi-sono-modern')"
+              class="nav-link-mobile">{{ 'currioPreview.navAboutMobile' | translate }}</a>
+            <a href="#preview-contatti-modern" (click)="closeMobileMenuAndScroll('#preview-contatti-modern')"
+              class="nav-link-mobile">{{ 'currioPreview.navContactMobile' | translate }}</a>
+          </div>
+        </header>
+        <section id="preview-home-modern" class="hero-bg py-20 md:py-32 modern-hero">
+          <div class="container mx-auto px-6 text-center">
+            <h1 class="text-4xl md:text-6xl font-bold mb-4 text-white modern-hero-title"
+              style="text-shadow: 0px 1px 3px rgba(0, 0, 0, 0.3);">
+              {{ currio.heroTitle }}</h1>
+            <p class="text-xl md:text-2xl mb-8 text-gray-100 modern-hero-subtitle"
+              style="text-shadow: 0px 1px 3px rgba(0, 0, 0, 0.2);">{{
+              currio.heroSubtitle }}</p>
+            <a href="#preview-progetti-modern"
+              (click)="$event.preventDefault(); smoothScrollTo('#preview-progetti-modern')"
+              class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg text-lg transition duration-300 modern-hero-cta">{{
+              'currioPreview.heroCTA' | translate }}</a>
+          </div>
         </section>
-
-        <footer class="preview-footer">
-            <div class="footer-container">
-                <p>&copy; {{ currentYear }} {{ currio.nomePortfolio }}. {{ 'currioPreview.footerRights' | translate }}</p>
-                <p class="footer-credits">{{ 'currioPreview.footerMadeWith' | translate }}</p>
+        <section id="preview-progetti-modern" class="py-16 bg-gray-50 modern-projects"
+          *ngIf="currio.progetti && currio.progetti.length > 0">
+          <div class="container mx-auto px-6">
+            <h2 class="text-3xl font-bold text-center text-gray-800 mb-12">{{ 'currioPreview.projectsTitle' | translate
+              }}</h2>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <div *ngFor="let progetto of currio.progetti"
+                class="bg-white rounded-lg shadow-lg overflow-hidden project-card transition-all duration-300">
+                <img
+                  [src]="progetto.immagineUrl || 'https://placehold.co/600x400/cccccc/ffffff?text=' + (progetto.titolo || 'Progetto')"
+                  [alt]="progetto.titolo" class="w-full h-48 object-cover" />
+                <div class="p-6">
+                  <h3 class="text-xl font-semibold text-gray-800 mb-2">{{ progetto.titolo }}</h3>
+                  <p class="text-gray-600 text-sm mb-4">{{ progetto.descrizione }}</p>
+                  <div *ngIf="progetto.tags && progetto.tags.length > 0" class="mb-3">
+                    <span *ngFor="let tag of progetto.tags"
+                      class="inline-block bg-blue-100 text-blue-600 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded-full">{{tag}}</span>
+                  </div>
+                  <a *ngIf="progetto.linkProgetto" [href]="progetto.linkProgetto" target="_blank"
+                    rel="noopener noreferrer"
+                    class="block text-center bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-300">
+                    {{ 'currioPreview.projectDetailsButton' | translate }}
+                  </a>
+                </div>
+              </div>
             </div>
-        </footer>
-    </div>
+          </div>
+        </section>
+      </ng-container>
+
+    </ng-container>
+    <footer class="bg-gray-800 text-gray-300 py-8 text-center"
+      *ngIf="currio.templateScelto === 'modern' || !currio.templateScelto">
+      <div class="container mx-auto px-6">
+        <p>&copy; {{ currentYear }} {{ currio.nomePortfolio }}. {{ 'currioPreview.footerRights' | translate }}</p>
+        <p class="text-sm">{{ 'currioPreview.footerMadeWith' | translate }}</p>
+      </div>
+    </footer>
+
+  </div>
 </div>
