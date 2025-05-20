@@ -6,6 +6,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { map } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
+import { Storage, ref as storageRefFn, deleteObject } from '@angular/fire/storage'; // Importa Storage v9
 
 @Injectable({
   providedIn: 'root',
@@ -13,7 +14,10 @@ import { environment } from 'src/environments/environment';
 export class CurrioService {
   private currioDbPath = 'currios';
 
-  constructor(private readonly http: HttpClient) {}
+  constructor(
+    private readonly http: HttpClient,
+    private readonly storage: Storage // Inietta Storage v9
+  ) {}
 
   getCurrios(): Observable<Currio[]> {
     return this.http
@@ -35,7 +39,7 @@ export class CurrioService {
       );
   }
 
-    getCurrioById(id: string): Observable<Currio | undefined> {
+  getCurrioById(id: string): Observable<Currio | undefined> {
     return this.http
       .get<Omit<Currio, 'id'> | null>(`${environment.firebase.databaseURL}/${this.currioDbPath}/${id}.json`)
       .pipe(
@@ -105,7 +109,6 @@ export class CurrioService {
         dataForPatch['userId'] = currio.userId;
     }
 
-
     console.log(`[CurrioService] Aggiornamento RTDB per currio ID: ${id} con payload:`, JSON.parse(JSON.stringify(dataForPatch)));
 
     return this.http.patch(
@@ -138,5 +141,30 @@ export class CurrioService {
           return submissions;
         })
       );
+  }
+
+  /**
+   * Elimina un file da Firebase Storage dato il suo URL completo.
+   * @param fileUrl L'URL HTTPS del file in Firebase Storage.
+   * @returns Promise che si risolve se l'eliminazione ha successo o se il file non esiste, altrimenti rigetta.
+   */
+  async deleteFileByUrl(fileUrl: string): Promise<void> {
+    if (!fileUrl || !fileUrl.startsWith('https://firebasestorage.googleapis.com/')) {
+      console.warn(`[CurrioService.deleteFileByUrl] URL non valido o non di Firebase Storage: ${fileUrl}`);
+      return Promise.resolve(); // Non è un URL di storage valido, non fare nulla
+    }
+    try {
+      const fileRef = storageRefFn(this.storage, fileUrl); // Crea il riferimento usando l'URL completo
+      await deleteObject(fileRef);
+      console.log(`[CurrioService.deleteFileByUrl] File eliminato con successo da Storage: ${fileUrl}`);
+    } catch (error: any) {
+      if (error.code === 'storage/object-not-found') {
+        console.warn(`[CurrioService.deleteFileByUrl] File non trovato in Storage (potrebbe essere già stato eliminato): ${fileUrl}`);
+        // Considera questo come un successo parziale, il file non c'è più.
+      } else {
+        console.error(`[CurrioService.deleteFileByUrl] Errore durante l'eliminazione del file ${fileUrl} da Firebase Storage:`, error);
+        throw error; // Rilancia l'errore per essere gestito dall'effect
+      }
+    }
   }
 }

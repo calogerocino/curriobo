@@ -175,7 +175,7 @@ $tooltip-border-radius: .375rem;
 // Tooltip
 
 // Forms
-$input-bg:                color(white);
+$input-bg:                $white; // Changed from color(white) to $white for direct color value
 $input-border-radius:     2px;
 $input-placeholder-color: #c9c8c8;
 $input-font-size: .875rem;
@@ -197,7 +197,8 @@ $input-padding-x-lg:    1rem;
 
 $input-font-size-sm:    .8rem;
 
-$input-group-addon-bg: rgba(theme-color(primary), .08);
+// MODIFIED LINE: Using the direct hex value of primary color from $theme-colors map
+$input-group-addon-bg: rgba(#727cf5, .08);
 // Forms
 
 // Dropdowns
@@ -217,7 +218,7 @@ $table-cell-padding: .875rem .9375rem;
 $table-border-color: $border-color;
 
 $table-inverse-bg: #2a2b32;
-$table-inverse-color: color(white);
+$table-inverse-color: $white; // Changed from color(white) to $white
 // Tables
 
 // Measurment and property variables
@@ -248,8 +249,8 @@ $breadcrumb-margin-bottom:          1rem;
 $breadcrumb-font-size:              $default-font-size;
 // $breadcrumb-bg:                     transparent;
 $breadcrumb-border-color:           $border-color;
-$breadcrumb-divider-color:          $gray-600;
-$breadcrumb-active-color:           $gray-700;
+$breadcrumb-divider-color:          map-get($colors, "gray-600"); // Bootstrap 4 uses $gray-600
+$breadcrumb-active-color:           map-get($colors, "gray-700"); // Bootstrap 4 uses $gray-700
 $breadcrumb-divider:                "/";
 // custom styles
 $breadcrumb-custom-padding-y:       0;
@@ -264,7 +265,7 @@ $breadcrumb-item-bg:                #dbe3e6;
 $modal-inner-padding:               0.937rem;
 $modal-dialog-margin:               10px;
 $modal-dialog-margin-y-sm-up:       30px;
-$modal-title-line-height:           $line-height-base;
+$modal-title-line-height:           1.5; // Using $default-line-height or 1.5
 $modal-content-bg:                  $white;
 $modal-content-box-shadow-xs:       0 3px 9px rgba($black,.5);
 $modal-content-box-shadow-sm-up:    0 5px 15px rgba($black,.5);
@@ -276,9 +277,9 @@ $modal-header-border-color:         $border-color;
 $modal-content-border-color:        $border-color;
 $modal-footer-border-color:         $border-color;
 
-$modal-header-border-width:         $border-width;
-$modal-content-border-width:        $border-width;
-$modal-footer-border-width:         $border-width;
+$modal-header-border-width:         1px; // Assuming $border-width is 1px
+$modal-content-border-width:        1px; // Assuming $border-width is 1px
+$modal-footer-border-width:         1px; // Assuming $border-width is 1px
 
 $modal-header-padding-x:              26px;
 $modal-header-padding-y:              25px;
@@ -325,3 +326,9 @@ $sidebar-folded-width: 70px;
 // Navbar
 $navbar-height: 60px;
 // Navbar
+
+// Footer color fix if color() function is not standard SASS or Bootstrap
+$footer-color: map-get($colors, "gray-dark"); // Assuming $gray-dark is defined in $colors or $theme-colors
+
+// Ensure $border-width is defined if used in Modals section (e.g., 1px)
+$border-width: 1px !default;

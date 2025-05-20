@@ -209,43 +209,50 @@
               <i class="feather icon-plus"></i> {{ 'customer.currio.addProgetto' | translate }}
             </button>
           </div>
-          <div class="card-body" formArrayName="progetti">
-            <div *ngFor="let progettoCtrl of progettiFormArray.controls; let i = index" [formGroupName]="i"
-              class="mb-3 p-3 border rounded">
-              <h6 class="d-flex justify-content-between align-items-center">
-                {{ 'Progetto' | translate }} {{i + 1}}
-                <button type="button" class="btn btn-sm btn-outline-danger" (click)="removeProgetto(i)">
-                  <i class="feather icon-trash-2"></i> {{ 'customer.currio.remove' | translate }}
-                </button>
-              </h6>
-              <div class="mb-2">
-                <label class="form-label">{{ 'customer.currio.form.progetto.titolo' | translate }}</label>
-                <input type="text" class="form-control form-control-sm" formControlName="titolo">
-              </div>
-              <div class="mb-2">
-                <label class="form-label">{{ 'customer.currio.form.progetto.descrizione' | translate }}</label>
-                <textarea class="form-control form-control-sm" formControlName="descrizione" rows="2"></textarea>
-              </div>
-              <div class="mb-2">
-                <label class="form-label">{{ 'customer.currio.form.progetto.immagineUrl' | translate }}</label>
-                <input type="url" class="form-control form-control-sm" formControlName="immagineUrl">
-              </div>
-              <div class="mb-2">
-                <label class="form-label">{{ 'customer.currio.form.progetto.linkProgetto' | translate }}</label>
-                <input type="url" class="form-control form-control-sm" formControlName="linkProgetto">
-              </div>
-              <div formArrayName="tags">
-                <label class="form-label">{{ 'customer.currio.form.progetto.tags' | translate }}</label>
-                <div *ngFor="let tagCtrl of getTags(i).controls; let tagIndex = index"
-                  class="input-group input-group-sm mb-1">
-                  <input type="text" class="form-control" [formControlName]="tagIndex">
-                  <button class="btn btn-outline-danger btn-sm" type="button" (click)="removeTag(i, tagIndex)"><i
-                      class="feather icon-x"></i></button>
-                </div>
-                <button type="button" class="btn btn-outline-secondary btn-sm mt-1" (click)="addTag(i)">Aggiungi
-                  Tag</button>
-              </div>
-            </div>
+          <div class="card-body accordion-container" formArrayName="progetti">
+            <ngb-accordion #accProgetti="ngbAccordion" [closeOthers]="true" activeIds="">
+              <ngb-panel *ngFor="let progettoCtrl of progettiFormArray.controls; let i = index" [id]="'progetto-' + i">
+                <ng-template ngbPanelTitle>
+                  <div class="d-flex justify-content-between align-items-center w-100">
+                    <span>{{ 'Progetto' | translate }} {{i + 1}}: {{ progettoCtrl.get('titolo')?.value || ('Nuovo Progetto' | translate) }}</span>
+                    <button type="button" class="btn btn-sm btn-outline-danger btn-remove-item" (click)="removeProgetto(i); $event.stopPropagation()">
+                      <i class="feather icon-trash-2"></i>
+                    </button>
+                  </div>
+                </ng-template>
+                <ng-template ngbPanelContent>
+                  <div [formGroupName]="i" class="accordion-item-content">
+                    <div class="mb-2">
+                      <label class="form-label">{{ 'customer.currio.form.progetto.titolo' | translate }}</label>
+                      <input type="text" class="form-control form-control-sm" formControlName="titolo">
+                    </div>
+                    <div class="mb-2">
+                      <label class="form-label">{{ 'customer.currio.form.progetto.descrizione' | translate }}</label>
+                      <textarea class="form-control form-control-sm" formControlName="descrizione" rows="2"></textarea>
+                    </div>
+                    <div class="mb-2">
+                      <label class="form-label">{{ 'customer.currio.form.progetto.immagineUrl' | translate }}</label>
+                      <input type="url" class="form-control form-control-sm" formControlName="immagineUrl">
+                    </div>
+                    <div class="mb-2">
+                      <label class="form-label">{{ 'customer.currio.form.progetto.linkProgetto' | translate }}</label>
+                      <input type="url" class="form-control form-control-sm" formControlName="linkProgetto">
+                    </div>
+                    <div formArrayName="tags">
+                      <label class="form-label">{{ 'customer.currio.form.progetto.tags' | translate }}</label>
+                      <div *ngFor="let tagCtrl of getTags(i).controls; let tagIndex = index"
+                        class="input-group input-group-sm mb-1">
+                        <input type="text" class="form-control" [formControlName]="tagIndex">
+                        <button class="btn btn-outline-danger btn-sm" type="button" (click)="removeTag(i, tagIndex)"><i
+                            class="feather icon-x"></i></button>
+                      </div>
+                      <button type="button" class="btn btn-outline-secondary btn-sm mt-1" (click)="addTag(i)">Aggiungi
+                        Tag</button>
+                    </div>
+                  </div>
+                </ng-template>
+              </ngb-panel>
+            </ngb-accordion>
             <div *ngIf="progettiFormArray.length === 0" class="text-muted text-center py-3">
               Nessun progetto aggiunto.
             </div>
@@ -259,66 +266,71 @@
               <i class="feather icon-plus"></i> {{ 'customer.currio.addEsperienza' | translate }}
             </button>
           </div>
-          <div class="card-body" formArrayName="esperienze">
-            <div *ngFor="let esperienzaCtrl of esperienzeFormArray.controls; let i = index" [formGroupName]="i"
-              class="mb-3 p-3 border rounded">
-              <h6 class="d-flex justify-content-between align-items-center">
-                Esperienza/Formazione {{i + 1}}
-                <button type="button" class="btn btn-sm btn-outline-danger" (click)="removeEsperienza(i)">
-                  <i class="feather icon-trash-2"></i> {{ 'customer.currio.remove' | translate }}
-                </button>
-              </h6>
-              <div class="row">
-                <div class="col-md-6 mb-2">
-                  <label class="form-label">{{ 'customer.currio.form.esperienza.titolo' | translate }}</label>
-                  <input type="text" class="form-control form-control-sm" formControlName="titolo">
-                </div>
-                <div class="col-md-6 mb-2">
-                  <label class="form-label">{{ 'customer.currio.form.esperienza.tipo' | translate }}</label>
-                  <select class="form-select form-select-sm" formControlName="tipo">
-                    <option value="lavoro">Lavoro</option>
-                    <option value="formazione">Formazione</option>
-                  </select>
-                </div>
-              </div>
-              <div class="mb-2">
-                <label class="form-label">{{ 'customer.currio.form.esperienza.aziendaScuola' | translate }}</label>
-                <input type="text" class="form-control form-control-sm" formControlName="aziendaScuola">
-              </div>
-              <div class="mb-2">
-                <label class="form-label">{{ 'customer.currio.form.esperienza.date' | translate }}</label>
-                <input type="text" class="form-control form-control-sm" formControlName="date">
-              </div>
-              <div class="mb-2">
-                <label class="form-label">{{ 'customer.currio.form.esperienza.descrizioneBreve' | translate }}</label>
-                <textarea class="form-control form-control-sm" formControlName="descrizioneBreve" rows="2"></textarea>
-              </div>
-
-              <div formArrayName="dettagli">
-                <label class="form-label">{{ 'customer.currio.form.esperienza.dettagli' | translate }}</label>
-                <div *ngFor="let dettaglioCtrl of getDettagli(i).controls; let detIndex = index"
-                  class="input-group input-group-sm mb-1">
-                  <input type="text" class="form-control" [formControlName]="detIndex">
-                  <button class="btn btn-outline-danger btn-sm" type="button" (click)="removeDettaglio(i, detIndex)"><i
-                      class="feather icon-x"></i></button>
-                </div>
-                <button type="button" class="btn btn-outline-secondary btn-sm mt-1" (click)="addDettaglio(i)">Aggiungi
-                  Dettaglio</button>
-              </div>
-
-              <div formArrayName="competenzeAcquisite" class="mt-2">
-                <label class="form-label">{{ 'customer.currio.form.esperienza.competenzeAcquisite' | translate
-                  }}</label>
-                <div *ngFor="let compCtrl of getCompetenzeAcquisite(i).controls; let compIndex = index"
-                  class="input-group input-group-sm mb-1">
-                  <input type="text" class="form-control" [formControlName]="compIndex">
-                  <button class="btn btn-outline-danger btn-sm" type="button"
-                    (click)="removeCompetenzaAcquisita(i, compIndex)"><i class="feather icon-x"></i></button>
-                </div>
-                <button type="button" class="btn btn-outline-secondary btn-sm mt-1"
-                  (click)="addCompetenzaAcquisita(i)">Aggiungi Competenza</button>
-              </div>
-            </div>
+          <div class="card-body accordion-container" formArrayName="esperienze">
+            <ngb-accordion #accEsperienze="ngbAccordion" [closeOthers]="true" activeIds="">
+              <ngb-panel *ngFor="let esperienzaCtrl of esperienzeFormArray.controls; let i = index" [id]="'esperienza-' + i">
+                <ng-template ngbPanelTitle>
+                  <div class="d-flex justify-content-between align-items-center w-100">
+                    <span>{{ 'Esperienza/Formazione' | translate }} {{i + 1}}: {{ esperienzaCtrl.get('titolo')?.value || ('Nuova Esperienza/Formazione' | translate )}}</span>
+                    <button type="button" class="btn btn-sm btn-outline-danger btn-remove-item" (click)="removeEsperienza(i); $event.stopPropagation()">
+                      <i class="feather icon-trash-2"></i>
+                    </button>
+                  </div>
+                </ng-template>
+                <ng-template ngbPanelContent>
+                  <div [formGroupName]="i" class="accordion-item-content">
+                    <div class="row">
+                      <div class="col-md-6 mb-2">
+                        <label class="form-label">{{ 'customer.currio.form.esperienza.titolo' | translate }}</label>
+                        <input type="text" class="form-control form-control-sm" formControlName="titolo">
+                      </div>
+                      <div class="col-md-6 mb-2">
+                        <label class="form-label">{{ 'customer.currio.form.esperienza.tipo' | translate }}</label>
+                        <select class="form-select form-select-sm" formControlName="tipo">
+                          <option value="lavoro">Lavoro</option>
+                          <option value="formazione">Formazione</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="mb-2">
+                      <label class="form-label">{{ 'customer.currio.form.esperienza.aziendaScuola' | translate }}</label>
+                      <input type="text" class="form-control form-control-sm" formControlName="aziendaScuola">
+                    </div>
+                    <div class="mb-2">
+                      <label class="form-label">{{ 'customer.currio.form.esperienza.date' | translate }}</label>
+                      <input type="text" class="form-control form-control-sm" formControlName="date">
+                    </div>
+                    <div class="mb-2">
+                      <label class="form-label">{{ 'customer.currio.form.esperienza.descrizioneBreve' | translate }}</label>
+                      <textarea class="form-control form-control-sm" formControlName="descrizioneBreve" rows="2"></textarea>
+                    </div>
+                    <div formArrayName="dettagli">
+                      <label class="form-label">{{ 'customer.currio.form.esperienza.dettagli' | translate }}</label>
+                      <div *ngFor="let dettaglioCtrl of getDettagli(i).controls; let detIndex = index"
+                        class="input-group input-group-sm mb-1">
+                        <input type="text" class="form-control" [formControlName]="detIndex">
+                        <button class="btn btn-outline-danger btn-sm" type="button" (click)="removeDettaglio(i, detIndex)"><i
+                            class="feather icon-x"></i></button>
+                      </div>
+                      <button type="button" class="btn btn-outline-secondary btn-sm mt-1" (click)="addDettaglio(i)">Aggiungi
+                        Dettaglio</button>
+                    </div>
+                    <div formArrayName="competenzeAcquisite" class="mt-2">
+                      <label class="form-label">{{ 'customer.currio.form.esperienza.competenzeAcquisite' | translate
+                        }}</label>
+                      <div *ngFor="let compCtrl of getCompetenzeAcquisite(i).controls; let compIndex = index"
+                        class="input-group input-group-sm mb-1">
+                        <input type="text" class="form-control" [formControlName]="compIndex">
+                        <button class="btn btn-outline-danger btn-sm" type="button"
+                          (click)="removeCompetenzaAcquisita(i, compIndex)"><i class="feather icon-x"></i></button>
+                      </div>
+                      <button type="button" class="btn btn-outline-secondary btn-sm mt-1"
+                        (click)="addCompetenzaAcquisita(i)">Aggiungi Competenza</button>
+                    </div>
+                  </div>
+                </ng-template>
+              </ngb-panel>
+            </ngb-accordion>
             <div *ngIf="esperienzeFormArray.length === 0" class="text-muted text-center py-3">
               Nessuna esperienza aggiunta.
             </div>
@@ -332,30 +344,37 @@
               <i class="feather icon-plus"></i> {{ 'customer.currio.addCompetenza' | translate }}
             </button>
           </div>
-          <div class="card-body" formArrayName="competenze">
-            <div *ngFor="let competenzaCtrl of competenzeFormArray.controls; let i = index" [formGroupName]="i"
-              class="mb-3 p-3 border rounded">
-              <h6 class="d-flex justify-content-between align-items-center">
-                Competenza {{i + 1}}
-                <button type="button" class="btn btn-sm btn-outline-danger" (click)="removeCompetenza(i)">
-                  <i class="feather icon-trash-2"></i> {{ 'customer.currio.remove' | translate }}
-                </button>
-              </h6>
-              <div class="mb-2">
-                <label class="form-label">{{ 'customer.currio.form.competenza.nome' | translate }}</label>
-                <input type="text" class="form-control form-control-sm" formControlName="nome">
-              </div>
-              <div class="mb-2">
-                <label class="form-label">{{ 'customer.currio.form.competenza.livello' | translate }}</label>
-                <input type="text" class="form-control form-control-sm" formControlName="livello">
-              </div>
-              <div class="mb-2">
-                <label class="form-label">{{ 'customer.currio.form.competenza.icona' | translate }}</label>
-                <textarea class="form-control form-control-sm" formControlName="icona" rows="2"
-                  placeholder='<svg>...</svg>'></textarea>
-                <small class="form-text text-muted">Incolla qui il codice SVG completo per l'icona (opzionale).</small>
-              </div>
-            </div>
+          <div class="card-body accordion-container" formArrayName="competenze">
+            <ngb-accordion #accCompetenze="ngbAccordion" [closeOthers]="true" activeIds="">
+              <ngb-panel *ngFor="let competenzaCtrl of competenzeFormArray.controls; let i = index" [id]="'competenza-' + i">
+                <ng-template ngbPanelTitle>
+                  <div class="d-flex justify-content-between align-items-center w-100">
+                    <span>{{ 'Competenza' | translate }} {{i + 1}}: {{ competenzaCtrl.get('nome')?.value || ('Nuova Competenza' | translate) }}</span>
+                    <button type="button" class="btn btn-sm btn-outline-danger btn-remove-item" (click)="removeCompetenza(i); $event.stopPropagation()">
+                      <i class="feather icon-trash-2"></i>
+                    </button>
+                  </div>
+                </ng-template>
+                <ng-template ngbPanelContent>
+                  <div [formGroupName]="i" class="accordion-item-content">
+                    <div class="mb-2">
+                      <label class="form-label">{{ 'customer.currio.form.competenza.nome' | translate }}</label>
+                      <input type="text" class="form-control form-control-sm" formControlName="nome">
+                    </div>
+                    <div class="mb-2">
+                      <label class="form-label">{{ 'customer.currio.form.competenza.livello' | translate }}</label>
+                      <input type="text" class="form-control form-control-sm" formControlName="livello">
+                    </div>
+                    <div class="mb-2">
+                      <label class="form-label">{{ 'customer.currio.form.competenza.icona' | translate }}</label>
+                      <textarea class="form-control form-control-sm" formControlName="icona" rows="2"
+                        placeholder='<svg>...</svg>'></textarea>
+                      <small class="form-text text-muted">Incolla qui il codice SVG completo per l'icona (opzionale).</small>
+                    </div>
+                  </div>
+                </ng-template>
+              </ngb-panel>
+            </ngb-accordion>
             <div *ngIf="competenzeFormArray.length === 0" class="text-muted text-center py-3">
               Nessuna competenza aggiunta.
             </div>
@@ -365,7 +384,6 @@
     </div>
   </form>
 </div>
-
 
 <div class="row mt-4" *ngIf="isUserAdmin && currio && currio.id">
   <div class="col-md-12">
@@ -393,7 +411,7 @@
           <div class="input-group input-group-sm mb-2">
             <input type="text" class="form-control form-control-sm" [value]="linkRegistrazione" readonly
               #registrationLinkInput>
-            <button class="btn btn-outline-secondary btn-sm" type="button" id="copyLinkBtnUnified"><i
+            <button class="btn btn-outline-secondary btn-sm" type="button" id="copyLinkBtnUnified" (click)="copyToClipboard(registrationLinkInput)"><i
                 class="feather icon-copy"></i> Copia</button>
           </div>
           <a href="mailto:{{ currio.datiCliente.email }}?subject=Completa la creazione del tuo Curriò&body=Ciao {{ currio.datiCliente.nome }},%0D%0A%0D%0Acompleta la creazione del tuo account per Curriò al seguente link: {{ encodedLinkRegistrazione }}%0D%0A%0D%0AIl link scadrà tra 24 ore."

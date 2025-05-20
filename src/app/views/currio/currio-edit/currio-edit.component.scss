@@ -1,8 +1,92 @@
 // src/app/views/currio/currio-edit/currio-edit.component.scss
+@import 'src/assets/scss/_variables.scss'; // Assicurati che il percorso sia corretto per accedere alle variabili
+
+.accordion-container {
+  .card-body { // Rimuovi padding extra se l'accordion è direttamente nel card-body
+    padding: 0;
+  }
+
+  .accordion-item-content {
+    padding: 1rem; // Padding interno per il contenuto del pannello quando è aperto
+    border-top: 1px solid $border-color; // Linea separatrice se il titolo non ha già un bordo
+  }
+
+  .btn-remove-item {
+    line-height: 1;
+    padding: 0.2rem 0.4rem; // Padding più piccolo per il pulsante rimuovi
+    font-size: 0.75rem;    // Font più piccolo
+    margin-left: auto;     // Spinge il pulsante a destra nel titolo
+    i {
+      font-size: 0.9rem;
+    }
+  }
+
+  // Sovrascrivi stili ng-bootstrap se necessario per coerenza con il tema
+  // Nota: potresti aver bisogno di ::ng-deep per sovrascrivere stili incapsulati,
+  // ma usalo con cautela. È preferibile definire variabili SCSS di ng-bootstrap se il tema lo permette.
+  // Altrimenti, usa una specificità maggiore o stili globali se ::ng-deep non funziona come previsto.
+
+  .accordion-button, ::ng-deep .accordion-button { // ::ng-deep per sovrascrivere stili incapsulati
+    padding: 0.75rem 1.25rem; // Padding standard del titolo del pannello
+    font-size: 0.9rem;     // Dimensione font per il titolo del pannello
+
+    // Stile per il titolo del pannello quando è collassato
+    &:not(.collapsed) {
+      color: $body-color; // Usa il colore del testo del tema
+      // CORREZIONE: Usa map-get per accedere al colore primario dalla mappa $theme-colors
+      background-color: rgba(map-get($theme-colors, "primary"), 0.05);
+      box-shadow: inset 0 -1px 0 rgba(0,0,0,.125);
+    }
+
+    // Rimuove l'icona di default dell'accordion di Bootstrap se non desiderata
+    &::after {
+      // display: none; // Decommenta se non vuoi l'icona freccia di default
+    }
+
+    &:focus {
+      // CORREZIONE: Usa map-get per il focus shadow se la variabile $primary non è definita globalmente
+      box-shadow: 0 0 0 0.25rem rgba(map-get($theme-colors, "primary"), .25);
+      z-index: 3; // Assicura che il focus sia visibile
+    }
+  }
+
+  .accordion-item, ::ng-deep .accordion-item { // ::ng-deep per sovrascrivere stili incapsulati
+    border: 1px solid $border-color;
+    margin-bottom: -1px; // Per far collassare i bordi tra gli item
+
+    &:first-of-type {
+      border-top-left-radius: $card-border-radius;
+      border-top-right-radius: $card-border-radius;
+      .accordion-button {
+         border-top-left-radius: calc(#{$card-border-radius} - 1px);
+         border-top-right-radius: calc(#{$card-border-radius} - 1px);
+      }
+    }
+    &:last-of-type {
+      border-bottom-left-radius: $card-border-radius;
+      border-bottom-right-radius: $card-border-radius;
+      margin-bottom: 0;
+      .accordion-button.collapsed {
+         border-bottom-left-radius: calc(#{$card-border-radius} - 1px);
+         border-bottom-right-radius: calc(#{$card-border-radius} - 1px);
+      }
+       .accordion-collapse {
+        border-bottom-right-radius: calc(#{$card-border-radius} - 1px);
+        border-bottom-left-radius: calc(#{$card-border-radius} - 1px);
+      }
+    }
+  }
+
+  .accordion-body, ::ng-deep .accordion-body { // ::ng-deep per sovrascrivere stili incapsulati
+    padding: 1rem 1.25rem; // Padding per il contenuto del pannello
+  }
+}
+
+// Stili per le anteprime dei template (già presenti nel tuo file, li includo per completezza)
 .template-option {
   cursor: pointer;
   transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, border-color 0.2s ease-in-out;
-  border: 2px solid #e9ecef; // Bordo di default leggero
+  border: 2px solid #e9ecef;
 
   &:hover {
     transform: translateY(-3px);
@@ -10,26 +94,30 @@
   }
 
   &.selected {
-    border-color: #198754; // Colore verde di successo di Bootstrap
-    box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.35); // Ombra verde corrispondente
+    // CORREZIONE: Usa map-get per accedere al colore success dalla mappa $theme-colors
+    border-color: map-get($theme-colors, "success") !important;
+    box-shadow: 0 0 0 0.25rem rgba(map-get($theme-colors, "success"), .35);
     transform: translateY(-2px);
 
-    img {
-      opacity: 1; // L'immagine selezionata è completamente opaca
+    .template-preview-img {
+      opacity: 1;
     }
   }
 
   .template-preview-img {
     max-height: 120px;
+    width: 100%;
     object-fit: cover;
-    border: 1px solid #dee2e6; // Un leggero bordo per l'immagine stessa
-    border-radius: .25rem; // Bordi arrotondati per l'immagine
-    opacity: 0.85; // Le immagini non selezionate sono leggermente trasparenti
-     transition: opacity 0.2s ease-in-out;
+    border: 1px solid #dee2e6;
+    border-radius: .25rem;
+    opacity: 0.85;
+    transition: opacity 0.2s ease-in-out;
   }
 
    p {
-    font-size: 0.875rem; // Testo leggermente più piccolo
-    margin-top: 0.5rem; // Spazio sopra il testo
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+    font-weight: 500;
   }
 }
+
