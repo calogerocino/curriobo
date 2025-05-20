@@ -1,69 +1,315 @@
 {
-	"generale.errori.camporichiesto": "Das Feld ist obligatorisch",
-	"generale.errori.caratteriminimi": "Mindestanzahl an Zeichen:",
-	"generale.errori.mailvalida": "Geben Sie eine gültige E-Mail-Adresse ein",
-	"generale.errori.nonsupportato": "Noch nicht unterstützt",
-	"generale.errori.pass8car": "Das Passwort muss mindestens 8 Zeichen enthalten",
-	"generale.errori.passpatt": "Das Passwort muss einen Großbuchstaben, einen Kleinbuchstaben und einen Sonderbuchstaben enthalten!",
-	"generale.home": "Willkommen zu CurriòDashboard",
-	"generale.layout.linguaa": "Sprache",
-	"generale.layout.lingua": "Deutsch",
-	"generale.layout.menu.catalogo.buonisconto": "Gutscheine",
-	"generale.layout.menu.catalogo.catalogo": "Katalog",
-	"generale.layout.menu.catalogo.categorie": "Kategorien",
-	"generale.layout.menu.catalogo.marche": "Marken und Lieferanten",
-	"generale.layout.menu.catalogo.prodotti": "Produkte",
-	"generale.layout.menu.clienti.clienti": "Kundschaft",
-	"generale.layout.menu.clienti.indirizzi": "Adressen",
-	"generale.layout.menu.contabilita.utenti": "Benutzer",
-	"generale.layout.menu.dashboard": "Armaturenbrett",
-	"generale.layout.menu.richieste": "Anfrage",
-	"generale.layout.menu.richieste.listarichieste": "Anforderungsliste",
-	"generale.layout.menu.richieste.listacurrio": "Curriò Liste",
-	"generale.layout.menu.listautenti": "Benutzerliste",
-	"generale.layout.menu.main": "Hauptsächlich",
-	"generale.layout.menu.sito": "Seite",
-  "generale.layout.menu.discord": "Discord",
-	"generale.layout.navbar.accessirapidi": "Schnellzugriffe",
-	"generale.layout.navbar.attivita": "Aktivitäten",
-	"generale.layout.navbar.database": "Datenbank",
-	"generale.layout.navbar.datiazienda": "Firmendaten",
-	"generale.layout.navbar.eliminatutti": "Alles löschen",
-	"generale.layout.navbar.esci": "Austragen",
-	"generale.layout.navbar.eseguiricerca": "Suche durchführen...",
-	"generale.layout.navbar.impostazioni": "Einstellungen",
-	"generale.layout.navbar.nuovemail": "Neue E-Mails",
-	"generale.layout.navbar.nuovenotifiche": "Neue Benachrichtigungen",
-	"generale.layout.navbar.visualizzatutti": "Alle ansehen",
-	"generale.shared.modifica": "Bearbeiten",
-	"generale.shared.aggiorna": "Aktualisieren",
-	"generale.shared.elimina": "Löschen",
-	"generale.shared.elimina": "Abbrechen",
-	"profiloUtente.aggiornapassword": "Passwort aktualisieren",
-	"profiloUtente.aggiornaprofilo": "Profil aktualisieren",
-	"profiloUtente.caricamentoimg": "Bild hochladen",
-	"profiloUtente.cellulare": "Handy",
-	"profiloUtente.cellulare-set": "Lieferung muss eingestellt werden",
-	"profiloUtente.email": "E-Mail",
-	"profiloUtente.email-set": "E-Mail zum Festlegen",
-	"profiloUtente.indirizzo": "Adresse",
-	"profiloUtente.indirizzo-set": "Adresse, die eingestellt werden soll",
-	"profiloUtente.inviamessaggio": "Nachricht senden",
-	"profiloUtente.mailnonverificata": "Die E-Mail wurde nicht verifiziert!",
-	"profiloUtente.nome": "Visualisierter Name",
-	"profiloUtente.nome-set": "Name, der festgelegt werden soll",
-	"profiloUtente.password": "Kennwort",
-	"profiloUtente.password-set": "Neues Passwort",
-	"profiloUtente.password-setre": "Neues Passwort wiederholen",
-	"profiloUtente.profilo": "Profil",
-	"profiloUtente.ruolo": "Rolle",
-	"profiloUtente.ruolo-set": "Zu setzende Rolle",
-  "profiloUtente.avvisoModificheNonSalvate": "Denken Sie daran, die Informationen zu speichern, bevor Sie die Seite schließen.",
-	"tabella.head.Azioni": "Aktionen",
-	"tabella.head.idlocale": "Benutzer-ID",
-	"tabella.head.immagine": "Bild",
-	"tabella.head.mailverificata": "Email überprüft",
-	"tabella.head.nome": "Name",
-    "tabella.head.stato": "Staat",
-    "tabella.head.descrizione": "Beschreibung"
+  "generale": {
+    "errori": {
+      "camporichiesto": "Das Feld ist erforderlich",
+      "caratteriminimi": "Mindestanzahl an Zeichen:",
+      "mailvalida": "Geben Sie eine gültige E-Mail-Adresse ein",
+      "nonsupportato": "Noch nicht unterstützt",
+      "pass8car": "Das Passwort muss mindestens 8 Zeichen lang sein",
+      "passpatt": "Das Passwort muss einen Großbuchstaben, einen Kleinbuchstaben und ein Sonderzeichen enthalten!",
+      "attenzione": "Achtung!",
+      "compilaCampi": "Bitte füllen Sie alle Pflichtfelder aus."
+    },
+    "home": "Willkommen bei CurriòDashboard",
+    "layout": {
+      "linguaa": "Sprache",
+      "lingua": "Deutsch",
+      "menu": {
+        "catalogo": {
+          "buonisconto": "Rabattgutscheine",
+          "catalogo": "Katalog",
+          "categorie": "Kategorien",
+          "marche": "Marken und Lieferanten",
+          "prodotti": "Produkte"
+        },
+        "clienti": {
+          "clienti": "Kunden",
+          "indirizzi": "Adressen"
+        },
+        "contabilita": {
+          "utenti": "Benutzer"
+        },
+        "dashboard": "Dashboard",
+        "richieste": "Anfragen",
+        "richieste_listarichieste": "Anfragenliste",
+        "richieste_listacurrio": "Curriò-Liste",
+        "listautenti": "Benutzerliste",
+        "main": "Haupt",
+        "sito": "Webseite",
+        "discord": "Discord"
+      },
+      "navbar": {
+        "accessirapidi": "Schnellzugriffe",
+        "attivita": "Aktivitäten",
+        "database": "Datenbank",
+        "datiazienda": "Firmendaten",
+        "eliminatutti": "Alles löschen",
+        "esci": "Abmelden",
+        "eseguiricerca": "Suche durchführen...",
+        "impostazioni": "Einstellungen",
+        "nuovemail": "Neue E-Mails",
+        "nuovenotifiche": "Neue Benachrichtigungen",
+        "visualizzatutti": "Alle anzeigen",
+        "nessunanuovanotifica": "Keine neuen Benachrichtigungen"
+      }
+    },
+    "shared": {
+      "modifica": "Bearbeiten",
+      "aggiorna": "Aktualisieren",
+      "elimina": "Löschen",
+      "annulla": "Abbrechen",
+      "salva": "Änderungen speichern",
+      "ok": "Ok"
+    }
+  },
+  "profiloUtente": {
+    "aggiornapassword": "Passwort aktualisieren",
+    "aggiornaprofilo": "Profil aktualisieren",
+    "caricamentoimg": "Bild hochladen",
+    "cellulare": "Handy",
+    "cellulare-set": "Kontakt festzulegen",
+    "email": "E-Mail",
+    "email-set": "E-Mail festzulegen",
+    "indirizzo": "Adresse",
+    "indirizzo-set": "Adresse festzulegen",
+    "inviamessaggio": "Nachricht senden",
+    "mailnonverificata": "Die E-Mail wurde nicht verifiziert!",
+    "nome": "Anzeigename",
+    "nome-set": "Name festzulegen",
+    "password": "Passwort",
+    "password-set": "Neues Passwort",
+    "password-setre": "Neues Passwort wiederholen",
+    "profilo": "Profil",
+    "ruolo": "Rolle",
+    "ruolo-set": "Rolle festzulegen",
+    "avvisoModificheNonSalvate": "Denken Sie daran, die Informationen zu speichern, bevor Sie die Seite schließen.",
+    "mailverificata": "E-Mail bestätigt"
+  },
+  "tabella": {
+    "head": {
+      "Azioni": "Aktionen",
+      "idlocale": "Benutzer-ID",
+      "immagine": "Bild",
+      "mailverificata": "E-Mail verifiziert",
+      "nome": "Name",
+      "stato": "Status",
+      "descrizione": "Beschreibungen"
+    }
+  },
+  "status": {
+    "nuova_richiesta": "Neue Anfrage",
+    "invito_spedito": "Einladung Gesendet",
+    "attivo": "Aktiv",
+    "archiviato": "Archiviert",
+    "sconosciuto": "Unbekannt"
+  },
+  "customer": {
+    "menu": {
+      "profile": "Mein Profil",
+      "currio": "Mein Curriò"
+    },
+    "currio": {
+      "form": {
+        "templateScelto": {
+          "titolo": "Wählen Sie Ihren Curriò-Stil",
+          "label": "Vorlage auswählen:",
+          "modern": "Modern",
+          "vintage": "Vintage",
+          "classic": "Klassisch"
+        },
+        "nomePortfolio": "Name Ihres Curriòs (z.B. Max Mustermanns Portfolio)",
+        "heroTitle": "Hauptüberschrift (z.B. Hallo, ich bin Max!)",
+        "heroSubtitle": "Untertitel (eine kurze Beschreibung von Ihnen)",
+        "linguaDefault": "Standard-Curriò-Sprache",
+        "chiSonoFotoUrl": "URL Ihres Fotos (optional)",
+        "chiSonoDescrizione1": "Beschreibung 'Über Mich' (Absatz 1)",
+        "chiSonoDescrizione2": "Beschreibung 'Über Mich' (Absatz 2, optional)",
+        "contattiEmail": "Öffentliche E-Mail (für das Curriò)",
+        "contattiGithub": "GitHub-Profil (vollständige URL)",
+        "contattiLinkedin": "LinkedIn-Profil (vollständige URL)",
+        "contattiInstagram": "Instagram-Profil (vollständige URL)",
+        "progetto": {
+          "titolo": "Projekttitel",
+          "descrizione": "Projektbeschreibung",
+          "immagineUrl": "Projektbild-URL",
+          "linkProgetto": "Link zum Projekt (z.B. GitHub, Live-Seite)",
+          "tags": "Technologien/Tags (kommagetrennt)"
+        },
+        "esperienza": {
+          "titolo": "Position/Studientitel",
+          "tipo": "Typ (Arbeit/Ausbildung)",
+          "aziendaScuola": "Firma/Schule",
+          "date": "Daten (z.B. Jan 2020 - Dez 2022)",
+          "descrizioneBreve": "Kurzbeschreibung",
+          "dettagli": "Details (ein Punkt pro Zeile)",
+          "competenzeAcquisite": "Erworbene Fähigkeiten (kommagetrennt)"
+        },
+        "competenza": {
+          "nome": "Fähigkeitsname (z.B. JavaScript)",
+          "livello": "Niveau (z.B. Fortgeschritten, Mittelstufe)",
+          "icona": "SVG-Symbol (optional, HTML/SVG-Code)"
+        }
+      },
+      "title": "Curriò-Einstellungen",
+      "updateCurrio": "Curriò Aktualisieren",
+      "progettiTitle": "Meine Projekte",
+      "esperienzeTitle": "Meine Erfahrungen",
+      "competenzeTitle": "Meine Fähigkeiten",
+      "addProgetto": "Projekt Hinzufügen",
+      "addEsperienza": "Erfahrung Hinzufügen",
+      "addCompetenza": "Fähigkeit Hinzufügen",
+      "remove": "Entfernen"
+    },
+    "dashboard": {
+      "welcome": "Willkommen in Ihrem Persönlichen Bereich",
+      "intro": "Von hier aus können Sie Ihre Konto- und Curriò-Informationen verwalten."
+    },
+    "account": {
+      "title": "Kontoinformationen",
+      "updateProfile": "Profil Aktualisieren",
+      "changePassword": "Passwort Ändern",
+      "currentPassword": "Aktuelles Passwort",
+      "newPassword": "Neues Passwort",
+      "confirmNewPassword": "Neues Passwort Bestätigen"
+    },
+    "logout": "Abmelden"
+  },
+  "currioPreview": {
+    "pageTitle": "Mein Curriò - {{ pageTitleName }}",
+    "navHome": "Startseite",
+    "navProjects": "Projekte",
+    "navSkills": "Fähigkeiten",
+    "navCV": "Erfahrung",
+    "navAbout": "Über Mich",
+    "navContact": "Kontakt",
+    "navHomeMobile": "Startseite",
+    "navProjectsMobile": "Projekte",
+    "navSkillsMobile": "Fähigkeiten",
+    "navCVMobile": "Erfahrung",
+    "navAboutMobile": "Über Mich",
+    "navContactMobile": "Kontakt",
+    "heroCTA": "Entdecke meine Arbeiten",
+    "projectsTitle": "Ausgewählte Projekte",
+    "projectDetailsButton": "Details Ansehen",
+    "cvTitle": "Erfahrung und Ausbildung",
+    "skillsTitle": "Meine Fähigkeiten",
+    "aboutTitle": "Über Mich",
+    "profilePhotoAlt": "Profilfoto",
+    "contactTitle": "Nehmen wir Kontakt auf",
+    "contactSubtitle": "Interessiert an einer Zusammenarbeit oder haben Sie eine Frage? Zögern Sie nicht, mir zu schreiben.",
+    "contactButton": "Senden Sie mir eine E-Mail",
+    "footerRights": "Alle Rechte vorbehalten.",
+    "footerMadeWith": "Erstellt mit ❤️ und Tailwind CSS.",
+    "viewMoreDetails": "Weitere Details",
+    "work": "Arbeit",
+    "education": "Ausbildung",
+    "errorTitle": "Fehler beim Laden des Curriòs",
+    "errorMessage": "Entschuldigung, die angeforderten Curriò-Daten konnten nicht geladen werden.",
+    "backToList": "Zurück zur Curriò-Liste",
+    "cvSoftSkillsTitle": "Soft Skills",
+    "cvSoftSkill1": "Problemlösung",
+    "cvSoftSkill2": "Teamfähigkeit",
+    "cvSoftSkill3": "Effektive Kommunikation",
+    "cvSoftSkill4": "Anpassungsfähigkeit",
+    "cvSoftSkill5": "Kreativität",
+    "cvSoftSkill6": "Zeitmanagement",
+    "cvLanguagesTitle": "Sprachen",
+    "cvLangItalian": "Italienisch",
+    "cvLangItalianLevel": "Muttersprache",
+    "cvLangEnglish": "Englisch",
+    "cvLangEnglishLevel": "Fließend (C1)",
+    "downloadCV": "Lebenslauf Herunterladen",
+    "openMenu": "Menü öffnen",
+    "closeMenu": "Menü schließen"
+  },
+  "landingpage": {
+    "nav": {
+      "myCurrio": "Mein Curriò!"
+    },
+    "hero": {
+      "title": "Curriò: Ihr Lebenslauf der Zukunft, gestaltet wie ein Portfolio.",
+      "subtitle": "Verschwenden Sie keine Zeit mehr mit komplizierten Layouts. Lassen Sie unsere Technologie einen automatischen, visuell beeindruckenden und personalisierten Lebenslauf/Portfolio für Sie erstellen.",
+      "cta": "Jetzt Starten: Erstellen Sie Ihr Curriò"
+    },
+    "whatIs": {
+      "title": "Was ist ein Curriò?",
+      "p1": "Curriò revolutioniert die Art und Weise, wie Sie sich präsentieren. Es ist nicht nur ein Lebenslauf; es ist Ihre dynamische digitale Visitenkarte, ein interaktives Portfolio, das Ihre berufliche Geschichte auf ansprechende und moderne Weise erzählt. Zeigen Sie, wer Sie sind, was Sie können und die Projekte, auf die Sie stolz sind – alles an einem Ort.",
+      "p2": "Vergessen Sie statische PDFs. Mit Curriò werden Ihre Fähigkeiten lebendig, Ihre Projekte glänzen und Ihre Einzigartigkeit tritt hervor und fesselt die Aufmerksamkeit von Personalvermittlern und Kooperationspartnern.",
+      "imageAlt": "Vorschau eines modernen und dynamischen Curriòs"
+    },
+    "whyCreate": {
+      "title": "Warum Ihr Curriò erstellen?",
+      "benefit1": "Heben Sie sich mit einem innovativen und ansprechenden Format von der Masse ab.",
+      "benefit2": "Erzählen Sie Ihre berufliche Geschichte umfassend und visuell.",
+      "benefit3": "Einfach zu aktualisieren, immer bereit für neue Möglichkeiten.",
+      "benefit4": "Überall und auf jedem Gerät zugänglich für maximale Sichtbarkeit.",
+      "imageAlt": "Illustration der Vorteile von Curriò"
+    },
+    "pricing": {
+      "title": "Wählen Sie den Perfekten Plan für Sich",
+      "subtitle": "Starten Sie kostenlos oder schalten Sie erweiterte Funktionen frei, um Ihr Profil zum Strahlen zu bringen.",
+      "month": "einmalzahlung",
+      "popular": "Beliebt",
+      "ctaSelect": "Loslegen",
+      "planBasic": {
+        "title": "Basis",
+        "price": "Kostenlos",
+        "feature1": "1 Curriò",
+        "feature2": "Begrenzte Vorlagen",
+        "feature3": "Standard-Support",
+        "feature4": "Curriò-Branding"
+      },
+      "planPro": {
+        "title": "Pro",
+        "price": "9,99€",
+        "feature1": "Bis zu 3 Curriòs",
+        "feature2": "Alle Vorlagen verfügbar",
+        "feature3": "Priorisierter Support",
+        "feature4": "Kein Curriò-Branding"
+      },
+      "planPremium": {
+        "title": "Premium",
+        "price": "19,99€",
+        "feature1": "Unbegrenzte Curriòs",
+        "feature2": "Anpassbare Vorlagen",
+        "feature3": "Dedizierter 24/7 Support",
+        "feature4": "Eigene Domain (opt.)"
+      }
+    },
+    "footer": {
+      "rights": "Alle Rechte vorbehalten.",
+      "madeWith": "Mit ❤️ und viel Leidenschaft gemacht."
+    },
+    "modal": {
+      "title": "Daten für Curriò eingeben",
+      "subtitle": "Geben Sie die Basisinformationen an, damit wir einen Entwurf Ihres Curriòs erstellen können.",
+      "form": {
+        "name": "Vollständiger Name",
+        "nameError": "Name ist erforderlich.",
+        "email": "E-Mail",
+        "emailErrorRequired": "E-Mail ist erforderlich.",
+        "emailErrorInvalid": "Geben Sie eine gültige E-Mail-Adresse ein.",
+        "experience": "Kurze Beschreibung der Erfahrungen (oder LinkedIn-Profillink)",
+        "experienceError": "Beschreibung der Erfahrungen ist erforderlich.",
+        "cvLabel": "Lebenslauf anhängen (PDF, JPG, PNG - Max. 5MB)",
+        "cvPrompt": "Ziehen Sie Ihre Datei hierher oder klicken Sie zum Auswählen.",
+        "cvSelected": "Datei ausgewählt",
+        "cvReplace": "Klicken oder ziehen Sie eine andere Datei zum Ersetzen",
+        "cvErrorType": "Dateiformat nicht unterstützt. Akzeptiert: PDF, JPG, PNG. (Bereitgestellt: {{type}})",
+        "cvErrorSize": "Datei zu groß (max. 5MB). Aktuelle Größe: {{size}}MB",
+        "submit": "Daten Senden"
+      },
+      "uploadingCVTitle": "Lebenslauf wird hochgeladen...",
+      "uploadingCVText": "Bitte warten.",
+      "uploadErrorTitle": "Fehler beim Hochladen",
+      "uploadErrorText": "Lebenslauf konnte nicht hochgeladen werden. Bitte versuchen Sie es erneut.",
+      "requestSentTitle": "Anfrage Gesendet!",
+      "requestSentText": "Ihre Daten wurden erfolgreich gesendet. Unser Team wird Sie in Kürze kontaktieren.",
+      "requestSentConfirm": "Fantastisch!"
+    },
+    "currioDefaultName": "Curriò von",
+    "currioDefaultHeroTitle": "Hallo, ich bin",
+    "currioDefaultAbout": "Profil von",
+    "currioDefaultAboutPlaceholder": "Geben Sie hier eine Beschreibung von sich ein."
+  }
 }

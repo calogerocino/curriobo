@@ -27,12 +27,16 @@
   justify-content: space-between;
   align-items: center;
   padding: 20px 40px;
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   box-sizing: border-box;
-  z-index: 10;
+  z-index: 1000;
+  background-color: rgba(0,0,0,0.1);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  transition: background-color 0.3s ease;
 }
 
 .logo {
@@ -76,16 +80,22 @@
   box-shadow: 0 4px 8px rgba(0,0,0,0.15);
 }
 
+.header.scrolled {
+  background-color: rgba(40, 50, 70, 0.85); /* Sfondo più scuro e meno trasparente */
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2); /* Leggera ombra per staccare */
+}
+
 .main-content {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   text-align: center;
-  padding: 100px 20px 60px;
-  min-height: 80vh;
+  padding: 120px 20px 60px;
+  min-height: 100vh;
   position: relative;
   z-index: 1;
+  box-sizing: border-box;
 }
 
 h1 {
@@ -363,3 +373,355 @@ textarea.ng-invalid.ng-touched {
   .drop-zone { padding: 20px; }
   .drop-zone-icon.feather { width: 40px; height: 40px; }
 }
+
+
+/* Stili Esistenti (accorciati per brevità) */
+:host {
+  display: block;
+  height: 100%;
+  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.6;
+  color: #ffffff;
+  overflow-x: hidden; /* Impedisce lo scroll orizzontale */
+}
+
+
+
+.main-content { /* Assicurati che il contenuto principale possa scrollare */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 120px 20px 60px; /* Aumentato padding top per header fisso */
+  min-height: 100vh; /* Occupa almeno tutta l'altezza della viewport */
+  position: relative;
+  z-index: 1;
+  box-sizing: border-box;
+}
+
+.scroll-down-indicator {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  cursor: pointer;
+  animation: bounce 2s infinite;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.scroll-down-indicator svg {
+  width: 2.5rem; /* 40px */
+  height: 2.5rem; /* 40px */
+}
+
+.scroll-down-indicator:hover {
+  color: #ffffff;
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateX(-50%) translateY(0);
+  }
+  40% {
+    transform: translateX(-50%) translateY(-10px);
+  }
+  60% {
+    transform: translateX(-50%) translateY(-5px);
+  }
+}
+
+/* Nuove Sezioni Informative */
+.info-section {
+  padding: 80px 20px;
+  min-height: 80vh; /* Altezza minima per dare spazio */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden; /* Per animazioni "slide-in" */
+  background-color: #fff; /* Sfondo per sezioni informative */
+  color: #333;
+  opacity: 0; /* Inizialmente nascoste per animazione */
+  transform: translateY(50px); /* Inizialmente spostate per animazione */
+  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.info-section.visible { /* Classe da aggiungere con JS allo scroll */
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.info-section.alt-bg {
+  background-color: #f8f9fa; /* Sfondo alternato per variazione */
+}
+
+.info-section .container {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.info-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 40px;
+}
+
+@media (min-width: 768px) {
+  .info-content {
+    flex-direction: row;
+    gap: 60px;
+  }
+  .info-section.alt-bg .info-content {
+    flex-direction: row-reverse; /* Inverte l'ordine per la sezione "why" */
+  }
+}
+
+.info-text {
+  flex: 1;
+  max-width: 500px;
+}
+
+.info-text h2 {
+  font-size: clamp(1.8rem, 4vw, 2.5rem);
+  color: #2c3e50;
+  margin-bottom: 25px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.info-text p, .info-text ul {
+  font-size: clamp(0.95rem, 2vw, 1.1rem);
+  color: #555;
+  margin-bottom: 20px;
+  line-height: 1.7;
+}
+
+.info-text ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.info-text ul li {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 15px;
+}
+
+.info-text ul li svg {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  color: #3498db; /* Blu per i checkmark */
+  margin-right: 12px;
+  margin-top: 2px;
+}
+
+.info-visual {
+  flex: 1;
+  max-width: 550px;
+}
+
+.info-visual img {
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Sezione Pricing */
+.pricing-section {
+  padding: 80px 20px;
+  background-color: #eef2f9; /* Un blu molto chiaro */
+  color: #333;
+  text-align: center;
+}
+
+.pricing-section .container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.pricing-section h2 {
+  font-size: clamp(2rem, 5vw, 3rem);
+  color: #1f3b64; /* Un blu più scuro */
+  margin-bottom: 20px;
+  font-weight: 700;
+}
+
+.pricing-subtitle {
+  font-size: clamp(1rem, 2.5vw, 1.25rem);
+  color: #5a728e;
+  margin-bottom: 60px;
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.pricing-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 30px;
+  align-items: stretch; /* Assicura che le card si allineino se hanno altezze diverse */
+}
+
+@media (min-width: 768px) {
+  .pricing-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .pricing-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.pricing-card {
+  background-color: #fff;
+  border-radius: 15px;
+  padding: 40px 30px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative; /* Per il badge "featured" */
+}
+
+.pricing-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.12);
+}
+
+.pricing-card.featured {
+  border: 3px solid #4A90E2; /* Un blu accattivante per il piano "featured" */
+  transform: scale(1.05); /* Leggermente più grande */
+}
+
+.featured-badge {
+  position: absolute;
+  top: -15px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #4A90E2;
+  color: white;
+  padding: 6px 15px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+
+.pricing-header h3 {
+  font-size: 1.6rem;
+  color: #2c3e50;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.pricing-header .price {
+  font-size: 2.8rem;
+  color: #4A90E2;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+.pricing-card.featured .pricing-header .price {
+    color: #3e7ac4; /* Colore più intenso per il piano featured */
+}
+
+.pricing-header .price span {
+  font-size: 1rem;
+  color: #7f8c8d;
+  font-weight: 400;
+}
+
+.features-list {
+  list-style: none;
+  padding: 0;
+  margin: 30px 0;
+  text-align: left;
+  flex-grow: 1; /* Fa sì che la lista occupi lo spazio rimanente */
+}
+
+.features-list li {
+  font-size: 1rem;
+  color: #555;
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+}
+
+.features-list li svg {
+  width: 20px;
+  height: 20px;
+  color: #27ae60; /* Verde per i checkmark dei vantaggi */
+  margin-right: 10px;
+  flex-shrink: 0;
+}
+
+.features-list li.dimmed {
+  color: #95a5a6; /* Grigio per feature non incluse */
+}
+
+.features-list li.dimmed svg {
+  color: #bdc3c7; /* Grigio più chiaro per i checkmark dimmati */
+}
+
+.pricing-cta {
+  display: block;
+  background-color: #4A90E2;
+  color: white;
+  padding: 14px 20px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 1rem;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  margin-top: auto; /* Spinge il bottone in fondo alla card */
+}
+
+.pricing-card.featured .pricing-cta {
+  background-color: #3e7ac4; /* Pulsante più scuro per il piano "featured" */
+}
+
+.pricing-cta:hover {
+  background-color: #357ABD;
+  transform: scale(1.03);
+}
+
+/* Footer Landing */
+.footer-landing {
+  background-color: #2c3e50; /* Blu scuro per il footer */
+  color: #bdc3c7; /* Grigio chiaro per il testo */
+  padding: 40px 20px;
+  text-align: center;
+}
+.footer-landing .container {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+.footer-landing p {
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+}
+.footer-landing .made-with {
+  font-style: italic;
+  font-size: 0.85rem;
+}
+
+/* Modal e Form - stili esistenti, potrebbero necessitare di aggiustamenti minori */
+.modal {
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto; /* Permette lo scroll nel modal se il contenuto è lungo */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.4s ease-in-out;
+}
+/* ... il resto degli stili del modal e del form rimane invariato ... */

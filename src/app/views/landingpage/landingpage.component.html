@@ -1,73 +1,241 @@
 <header class="header">
   <img src="assets/images/logo.png" alt="Curriò Logo" class="logo">
   <nav class="main-nav">
-    <a routerLink="/auth/login" class="nav-link customer-login-btn">Il mio Curriò!</a>
+    <a routerLink="/auth/login" class="nav-link customer-login-btn">{{ 'landingpage.nav.myCurrio' | translate }}</a>
   </nav>
 </header>
 
 <main class="main-content">
-  <h1>Curriò: Il tuo Curriculum del futuro, creato come un portfolio.</h1>
+  <h1>{{ 'landingpage.hero.title' | translate }}</h1>
   <p class="subheadline">
-    Smetti di perdere tempo con layout complicati. Lascia che la nostra tecnologia crei per te un curriculum/portfolio
-    automatico, visivamente sorprendente e personalizzato.
+    {{ 'landingpage.hero.subtitle' | translate }}
   </p>
-  <button (click)="openModal()" class="cta-button">Inizia Ora: Crea il Tuo Curriò</button>
+  <button (click)="openModal()" class="cta-button">{{ 'landingpage.hero.cta' | translate }}</button>
+  <div class="scroll-down-indicator" (click)="scrollToSection('discover-currio')">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+      class="w-10 h-10">
+      <path stroke-linecap="round" stroke-linejoin="round"
+        d="M9 12.75l3 3m0 0l3-3m-3 3v-7.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+  </div>
 </main>
+
+<section id="discover-currio" class="info-section">
+  <div class="info-content container">
+    <div class="info-text">
+      <h2>{{ 'landingpage.whatIs.title' | translate }}</h2>
+      <p>{{ 'landingpage.whatIs.p1' | translate }}</p>
+      <p>{{ 'landingpage.whatIs.p2' | translate }}</p>
+    </div>
+    <div class="info-visual">
+      <img src="assets/images/currio-showcase-1.png" alt="{{ 'landingpage.whatIs.imageAlt' | translate }}" />
+    </div>
+  </div>
+</section>
+
+<section id="why-currio" class="info-section alt-bg">
+  <div class="info-content container">
+    <div class="info-visual">
+      <img src="assets/images/currio-showcase-2.png" alt="{{ 'landingpage.whyCreate.imageAlt' | translate }}" />
+    </div>
+    <div class="info-text">
+      <h2>{{ 'landingpage.whyCreate.title' | translate }}</h2>
+      <ul>
+        <li><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
+            <path fill-rule="evenodd"
+              d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
+              clip-rule="evenodd" />
+          </svg>
+          {{ 'landingpage.whyCreate.benefit1' | translate }}
+        </li>
+        <li><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
+            <path fill-rule="evenodd"
+              d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
+              clip-rule="evenodd" />
+          </svg>
+          {{ 'landingpage.whyCreate.benefit2' | translate }}
+        </li>
+        <li><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
+            <path fill-rule="evenodd"
+              d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
+              clip-rule="evenodd" />
+          </svg>
+          {{ 'landingpage.whyCreate.benefit3' | translate }}
+        </li>
+         <li><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
+            <path fill-rule="evenodd"
+              d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
+              clip-rule="evenodd" />
+          </svg>
+          {{ 'landingpage.whyCreate.benefit4' | translate }}
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="pricing-plans" class="pricing-section">
+  <div class="container">
+    <h2>{{ 'landingpage.pricing.title' | translate }}</h2>
+    <p class="pricing-subtitle">{{ 'landingpage.pricing.subtitle' | translate }}</p>
+    <div class="pricing-grid">
+      <div class="pricing-card">
+        <div class="pricing-header">
+          <h3>{{ 'landingpage.pricing.planBasic.title' | translate }}</h3>
+          <p class="price">{{ 'landingpage.pricing.planBasic.price' | translate }}</p>
+        </div>
+        <ul class="features-list">
+          <li><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
+              <path fill-rule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
+                clip-rule="evenodd" />
+            </svg> {{ 'landingpage.pricing.planBasic.feature1' | translate }}</li>
+          <li><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
+              <path fill-rule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
+                clip-rule="evenodd" />
+            </svg> {{ 'landingpage.pricing.planBasic.feature2' | translate }}</li>
+          <li><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
+              <path fill-rule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
+                clip-rule="evenodd" />
+            </svg> {{ 'landingpage.pricing.planBasic.feature3' | translate }}</li>
+          <li class="dimmed"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
+              <path fill-rule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zM6.75 9.25a.75.75 0 000 1.5h6.5a.75.75 0 000-1.5h-6.5z"
+                clip-rule="evenodd" />
+            </svg> {{ 'landingpage.pricing.planBasic.feature4' | translate }}</li>
+        </ul>
+        <button class="pricing-cta" (click)="openModal()">{{ 'landingpage.pricing.ctaSelect' | translate }}</button>
+      </div>
+
+      <div class="pricing-card featured">
+        <div class="featured-badge">{{ 'landingpage.pricing.popular' | translate }}</div>
+        <div class="pricing-header">
+          <h3>{{ 'landingpage.pricing.planPro.title' | translate }}</h3>
+          <p class="price">{{ 'landingpage.pricing.planPro.price' | translate }} <span>/ {{ 'landingpage.pricing.month' | translate }}</span></p>
+        </div>
+        <ul class="features-list">
+          <li><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
+              <path fill-rule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
+                clip-rule="evenodd" />
+            </svg> {{ 'landingpage.pricing.planPro.feature1' | translate }}</li>
+          <li><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
+              <path fill-rule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
+                clip-rule="evenodd" />
+            </svg> {{ 'landingpage.pricing.planPro.feature2' | translate }}</li>
+          <li><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
+              <path fill-rule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
+                clip-rule="evenodd" />
+            </svg> {{ 'landingpage.pricing.planPro.feature3' | translate }}</li>
+          <li><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
+              <path fill-rule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
+                clip-rule="evenodd" />
+            </svg> {{ 'landingpage.pricing.planPro.feature4' | translate }}</li>
+        </ul>
+        <button class="pricing-cta" (click)="openModal()">{{ 'landingpage.pricing.ctaSelect' | translate }}</button>
+      </div>
+
+      <div class="pricing-card">
+        <div class="pricing-header">
+          <h3>{{ 'landingpage.pricing.planPremium.title' | translate }}</h3>
+          <p class="price">{{ 'landingpage.pricing.planPremium.price' | translate }} <span>/ {{ 'landingpage.pricing.month' | translate }}</span></p>
+        </div>
+        <ul class="features-list">
+          <li><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
+              <path fill-rule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
+                clip-rule="evenodd" />
+            </svg> {{ 'landingpage.pricing.planPremium.feature1' | translate }}</li>
+          <li><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
+              <path fill-rule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
+                clip-rule="evenodd" />
+            </svg> {{ 'landingpage.pricing.planPremium.feature2' | translate }}</li>
+          <li><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
+              <path fill-rule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
+                clip-rule="evenodd" />
+            </svg> {{ 'landingpage.pricing.planPremium.feature3' | translate }}</li>
+          <li><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
+              <path fill-rule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
+                clip-rule="evenodd" />
+            </svg> {{ 'landingpage.pricing.planPremium.feature4' | translate }}</li>
+        </ul>
+        <button class="pricing-cta" (click)="openModal()">{{ 'landingpage.pricing.ctaSelect' | translate }}</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="footer-landing">
+  <div class="container">
+    <p>&copy; {{ currentYear }} Curriò. {{ 'landingpage.footer.rights' | translate }}</p>
+    <p class="made-with">{{ 'landingpage.footer.madeWith' | translate }}</p>
+  </div>
+</footer>
+
 
 <div id="formModal" class="modal" *ngIf="isModalOpen" (keydown.escape)="closeModal()" tabindex="0">
   <div class="modal-content" (click)="$event.stopPropagation()">
     <span class="close-button" (click)="closeModal()">&times;</span>
-    <h2>Inserisci i dati per Curriò</h2>
-    <p>Fornisci le informazioni base per permetterci di generare una bozza del tuo Curriò.</p>
+    <h2>{{ 'landingpage.modal.title' | translate }}</h2>
+    <p>{{ 'landingpage.modal.subtitle' | translate }}</p>
 
     <form id="currioForm" #currioForm="ngForm" (ngSubmit)="onSubmit(currioForm)">
       <div class="form-group">
-        <label for="nome">Nome Completo:</label>
+        <label for="nome">{{ 'landingpage.modal.form.name' | translate }}:</label>
         <input type="text" id="nome" name="nome" [(ngModel)]="formData.nome" required #nomeInput="ngModel">
         <div *ngIf="nomeInput.invalid && (nomeInput.dirty || nomeInput.touched)" class="error-message">
-          Nome è obbligatorio.
+          {{ 'landingpage.modal.form.nameError' | translate }}
         </div>
       </div>
 
       <div class="form-group">
-        <label for="email">Email:</label>
+        <label for="email">{{ 'landingpage.modal.form.email' | translate }}:</label>
         <input type="email" id="email" name="email" [(ngModel)]="formData.email" required email #emailInput="ngModel">
         <div *ngIf="emailInput.invalid && (emailInput.dirty || emailInput.touched)" class="error-message">
-          <span *ngIf="emailInput.errors?.['required']">Email è obbligatoria.</span>
-          <span *ngIf="emailInput.errors?.['email']">Inserisci un indirizzo email valido.</span>
+          <span *ngIf="emailInput.errors?.['required']">{{ 'landingpage.modal.form.emailErrorRequired' | translate
+            }}</span>
+          <span *ngIf="emailInput.errors?.['email']">{{ 'landingpage.modal.form.emailErrorInvalid' | translate
+            }}</span>
         </div>
       </div>
 
       <div class="form-group">
-        <label for="esperienze">Breve descrizione esperienze (o link profilo LinkedIn):</label>
+        <label for="esperienze">{{ 'landingpage.modal.form.experience' | translate }}:</label>
         <textarea id="esperienze" name="esperienze" rows="4" [(ngModel)]="formData.esperienze" required
           #esperienzeInput="ngModel"></textarea>
         <div *ngIf="esperienzeInput.invalid && (esperienzeInput.dirty || esperienzeInput.touched)"
           class="error-message">
-          Descrizione esperienze è obbligatoria.
+          {{ 'landingpage.modal.form.experienceError' | translate }}
         </div>
       </div>
       <div class="form-group">
-        <label for="curriculumFileDropZone">Allega Curriculum (PDF, JPG, PNG - Max 5MB):</label>
+        <label for="curriculumFileDropZone">{{ 'landingpage.modal.form.cvLabel' | translate }}:</label>
         <div id="curriculumFileDropZone" class="drop-zone" (click)="fileInput.click()" (dragover)="onDragOver($event)"
           (dragleave)="onDragLeave($event)" (drop)="onDrop($event)" [class.drag-over]="isDraggingOver">
           <input type="file" #fileInput id="curriculumFile" name="curriculumFile" (change)="onFileSelected($event)"
             accept=".pdf,.jpg,.jpeg,.png" style="display: none" />
           <div class="drop-zone-prompt">
-            <p *ngIf="!selectedFileName">Trascina il tuo file qui o clicca per selezionare.</p>
+            <p *ngIf="!selectedFileName">{{ 'landingpage.modal.form.cvPrompt' | translate }}</p>
             <p *ngIf="selectedFileName" class="file-selected-text">
-              File Selezionato: <strong>{{ selectedFileName }}</strong>
+              {{ 'landingpage.modal.form.cvSelected' | translate }}: <strong>{{ selectedFileName }}</strong>
               <br>
-              <small>(Clicca o trascina un altro file per sostituire)</small>
+              <small>({{ 'landingpage.modal.form.cvReplace' | translate }})</small>
             </p>
             <span class="drop-zone-icon feather icon-upload-cloud"></span>
           </div>
         </div>
         <div *ngIf="fileError" class="error-message mt-1">{{ fileError }}</div>
       </div>
-
-
-      <button type="submit" class="submit-button" [disabled]="!currioForm.valid">Invia Dati</button>
+      <button type="submit" class="submit-button" [disabled]="!currioForm.valid">{{ 'landingpage.modal.form.submit' |
+        translate }}</button>
     </form>
   </div>
   <div class="modal-overlay" (click)="closeModal()"></div>

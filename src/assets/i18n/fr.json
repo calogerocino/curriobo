@@ -1,69 +1,315 @@
 {
-	"generale.errori.camporichiesto": "Le champ est obligatoire",
-	"generale.errori.caratteriminimi": "Nombre minimum de caractères :",
-	"generale.errori.mailvalida": "Entrer un email valide",
-	"generale.errori.nonsupportato": "Pas encore pris en charge",
-	"generale.errori.pass8car": "Le mot de passe doit contenir au moins 8 caractères",
-	"generale.errori.passpatt": "Le mot de passe doit contenir une lettre majuscule, une lettre minuscule et une lettre spéciale !",
-	"generale.home": "Bienvenue à CurriòDashboard",
-	"generale.layout.linguaa": "Langue",
-	"generale.layout.lingua": "Français",
-	"generale.layout.menu.catalogo.buonisconto": "Coupons",
-	"generale.layout.menu.catalogo.catalogo": "Catalogue",
-	"generale.layout.menu.catalogo.categorie": "Catégories",
-	"generale.layout.menu.catalogo.marche": "Marques et Fournisseurs",
-	"generale.layout.menu.catalogo.prodotti": "Produits",
-	"generale.layout.menu.clienti.clienti": "Clientèle",
-	"generale.layout.menu.clienti.indirizzi": "Adresses",
-	"generale.layout.menu.contabilita.utenti": "utilisateurs",
-	"generale.layout.menu.dashboard": "Tableau de bord",
-	"generale.layout.menu.richieste": "Demandes",
-	"generale.layout.menu.richieste.listarichieste": "Liste des demandes",
-	"generale.layout.menu.richieste.listacurrio": "Liste Curriò",
-	"generale.layout.menu.listautenti": "Liste d'utilisateur",
-	"generale.layout.menu.main": "Principal",
-	"generale.layout.menu.sito": "Site",
-  "generale.layout.menu.discord": "Discord",
-	"generale.layout.navbar.accessirapidi": "Accès rapides",
-	"generale.layout.navbar.attivita": "Activités",
-	"generale.layout.navbar.database": "Base de données",
-	"generale.layout.navbar.datiazienda": "Les données de la compagnie",
-	"generale.layout.navbar.eliminatutti": "Supprimer tout",
-	"generale.layout.navbar.esci": "Fermer la session",
-	"generale.layout.navbar.eseguiricerca": "Effectuer une recherche...",
-	"generale.layout.navbar.impostazioni": "Réglages",
-	"generale.layout.navbar.nuovemail": "Nouveaux e-mails",
-	"generale.layout.navbar.nuovenotifiche": "Nouvelles notifications",
-	"generale.layout.navbar.visualizzatutti": "Voir tout",
-	"generale.shared.modifica": "Editer",
-	"generale.shared.aggiorna": "Mettre à jour",
-	"generale.shared.elimina": "Supprimer",
-	"generale.shared.elimina": "Annuler",
-	"profiloUtente.aggiornapassword": "Mettre à jour le mot de passe",
-	"profiloUtente.aggiornaprofilo": "Mettre à jour le profil",
-	"profiloUtente.caricamentoimg": "Télécharger l'image",
-	"profiloUtente.cellulare": "Portable",
-	"profiloUtente.cellulare-set": "Livraison à définir",
-	"profiloUtente.email": "Email",
-	"profiloUtente.email-set": "E-mail à définir",
-	"profiloUtente.indirizzo": "Adresse",
-	"profiloUtente.indirizzo-set": "Adresse à définir",
-	"profiloUtente.inviamessaggio": "Envoyer un message",
-	"profiloUtente.mailnonverificata": "L'e-mail n'a pas été vérifié !",
-	"profiloUtente.nome": "Nom visualisé",
-	"profiloUtente.nome-set": "Nom à définir",
-	"profiloUtente.password": "Mot de passe",
-	"profiloUtente.password-set": "Nouveau mot de passe",
-	"profiloUtente.password-setre": "Répéter le nouveau mot de passe",
-	"profiloUtente.profilo": "Profil",
-	"profiloUtente.ruolo": "Rôle",
-	"profiloUtente.ruolo-set": "Rôle à définir",
-  "profiloUtente.avvisoModificheNonSalvate": "N'oubliez pas d'enregistrer les informations avant de fermer la page.",
-	"tabella.head.Azioni": "Actes",
-	"tabella.head.idlocale": "Identifiant utilisateur",
-	"tabella.head.immagine": "Image",
-	"tabella.head.mailverificata": "Email vérifié",
-	"tabella.head.nome": "Prénom",
-  "tabella.head.stato": "Etat",
-"tabella.head.descrizione": "Description"
+  "generale": {
+    "errori": {
+      "camporichiesto": "Le champ est obligatoire",
+      "caratteriminimi": "Nombre minimum de caractères :",
+      "mailvalida": "Entrez une adresse e-mail valide",
+      "nonsupportato": "Pas encore pris en charge",
+      "pass8car": "Le mot de passe doit contenir au moins 8 caractères",
+      "passpatt": "Le mot de passe doit contenir une lettre majuscule, une lettre minuscule et un caractère spécial !",
+      "attenzione": "Attention !",
+      "compilaCampi": "Veuillez remplir tous les champs obligatoires."
+    },
+    "home": "Bienvenue sur CurriòDashboard",
+    "layout": {
+      "linguaa": "Langue",
+      "lingua": "Français",
+      "menu": {
+        "catalogo": {
+          "buonisconto": "Bons de réduction",
+          "catalogo": "Catalogue",
+          "categorie": "Catégories",
+          "marche": "Marques et Fournisseurs",
+          "prodotti": "Produits"
+        },
+        "clienti": {
+          "clienti": "Clients",
+          "indirizzi": "Adresses"
+        },
+        "contabilita": {
+          "utenti": "Utilisateurs"
+        },
+        "dashboard": "Tableau de bord",
+        "richieste": "Demandes",
+        "richieste_listarichieste": "Liste des demandes",
+        "richieste_listacurrio": "Liste Curriò",
+        "listautenti": "Liste des utilisateurs",
+        "main": "Principal",
+        "sito": "Site",
+        "discord": "Discord"
+      },
+      "navbar": {
+        "accessirapidi": "Accès rapides",
+        "attivita": "Activités",
+        "database": "Base de données",
+        "datiazienda": "Données de l'entreprise",
+        "eliminatutti": "Tout supprimer",
+        "esci": "Se déconnecter",
+        "eseguiricerca": "Effectuer une recherche...",
+        "impostazioni": "Paramètres",
+        "nuovemail": "Nouveaux e-mails",
+        "nuovenotifiche": "Nouvelles notifications",
+        "visualizzatutti": "Voir tout",
+        "nessunanuovanotifica": "Aucune nouvelle notification"
+      }
+    },
+    "shared": {
+      "modifica": "Modifier",
+      "aggiorna": "Mettre à jour",
+      "elimina": "Supprimer",
+      "annulla": "Annuler",
+      "salva": "Enregistrer les modifications",
+      "ok": "Ok"
+    }
+  },
+  "profiloUtente": {
+    "aggiornapassword": "Mettre à jour le mot de passe",
+    "aggiornaprofilo": "Mettre à jour le profil",
+    "caricamentoimg": "Chargement de l'image",
+    "cellulare": "Portable",
+    "cellulare-set": "Coordonnées à définir",
+    "email": "E-mail",
+    "email-set": "E-mail à définir",
+    "indirizzo": "Adresse",
+    "indirizzo-set": "Adresse à définir",
+    "inviamessaggio": "Envoyer un message",
+    "mailnonverificata": "L'e-mail n'a pas été vérifié !",
+    "nome": "Nom affiché",
+    "nome-set": "Nom à définir",
+    "password": "Mot de passe",
+    "password-set": "Nouveau mot de passe",
+    "password-setre": "Répéter le nouveau mot de passe",
+    "profilo": "Profil",
+    "ruolo": "Rôle",
+    "ruolo-set": "Rôle à définir",
+    "avvisoModificheNonSalvate": "N'oubliez pas d'enregistrer les informations avant de fermer la page.",
+    "mailverificata": "E-mail Verifié"
+  },
+  "tabella": {
+    "head": {
+      "Azioni": "Actions",
+      "idlocale": "ID Utilisateur",
+      "immagine": "Image",
+      "mailverificata": "E-mail vérifié",
+      "nome": "Nom",
+      "stato": "État",
+      "descrizione": "Descriptions"
+    }
+  },
+  "status": {
+    "nuova_richiesta": "Nouvelle Demande",
+    "invito_spedito": "Invitation Envoyée",
+    "attivo": "Actif",
+    "archiviato": "Archivé",
+    "sconosciuto": "Inconnu"
+  },
+  "customer": {
+    "menu": {
+      "profile": "Mon Profil",
+      "currio": "Mon Curriò"
+    },
+    "currio": {
+      "form": {
+        "templateScelto": {
+          "titolo": "Choisissez le Style de Votre Curriò",
+          "label": "Sélectionnez un modèle :",
+          "modern": "Moderne",
+          "vintage": "Vintage",
+          "classic": "Classique"
+        },
+        "nomePortfolio": "Nom de Votre Curriò (ex. Portfolio de Marie Dupont)",
+        "heroTitle": "Titre Principal (ex. Bonjour, je suis Marie !)",
+        "heroSubtitle": "Sous-titre (une brève description de vous)",
+        "linguaDefault": "Langue par Défaut du Curriò",
+        "chiSonoFotoUrl": "URL de Votre Photo (optionnel)",
+        "chiSonoDescrizione1": "Description 'Qui Suis-je' (paragraphe 1)",
+        "chiSonoDescrizione2": "Description 'Qui Suis-je' (paragraphe 2, optionnel)",
+        "contattiEmail": "E-mail Public (pour le Curriò)",
+        "contattiGithub": "Profil GitHub (URL complète)",
+        "contattiLinkedin": "Profil LinkedIn (URL complète)",
+        "contattiInstagram": "Profil Instagram (URL complète)",
+        "progetto": {
+          "titolo": "Titre du Projet",
+          "descrizione": "Description du Projet",
+          "immagineUrl": "URL de l'Image du Projet",
+          "linkProgetto": "Lien vers le Projet (ex. GitHub, site en ligne)",
+          "tags": "Technologies/Tags (séparés par des virgules)"
+        },
+        "esperienza": {
+          "titolo": "Poste/Titre d'Études",
+          "tipo": "Type (Travail/Formation)",
+          "aziendaScuola": "Entreprise/École",
+          "date": "Dates (ex. Jan 2020 - Déc 2022)",
+          "descrizioneBreve": "Description Brève",
+          "dettagli": "Détails (un point par ligne)",
+          "competenzeAcquisite": "Compétences Acquises (séparées par des virgules)"
+        },
+        "competenza": {
+          "nome": "Nom de la Compétence (ex. JavaScript)",
+          "livello": "Niveau (ex. Avancé, Intermédiaire)",
+          "icona": "Icône SVG (optionnel, code HTML/SVG)"
+        }
+      },
+      "title": "Paramètres Curriò",
+      "updateCurrio": "Mettre à Jour Curriò",
+      "progettiTitle": "Mes Projets",
+      "esperienzeTitle": "Mes Expériences",
+      "competenzeTitle": "Mes Compétences",
+      "addProgetto": "Ajouter Projet",
+      "addEsperienza": "Ajouter Expérience",
+      "addCompetenza": "Ajouter Compétence",
+      "remove": "Supprimer"
+    },
+    "dashboard": {
+      "welcome": "Bienvenue dans votre Espace Personnel",
+      "intro": "D'ici, vous pouvez gérer les informations de votre compte et de votre Curriò."
+    },
+    "account": {
+      "title": "Informations du Compte",
+      "updateProfile": "Mettre à Jour le Profil",
+      "changePassword": "Changer le Mot de Passe",
+      "currentPassword": "Mot de Passe Actuel",
+      "newPassword": "Nouveau Mot de Passe",
+      "confirmNewPassword": "Confirmer le Nouveau Mot de Passe"
+    },
+    "logout": "Se déconnecter"
+  },
+  "currioPreview": {
+    "pageTitle": "Mon Curriò - {{ pageTitleName }}",
+    "navHome": "Accueil",
+    "navProjects": "Projets",
+    "navSkills": "Compétences",
+    "navCV": "Expériences",
+    "navAbout": "À Propos",
+    "navContact": "Contact",
+    "navHomeMobile": "Accueil",
+    "navProjectsMobile": "Projets",
+    "navSkillsMobile": "Compétences",
+    "navCVMobile": "Expériences",
+    "navAboutMobile": "À Propos",
+    "navContactMobile": "Contact",
+    "heroCTA": "Découvrez mes Travaux",
+    "projectsTitle": "Projets à la Une",
+    "projectDetailsButton": "Voir Détails",
+    "cvTitle": "Expériences et Formation",
+    "skillsTitle": "Mes Compétences",
+    "aboutTitle": "Qui Suis-je",
+    "profilePhotoAlt": "Photo de Profil",
+    "contactTitle": "Contactons-nous",
+    "contactSubtitle": "Intéressé par une collaboration ou une question ? N'hésitez pas à m'écrire.",
+    "contactButton": "Envoyez-moi un E-mail",
+    "footerRights": "Tous droits réservés.",
+    "footerMadeWith": "Réalisé avec ❤️ et Tailwind CSS.",
+    "viewMoreDetails": "Plus de détails",
+    "work": "Travail",
+    "education": "Formation",
+    "errorTitle": "Erreur de Chargement du Curriò",
+    "errorMessage": "Désolé, les données du Curriò demandé n'ont pas pu être chargées.",
+    "backToList": "Retour à la Liste Curriò",
+    "cvSoftSkillsTitle": "Compétences Non Techniques",
+    "cvSoftSkill1": "Résolution de Problèmes",
+    "cvSoftSkill2": "Travail d'Équipe",
+    "cvSoftSkill3": "Communication Efficace",
+    "cvSoftSkill4": "Adaptabilité",
+    "cvSoftSkill5": "Créativité",
+    "cvSoftSkill6": "Gestion du Temps",
+    "cvLanguagesTitle": "Langues",
+    "cvLangItalian": "Italien",
+    "cvLangItalianLevel": "Langue Maternelle",
+    "cvLangEnglish": "Anglais",
+    "cvLangEnglishLevel": "Courant (C1)",
+    "downloadCV": "Télécharger CV",
+    "openMenu": "Ouvrir le menu",
+    "closeMenu": "Fermer le menu"
+  },
+  "landingpage": {
+    "nav": {
+      "myCurrio": "Mon Curriò !"
+    },
+    "hero": {
+      "title": "Curriò : Votre curriculum vitae du futur, créé comme un portfolio.",
+      "subtitle": "Arrêtez de perdre du temps avec des mises en page compliquées. Laissez notre technologie créer pour vous un curriculum/portfolio automatique, visuellement époustouflant et personnalisé.",
+      "cta": "Commencez Maintenant : Créez Votre Curriò"
+    },
+    "whatIs": {
+      "title": "Qu'est-ce qu'un Curriò ?",
+      "p1": "Curriò révolutionne la façon dont vous vous présentez. Ce n'est pas seulement un CV, c'est votre vitrine numérique dynamique, un portfolio interactif qui raconte votre histoire professionnelle de manière engageante et moderne. Montrez qui vous êtes, ce que vous savez faire et les projets dont vous êtes fier, le tout en un seul endroit.",
+      "p2": "Oubliez les PDF statiques. Avec Curriò, vos compétences prennent vie, vos projets brillent et votre unicité émerge, captant l'attention des recruteurs et des collaborateurs.",
+      "imageAlt": "Aperçu d'un Curriò moderne et dynamique"
+    },
+    "whyCreate": {
+      "title": "Pourquoi créer votre Curriò ?",
+      "benefit1": "Démarquez-vous avec un format innovant et attrayant.",
+      "benefit2": "Racontez votre histoire professionnelle de manière complète et visuelle.",
+      "benefit3": "Facile à mettre à jour, toujours prêt pour de nouvelles opportunités.",
+      "benefit4": "Accessible partout, sur n'importe quel appareil, pour une visibilité maximale.",
+      "imageAlt": "Illustration des avantages de Curriò"
+    },
+    "pricing": {
+      "title": "Choisissez le Plan Parfait pour Vous",
+      "subtitle": "Commencez gratuitement ou débloquez des fonctionnalités avancées pour faire briller votre profil.",
+      "month": "paiement unique",
+      "popular": "Populaire",
+      "ctaSelect": "Commencer",
+      "planBasic": {
+        "title": "Basique",
+        "price": "Gratuit",
+        "feature1": "1 Curriò",
+        "feature2": "Modèles limités",
+        "feature3": "Support standard",
+        "feature4": "Marque Curriò"
+      },
+      "planPro": {
+        "title": "Pro",
+        "price": "9.99€",
+        "feature1": "Jusqu'à 3 Curriòs",
+        "feature2": "Tous les modèles disponibles",
+        "feature3": "Support prioritaire",
+        "feature4": "Aucune marque Curriò"
+      },
+      "planPremium": {
+        "title": "Premium",
+        "price": "19.99€",
+        "feature1": "Curriòs illimités",
+        "feature2": "Modèles personnalisables",
+        "feature3": "Support dédié 24/7",
+        "feature4": "Domaine personnalisé (opt.)"
+      }
+    },
+    "footer": {
+      "rights": "Tous droits réservés.",
+      "madeWith": "Réalisé avec ❤️ et beaucoup de passion."
+    },
+    "modal": {
+      "title": "Entrez les données pour Curriò",
+      "subtitle": "Fournissez les informations de base pour nous permettre de générer une ébauche de votre Curriò.",
+      "form": {
+        "name": "Nom Complet",
+        "nameError": "Le nom est obligatoire.",
+        "email": "E-mail",
+        "emailErrorRequired": "L'e-mail est obligatoire.",
+        "emailErrorInvalid": "Entrez une adresse e-mail valide.",
+        "experience": "Brève description des expériences (ou lien profil LinkedIn)",
+        "experienceError": "La description des expériences est obligatoire.",
+        "cvLabel": "Joindre CV (PDF, JPG, PNG - Max 5Mo)",
+        "cvPrompt": "Faites glisser votre fichier ici ou cliquez pour sélectionner.",
+        "cvSelected": "Fichier Sélectionné",
+        "cvReplace": "Cliquez ou faites glisser un autre fichier pour remplacer",
+        "cvErrorType": "Format de fichier non pris en charge. Acceptés : PDF, JPG, PNG. (Fourni : {{type}})",
+        "cvErrorSize": "Fichier trop volumineux (max 5Mo). Taille actuelle : {{size}}Mo",
+        "submit": "Envoyer les Données"
+      },
+      "uploadingCVTitle": "Chargement du CV...",
+      "uploadingCVText": "Veuillez patienter.",
+      "uploadErrorTitle": "Erreur de Chargement",
+      "uploadErrorText": "Impossible de charger le CV. Veuillez réessayer.",
+      "requestSentTitle": "Demande Envoyée !",
+      "requestSentText": "Vos données ont été envoyées avec succès. Notre équipe vous contactera sous peu.",
+      "requestSentConfirm": "Fantastique !"
+    },
+    "currioDefaultName": "Le Curriò de",
+    "currioDefaultHeroTitle": "Bonjour, je suis",
+    "currioDefaultAbout": "Profil de",
+    "currioDefaultAboutPlaceholder": "Entrez une description de vous ici."
+  }
 }
