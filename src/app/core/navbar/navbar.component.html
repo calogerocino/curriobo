@@ -45,115 +45,102 @@
         </a>
         <div ngbDropdownMenu aria-labelledby="appsDropdown">
           <div class="dropdown-header d-flex align-items-center justify-content-between">
-            <p class="mb-0 font-weight-medium">a</p>
-            <a href="" (click)="false" class="text-muted">{{'generale.shared.modifica' | translate}}</a>
+            <p class="mb-0 font-weight-medium">{{'generale.layout.navbar.accessirapidi' | translate}}</p>
           </div>
           <div class="dropdown-body">
             <div class="d-flex align-items-center apps">
-              <a routerLink="/apps/chat"><i class="feather icon-message-square"></i>
-                <p>{{'generale.layout.menu.ordini.listaordini' | translate}}</p>
+              <a routerLink="/admin/currio/listacurrio">
+                <i class="feather icon-file-text"></i>
+                <p>{{'generale.layout.menu.richieste.listacurrio' | translate}}</p>
               </a>
-              <a routerLink="/apps/calendar"><i class="feather icon-user"></i>
+              <a routerLink="/admin/utente/utenti">
+                <i class="feather icon-users"></i>
                 <p>{{'generale.layout.menu.listautenti' | translate}}</p>
               </a>
-              <a routerLink="/apps/email/inbox"><i class="feather icon-mail"></i>
-                <p>{{'profiloUtente.email' | translate}}</p>
+              <a routerLink="/admin/dashboard">
+                <i class="feather icon-home"></i>
+                <p>{{'generale.layout.menu.dashboard' | translate}}</p>
               </a>
-              <a routerLink="/general/profile"><i class="feather icon-instagram"></i>
+              <a *ngIf="connectedUser$ | async as userData" [routerLink]="['/admin/utente/profilo/', userData.localId]">
+                <i class="feather icon-user"></i>
                 <p>{{'profiloUtente.profilo' | translate}}</p>
               </a>
             </div>
           </div>
-          <div class="dropdown-footer d-flex align-items-center justify-content-center">
-            <a href="" (click)="false">{{'generale.layout.navbar.visualizzatutti' | translate}}</a>
-          </div>
         </div>
       </li>
-      <li class="nav-item nav-messages" ngbDropdown>
-        <a class="nav-link" ngbDropdownToggle id="messageDropdown">
-          <i class="link-icon feather icon-mail"></i>
-        </a>
-        <div ngbDropdownMenu aria-labelledby="messageDropdown">
-          <div class="dropdown-header d-flex align-items-center justify-content-between">
-            <p class="mb-0 font-weight-medium">{{'generale.layout.navbar.nuovemail' | translate}}</p>
-            <a href="" (click)="false" class="text-muted">{{'generale.layout.navbar.eliminatutti' | translate}}</a>
-          </div>
-          <div class="dropdown-body">
-                    </div>
-          <div class="dropdown-footer d-flex align-items-center justify-content-center">
-            <a href="" (click)="false">{{'generale.layout.navbar.visualizzatutti' | translate}}</a>
-          </div>
-        </div>
-      </li>
+
       <li class="nav-item nav-notifications" ngbDropdown>
         <a class="nav-link" ngbDropdownToggle id="notificationDropdown">
           <i class="link-icon feather icon-bell"></i>
-          <div class="indicator">
+          <div class="indicator" *ngIf="ciSonoNuoveRichieste$ | async">
             <div class="circle"></div>
           </div>
         </a>
         <div ngbDropdownMenu aria-labelledby="notificationDropdown">
           <div class="dropdown-header d-flex align-items-center justify-content-between">
-            <p class="mb-0 font-weight-medium">{{'generale.layout.navbar.nuovenotifiche' | translate}}</p>
-            <a href="" (click)="false" class="text-muted">{{'generale.layout.navbar.eliminatutti' | translate}}</a>
-          </div>
+            <p class="mb-0 font-weight-medium">
+              {{ (conteggioNuoveRichieste$ | async) || 0 }} {{'generale.layout.navbar.nuovenotifiche' | translate }}
+            </p>
+            </div>
           <div class="dropdown-body">
-                     </div>
+            <ng-container *ngIf="(conteggioNuoveRichieste$ | async) > 0; else noNotificationsBlock">
+              <a *ngFor="let notifica of (nuoveRichiesteCurrio$ | async)"
+                 (click)="apriRichiestaCurrio(notifica.id)"
+                 class="dropdown-item d-flex align-items-center py-2">
+                <div class="wd-30 ht-30 d-flex align-items-center justify-content-center bg-primary rounded-circle me-3 flex-shrink-0">
+                  <i class="feather icon-file-plus text-white icon-sm"></i>
+                </div>
+                <div class="flex-grow-1 me-2">
+                  <p>{{ 'Nuova richiesta Curriò da' | translate }}:<br><strong>{{ notifica.datiCliente?.nome || 'Sconosciuto' }}</strong></p>
+                  <p class="tx-12 text-muted">{{ notifica.datiCliente?.email }}</p>
+                </div>
+              </a>
+            </ng-container>
+            <ng-template #noNotificationsBlock>
+                <div class="text-center py-3 px-3 text-muted">
+                    {{ 'generale.layout.navbar.nessunanuovanotifica' | translate }}
+                </div>
+            </ng-template>
+          </div>
           <div class="dropdown-footer d-flex align-items-center justify-content-center">
-            <a href="" (click)="false">{{'generale.layout.navbar.visualizzatutti' | translate}}</a>
+            <a href="#" (click)="$event.preventDefault(); visualizzaTutteLeRichieste()">{{'generale.layout.navbar.visualizzatutti' | translate}}</a>
           </div>
         </div>
       </li>
+
       <li class="nav-item nav-profile" ngbDropdown *ngIf="connectedUser$ | async as userData">
         <a class="nav-link" ngbDropdownToggle id="profileDropdown">
-          <img [src]="userData.photoURL" alt="profile">
+          <img [src]="userData.photoURL || 'assets/images/default-avatar.png'" alt="profile">
         </a>
         <div ngbDropdownMenu aria-labelledby="profileDropdown">
           <div class="dropdown-header d-flex flex-column align-items-center">
             <div class="figure mb-3">
-              <img [src]="userData.photoURL" alt="">
+              <img [src]="userData.photoURL || 'assets/images/default-avatar.png'" alt="User photo">
             </div>
             <div class="info text-center">
               <p class="name font-weight-bold mb-0">
-                {{userData.displayName?userData.displayName:'profiloUtente.nome-set' | translate}}</p>
-              <p class="email text-muted mb-3">{{userData.email?userData.email:'profiloUtente.email-set' | translate}}
+                {{userData.displayName?userData.displayName:('profiloUtente.nome-set' | translate)}}</p>
+              <p class="email text-muted mb-3">{{userData.email?userData.email:('profiloUtente.email-set' | translate)}}
               </p>
             </div>
           </div>
           <div class="dropdown-body">
             <ul class="profile-nav p-0 pt-3">
               <li class="nav-item">
-                <a routerLink="/admin/utente/profilo/{{userData.localId}}" class="nav-link">
+                <a [routerLink]="['/admin/utente/profilo/', userData.localId]" class="nav-link">
                   <i class="feather icon-user"></i>
                   <span>{{'profiloUtente.profilo' | translate}}</span>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="" (click)="false" class="nav-link">
-                  <i class="feather icon-globe"></i>
-                  <span>{{'generale.layout.navbar.datiazienda' | translate}}</span>
-                </a>
-              </li>
-              <li class="nav-item" style="border-bottom: 1px solid #f2f4f9;">
-                <a href="" (click)="false" class="nav-link">
-                  <i class="feather icon-activity"></i>
-                  <span>{{'generale.layout.navbar.attivita' | translate}}</span>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="" (click)="false" class="nav-link">
-                  <i class="feather icon-database"></i>
-                  <span>{{'generale.layout.navbar.database' | translate}}</span>
-                </a>
-              </li>
-              <li class="nav-item" style="border-bottom: 1px solid #f2f4f9;">
-                <a href="" (click)="false" class="nav-link">
+                <a (click)="$event.preventDefault()" class="nav-link">
                   <i class="feather icon-settings"></i>
                   <span>{{'generale.layout.navbar.impostazioni' | translate}}</span>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="" (click)="signOut($event)" class="nav-link">
+                <a href="#" (click)="signOut($event)" class="nav-link">
                   <i class="feather icon-log-out"></i>
                   <span>{{'generale.layout.navbar.esci' | translate}}</span>
                 </a>

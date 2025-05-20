@@ -1,11 +1,11 @@
 import { Component, OnInit, OnDestroy } from "@angular/core";
 import { Observable, Subject, Subscription } from "rxjs";
-import { map,  takeUntil } from 'rxjs/operators';
+import { map, takeUntil, distinctUntilChanged } from 'rxjs/operators';
 import { Currio } from "src/app/shared/models/currio.model";
 import { CurrioSubmission } from "src/app/shared/models/currio-submission.model";
 import { Store } from "@ngrx/store";
 import { AppState } from "src/app/shared/app.state";
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router'; // Import ActivatedRoute
 import { getCurrios, getCurrioSubmissions } from "../state/currio.selector";
 import { loadCurrios, loadCurrioSubmissions, deleteCurrio } from "../state/currio.action";
 import Swal from 'sweetalert2';
@@ -20,37 +20,36 @@ type CurrioStatusType = 'nuova_richiesta' | 'invito_spedito' | 'attivo' | 'archi
 export class ListaCurrioComponent implements OnInit, OnDestroy {
   currios$: Observable<Currio[]>;
   filteredCurrios$: Observable<Currio[]>;
-  currioSubmissions$: Observable<CurrioSubmission[]>;
 
   selectedStatusFilter: CurrioStatusType | "" = "";
 
   private allCurrios: Currio[] = [];
-  private curriosSubscription: Subscription | undefined;
   private destroy$ = new Subject<void>();
 
   constructor(
     private readonly store: Store<AppState>,
-    private readonly router: Router
+    private readonly router: Router,
+    private readonly activatedRoute: ActivatedRoute
   ) {
     this.currios$ = this.store.select(getCurrios);
-    this.currioSubmissions$ = this.store.select(getCurrioSubmissions);
   }
 
   ngOnInit(): void {
     this.store.dispatch(loadCurrios());
-    this.store.dispatch(loadCurrioSubmissions());
-
-    this.curriosSubscription = this.currios$.pipe(
-        takeUntil(this.destroy$)
-    ).subscribe(currios => {
-      this.allCurrios = currios;
+    this.activatedRoute.queryParamMap.pipe(
+      takeUntil(this.destroy$),
+      map(params => params.get('statusFilter') as CurrioStatusType | "" | null),
+      distinctUntilChanged()
+    ).subscribe(statusFilterParam => {
+      if (statusFilterParam && ['nuova_richiesta', 'invito_spedito', 'attivo', 'archiviato'].includes(statusFilterParam)) {
+        this.selectedStatusFilter = statusFilterParam;
+      } else {
+        this.selectedStatusFilter = "";
+      }
       this.applyFilter();
     });
 
-    this.filteredCurrios$ = this.currios$.pipe(
-      map(currios => this.filterCurrios(currios, this.selectedStatusFilter)),
-      takeUntil(this.destroy$)
-    );
+    this.applyFilter();
   }
 
   applyFilter(): void {
@@ -103,11 +102,6 @@ export class ListaCurrioComponent implements OnInit, OnDestroy {
       }).then((result) => {
         if (result.isConfirmed) {
           this.store.dispatch(deleteCurrio({ id }));
-          Swal.fire(
-            'Eliminato!',
-            'Il Curriò è stato eliminato.',
-            'success'
-          );
         }
       });
     } else {
@@ -134,20 +128,7 @@ export class ListaCurrioComponent implements OnInit, OnDestroy {
     if (!status) {
       return 'status.sconosciuto';
     }
-    switch (status) {
-      case 'nuova_richiesta':
-        return 'status.nuova_richiesta';
-      case 'invito_spedito':
-        return 'status.invito_spedito';
-      case 'attivo':
-        return 'status.attivo';
-      case 'archiviato':
-        return 'status.archiviato';
-      default:
-        const unknownStatus: string = status;
-        console.warn(`Stato Curriò non previsto nel formatStatus (ma valido): ${unknownStatus}`);
-        return `status.${unknownStatus.replace('_', '')}`;
-    }
+    return `status.${status.replace(/_/g, '')}`;
   }
 
   ngOnDestroy(): void {

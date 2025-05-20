@@ -35,6 +35,7 @@
 	"generale.layout.navbar.nuovemail": "New emails",
 	"generale.layout.navbar.nuovenotifiche": "New notifications",
 	"generale.layout.navbar.visualizzatutti": "View all",
+   "generale.layout.navbar.nessunanuovanotifica": "No new notifications",
 	"generale.shared.modifica": "EDIT",
 	"generale.shared.aggiorna": "Update",
 	"generale.shared.elimina": "Delete",
