@@ -59,12 +59,21 @@ export class AuthService {
   }
 
   // Metodo per cambiare le informazioni dell'utente (es. displayName, photoURL)
-  ChangeInfo(idToken: string, displayName: string, photoURL: string): Observable<any> {
+ChangeInfo(idToken: string, displayName: string, photoURL: string): Observable<any> {
+    const payload: { idToken: string, displayName: string, returnSecureToken: boolean, photoUrl?: string } = {
+      idToken: idToken,
+      displayName: displayName,
+      returnSecureToken: false // Generalmente true se vuoi indietro il token aggiornato, false se no.
+    };
+    if (photoURL) { // Includi photoUrl solo se fornito
+      payload.photoUrl = photoURL;
+    }
     return this.http.post(
       `https://identitytoolkit.googleapis.com/v1/accounts:update?key=${environment.firebase.apiKey}`,
-      { idToken: idToken, displayName: displayName, photoUrl: photoURL, returnSecureToken: false }
+      payload
     );
   }
+
 
 
   // Registrazione con email/password
@@ -86,7 +95,7 @@ export class AuthService {
       });
   }
 
- SetUserData(firebaseUser: FirebaseAuthUserType | any): Promise<void> {
+SetUserData(firebaseUser: FirebaseAuthUserType | any): Promise<void> {
     if (!firebaseUser || !firebaseUser.uid) {
       console.error('[AuthService.SetUserData] Chiamato con un oggetto utente non valido:', firebaseUser);
       return Promise.reject(new Error('Oggetto utente non valido per SetUserData'));
@@ -96,16 +105,17 @@ export class AuthService {
       `users/${firebaseUser.uid}`
     );
 
+    // Mantieni il ruolo esistente se presente, altrimenti default a 'cliente'
     const ruoloDaUsare = firebaseUser.ruolo || 'cliente';
 
     const dataToSet: User = {
       localId: firebaseUser.uid,
       email: firebaseUser.email || '',
       displayName: firebaseUser.displayName || '',
-      photoURL: firebaseUser.photoURL || 'assets/images/default-avatar.png',
+      photoURL: firebaseUser.photoURL || 'assets/images/default-avatar.png', // Default se non presente
       emailVerified: firebaseUser.emailVerified || false,
       ruolo: ruoloDaUsare,
-      cellulare: firebaseUser.cellulare !== undefined ? firebaseUser.cellulare : null,
+      cellulare: firebaseUser.cellulare !== undefined ? firebaseUser.cellulare : null, // Usa null se undefined
     };
 
     console.log(`[AuthService.SetUserData] Scrittura/Aggiornamento su Firestore per users/${firebaseUser.uid} con payload:`, JSON.parse(JSON.stringify(dataToSet)));
@@ -116,7 +126,7 @@ export class AuthService {
       })
       .catch(error => {
         console.error(`[AuthService.SetUserData] Errore nel salvare i dati utente ${firebaseUser.uid} in Firestore:`, error);
-        throw error;
+        throw error; // Rilancia l'errore per essere gestito dal chiamante
       });
   }
 

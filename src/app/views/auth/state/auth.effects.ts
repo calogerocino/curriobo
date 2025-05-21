@@ -214,28 +214,36 @@ private redirectToRoleDefault(user: User): void {
     )
   );
 
-  changeInfo$ = createEffect(() =>
+ changeInfo$ = createEffect(() =>
     this.actions$.pipe(
       ofType(changeInfoStart),
       switchMap((action) => {
         return this.store.select(getUserToken).pipe(
           take(1),
           switchMap(token => {
-            let authUpdateObservable = of(null);
+            let authUpdateObservable = of(null); // Inizializza con un observable che completa subito
 
-            if (action.value.displayName !== undefined && token) {
-              const displayName = action.value.displayName!;
-              const photoURLFromStorage = this.authService.getUserFromLocalStorage()?.photoURL;
-              const photoURLValue = action.value.photoURL || photoURLFromStorage || '';
-              authUpdateObservable = this.authService.ChangeInfo(token, displayName, photoURLValue);
+            // Prepara i dati per Firebase Auth
+            const displayName = action.value.displayName;
+            const photoURLValue = action.value.photoURL; // Può essere undefined se non si aggiorna l'immagine
+
+            if (token && (displayName !== undefined || photoURLValue !== undefined)) {
+              // Chiamiamo ChangeInfo solo se c'è qualcosa da aggiornare in Firebase Auth (displayName o photoURL)
+              authUpdateObservable = this.authService.ChangeInfo(
+                token,
+                displayName ?? this.authService.getUserFromLocalStorage()?.displayName ?? '', // Usa esistente se non fornito
+                photoURLValue ?? this.authService.getUserFromLocalStorage()?.photoURL ?? ''   // Usa esistente se non fornito
+              );
             }
 
             return authUpdateObservable.pipe(
               switchMap(() => {
+                // Dopo l'aggiornamento di Firebase Auth (o se non necessario), aggiorna Firestore
                 return this.userService.updateUserInfo(action.localId, action.value).pipe(
                   map(() => {
                     this.store.dispatch(setLoadingSpinner({ status: false }));
                     this.store.dispatch(setErrorMessage({ message: null }));
+                    // Dispatch updateLogin per ricaricare i dati utente aggiornati nello store
                     this.store.dispatch(updateLogin({ redirect: false, isCustomerLogin: action.value.ruolo === 'cliente' }));
                     Swal.fire('Successo', 'Profilo aggiornato con successo!', 'success');
                     return changeInfoSuccess();
@@ -246,9 +254,9 @@ private redirectToRoleDefault(user: User): void {
                 this.store.dispatch(setLoadingSpinner({ status: false }));
                 console.error("Errore aggiornamento profilo:", errResp);
                 const errorMessage = this.authService.getErrorMessage(
-                  errResp?.error?.error?.message || 'ERRORE_AGGIORNAMENTO_PROFILO'
+                  errResp?.error?.error?.message || errResp?.message || 'ERRORE_AGGIORNAMENTO_PROFILO'
                 );
-                Swal.fire('Errore', errorMessage, 'error'); 
+                Swal.fire('Errore', errorMessage, 'error');
                 return of(setErrorMessage({ message: errorMessage }));
               })
             );

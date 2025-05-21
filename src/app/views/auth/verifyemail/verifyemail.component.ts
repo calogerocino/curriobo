@@ -12,6 +12,6 @@ export class VerifyemailComponent {
   constructor(private readonly authService: AuthService) {}
 
   sendVerificationMail() {
-    this.authService.SendVerificationMail();
+    // this.authService.SendVerificationMail();
   }
 }
