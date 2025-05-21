@@ -6,6 +6,7 @@ import { Observable, of, from } from 'rxjs';
 import { map, catchError, take, switchMap } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
 import { AppState } from '../app.state';
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root',
@@ -13,7 +14,8 @@ import { AppState } from '../app.state';
 export class UserService {
   constructor(
     private readonly afs: AngularFirestore,
-    private readonly store: Store<AppState>
+    private readonly store: Store<AppState>,
+    private readonly authService: AuthService
   ) {}
 
   SetUserData(user: Partial<User>): Promise<void> {
@@ -71,9 +73,9 @@ export class UserService {
           const userSenzaDatiFirestore: User = {
             ...userFromAuth,
             displayName: userFromAuth.displayName || 'Nuovo Utente (No Firestore)',
-            photoURL: userFromAuth.photoURL || 'assets/images/default-avatar.png',
+            photoURL: userFromAuth.photoURL || this.authService.DEFAULT_AVATAR_URL, // <--- Usa default da storage
             emailVerified: userFromAuth.emailVerified || false,
-            ruolo: userFromAuth.ruolo || 'cliente', // Default a 'cliente' se non specificato e non trovato
+            ruolo: userFromAuth.ruolo || 'cliente',
             cellulare: userFromAuth.cellulare || undefined,
           };
           console.log(`[UserService.MergeDatiUtente] Utente risultante (senza dati Firestore):`, JSON.parse(JSON.stringify(userSenzaDatiFirestore)));
@@ -81,12 +83,12 @@ export class UserService {
         }
 
         const mergedUser: User = {
-          ...userFromAuth, // Prende token, localId, expirationDate da Auth
-          displayName: firestoreUser.displayName || userFromAuth.displayName || '', // Priorità a Firestore, poi Auth, poi stringa vuota
-          photoURL: firestoreUser.photoURL || userFromAuth.photoURL || 'assets/images/default-avatar.png',
+          ...userFromAuth,
+          displayName: firestoreUser.displayName || userFromAuth.displayName || '',
+          photoURL: firestoreUser.photoURL || userFromAuth.photoURL || this.authService.DEFAULT_AVATAR_URL, // <--- Usa default da storage
           emailVerified: firestoreUser.emailVerified !== undefined ? firestoreUser.emailVerified : (userFromAuth.emailVerified || false),
-          ruolo: firestoreUser.ruolo || userFromAuth.ruolo || 'cliente', // Priorità a Firestore, poi Auth, poi default 'cliente'
-          cellulare: firestoreUser.cellulare || userFromAuth.cellulare || undefined, // Priorità a Firestore, poi Auth
+          ruolo: firestoreUser.ruolo || userFromAuth.ruolo || 'cliente',
+          cellulare: firestoreUser.cellulare || userFromAuth.cellulare || undefined,
         };
         console.log(`[UserService.MergeDatiUtente] RUOLO da Firestore: ${firestoreUser.ruolo}, RUOLO in userFromAuth: ${userFromAuth.ruolo}, RUOLO finale in mergedUser: ${mergedUser.ruolo}`);
         console.log(`[UserService.MergeDatiUtente] Utente finale unito (mergedUser) per UID ${uid}:`, JSON.parse(JSON.stringify(mergedUser)));
@@ -94,19 +96,19 @@ export class UserService {
       }),
       catchError(error => {
         console.error(`[UserService.MergeDatiUtente] Errore CRITICO durante il recupero o merge per UID ${uid}:`, error);
-        // Fallback a dati da Auth con default per ruolo
         const fallbackUser: User = {
             ...userFromAuth,
             displayName: userFromAuth.displayName || 'Utente (errore db)',
-            photoURL: userFromAuth.photoURL || 'assets/images/default-avatar.png',
+            photoURL: userFromAuth.photoURL || this.authService.DEFAULT_AVATAR_URL, // <--- Usa default da storage
             emailVerified: userFromAuth.emailVerified || false,
-            ruolo: 'cliente', // Default a 'cliente' in caso di errore critico
+            ruolo: 'cliente',
         };
         console.warn(`[UserService.MergeDatiUtente] Restituzione utente di fallback a causa di errore:`, JSON.parse(JSON.stringify(fallbackUser)));
         return of(fallbackUser);
       })
     );
   }
+
 
 Searchuser(uid: string): Observable<User | null> {
   return this.getFFUser(uid).pipe(

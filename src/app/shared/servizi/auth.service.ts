@@ -25,7 +25,7 @@ import { User as FirebaseAuthUserType } from '@firebase/auth-types';
 })
 export class AuthService {
   timeoutInterval: any;
-
+readonly DEFAULT_AVATAR_URL = 'https://firebasestorage.googleapis.com/v0/b/curriobo.firebasestorage.app/o/profile-pictures%2Fdefault-avatar.jpeg?alt=media&token=18e26d41-1d09-4693-9a98-b4ad559e8b7d';
   Toast = Swal.mixin({
     toast: true,
     position: 'top-end',
@@ -40,7 +40,11 @@ export class AuthService {
     public ngZone: NgZone,
     private store: Store<AppState>,
     private http: HttpClient
-  ) {}
+  ) {
+     if (this.DEFAULT_AVATAR_URL === 'https://firebasestorage.googleapis.com/v0/b/curriobo.firebasestorage.app/o/profile-pictures%2Fdefault-avatar.jpeg?alt=media&token=18e26d41-1d09-4693-9a98-b4ad559e8b7d') {
+      console.warn("ATTENZIONE: L'URL dell'avatar di default non è stato configurato in AuthService.ts");
+    }
+  }
 
   // Accedi con e-mail/password (usato da NGRX effects)
   SignIn(email: string, password: string): Observable<AuthResponseData> {
@@ -105,17 +109,16 @@ SetUserData(firebaseUser: FirebaseAuthUserType | any): Promise<void> {
       `users/${firebaseUser.uid}`
     );
 
-    // Mantieni il ruolo esistente se presente, altrimenti default a 'cliente'
     const ruoloDaUsare = firebaseUser.ruolo || 'cliente';
 
     const dataToSet: User = {
       localId: firebaseUser.uid,
       email: firebaseUser.email || '',
       displayName: firebaseUser.displayName || '',
-      photoURL: firebaseUser.photoURL || 'assets/images/default-avatar.png', // Default se non presente
+      photoURL: firebaseUser.photoURL || undefined,
       emailVerified: firebaseUser.emailVerified || false,
       ruolo: ruoloDaUsare,
-      cellulare: firebaseUser.cellulare !== undefined ? firebaseUser.cellulare : null, // Usa null se undefined
+      cellulare: firebaseUser.cellulare !== undefined ? firebaseUser.cellulare : undefined,
     };
 
     console.log(`[AuthService.SetUserData] Scrittura/Aggiornamento su Firestore per users/${firebaseUser.uid} con payload:`, JSON.parse(JSON.stringify(dataToSet)));
@@ -126,7 +129,7 @@ SetUserData(firebaseUser: FirebaseAuthUserType | any): Promise<void> {
       })
       .catch(error => {
         console.error(`[AuthService.SetUserData] Errore nel salvare i dati utente ${firebaseUser.uid} in Firestore:`, error);
-        throw error; // Rilancia l'errore per essere gestito dal chiamante
+        throw error;
       });
   }
 
@@ -159,12 +162,12 @@ SetUserData(firebaseUser: FirebaseAuthUserType | any): Promise<void> {
       localId: data.localId,
       expirationDate: expirationDate,
       displayName: undefined,
-      photoURL: undefined,
       emailVerified: undefined,
       ruolo: undefined,
       cellulare: undefined,
+      photoURL: undefined,
     };
-    console.log('[AuthService formatUser] User object created:', JSON.parse(JSON.stringify(formattedUser))); // LOG
+    console.log('[AuthService formatUser] User object created:', JSON.parse(JSON.stringify(formattedUser)));
     return formattedUser;
   }
 

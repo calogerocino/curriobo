@@ -179,7 +179,7 @@ export class CompletaRegistrazioneComponent implements OnInit, OnDestroy {
         uid: newAuthUser.uid,
         email: newAuthUser.email,
         displayName: displayName || newAuthUser.displayName || '',
-        photoURL: newAuthUser.photoURL || 'assets/images/default-avatar.png',
+        photoURL: newAuthUser.photoURL || this.authService.DEFAULT_AVATAR_URL,
         emailVerified: newAuthUser.emailVerified,
         ruolo: 'cliente',
       });

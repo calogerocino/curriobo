@@ -110,13 +110,13 @@
       </li>
 
       <li class="nav-item nav-profile" ngbDropdown *ngIf="connectedUser$ | async as userData">
-        <a class="nav-link" ngbDropdownToggle id="profileDropdown">
-          <img [src]="userData.photoURL || 'assets/images/default-avatar.png'" alt="profile">
+        <a class="nav-link" ngbDropdownToggle id="profileDropdownNav">
+            <img [src]="userData.photoURL || authService.DEFAULT_AVATAR_URL" alt="profile" class="rounded-circle" style="width: 30px; height: 30px; object-fit: cover;">
         </a>
-        <div ngbDropdownMenu aria-labelledby="profileDropdown">
+        <div ngbDropdownMenu aria-labelledby="profileDropdownNav">
           <div class="dropdown-header d-flex flex-column align-items-center">
             <div class="figure mb-3">
-              <img [src]="userData.photoURL || 'assets/images/default-avatar.png'" alt="User photo">
+                <img [src]="userData.photoURL || authService.DEFAULT_AVATAR_URL" alt="User photo" class="rounded-circle" style="width: 80px; height: 80px; object-fit: cover;">
             </div>
             <div class="info text-center">
               <p class="name font-weight-bold mb-0">

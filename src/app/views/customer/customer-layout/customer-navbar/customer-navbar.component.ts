@@ -7,6 +7,7 @@ import { getUser } from 'src/app/views/auth/state/auth.selector';
 import { User } from 'src/app/shared/models/user.interface';
 import { TranslateService } from '@ngx-translate/core';
 import { autologout } from 'src/app/views/auth/state/auth.action';
+import { AuthService } from 'src/app/shared/servizi/auth.service';
 
 @Component({
   selector: 'app-customer-navbar',
@@ -18,7 +19,8 @@ export class CustomerNavbarComponent implements OnInit {
   constructor(
     @Inject(DOCUMENT) private document: Document,
     private store: Store<AppState>,
-    public translate: TranslateService
+    public translate: TranslateService,
+    public readonly authService: AuthService
   ) {}
 
   ngOnInit(): void {

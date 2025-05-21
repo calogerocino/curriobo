@@ -5,25 +5,25 @@
   <div class="navbar-content">
     <ul class="navbar-nav">
       <li class="nav-item" ngbDropdown>
-        <a class="nav-link" ngbDropdownToggle id="languageDropdown" role="button">
+        <a class="nav-link" ngbDropdownToggle id="languageDropdownCustomer" role="button">
           <i class="flag-icon flag-icon-{{this.currentLang()}} mt-1"></i> <span
             class="font-weight-medium ml-1 mr-1 d-none d-md-inline-block">{{'generale.layout.linguaa' |
             translate}}</span>
         </a>
-        <div ngbDropdownMenu aria-labelledby="languageDropdown">
+        <div ngbDropdownMenu aria-labelledby="languageDropdownCustomer">
           <a ngbDropdownItem class="py-2" (click)="this.switchLanguage($event.target)" id="it"><i class="flag-icon flag-icon-it mr-1"></i> Italiano</a>
           <a ngbDropdownItem class="py-2" (click)="this.switchLanguage($event.target)" id="en"><i class="flag-icon flag-icon-us mr-1"></i> English </a>
           </div>
       </li>
 
       <li class="nav-item nav-profile" ngbDropdown *ngIf="connectedUser$ | async as userData">
-        <a class="nav-link" ngbDropdownToggle id="profileDropdown">
-          <img [src]="userData.photoURL || 'assets/images/default-avatar.png'" alt="profile">
+        <a class="nav-link" ngbDropdownToggle id="profileDropdownCustomer">
+            <img [src]="userData.photoURL || authService.DEFAULT_AVATAR_URL" alt="profile" class="rounded-circle" style="width: 30px; height: 30px; object-fit: cover;">
         </a>
-        <div ngbDropdownMenu aria-labelledby="profileDropdown">
+        <div ngbDropdownMenu aria-labelledby="profileDropdownCustomer">
           <div class="dropdown-header d-flex flex-column align-items-center">
             <div class="figure mb-3">
-              <img [src]="userData.photoURL || 'assets/images/default-avatar.png'" alt="User photo">
+                <img [src]="userData.photoURL || authService.DEFAULT_AVATAR_URL" alt="User photo" class="rounded-circle" style="width: 80px; height: 80px; object-fit: cover;">
             </div>
             <div class="info text-center">
               <p class="name font-weight-bold mb-0">

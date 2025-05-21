@@ -15,7 +15,7 @@ import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-navbar',
-  templateUrl: './navbar.component.html'
+  templateUrl: './navbar.component.html',
 })
 export class NavbarComponent implements OnInit, OnDestroy {
   connectedUser$: Observable<User | null>;
@@ -27,7 +27,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
   constructor(
     @Inject(DOCUMENT) private document: Document,
-    private readonly authService: AuthService,
+    public readonly authService: AuthService,
     private readonly store: Store<AppState>,
     private readonly translate: TranslateService,
     readonly router: Router
@@ -41,15 +41,15 @@ export class NavbarComponent implements OnInit, OnDestroy {
     const allCurrios$ = this.store.select(getCurrios);
 
     this.nuoveRichiesteCurrio$ = allCurrios$.pipe(
-      map(currios => currios.filter(c => c.status === 'nuova_richiesta'))
+      map((currios) => currios.filter((c) => c.status === 'nuova_richiesta'))
     );
 
     this.conteggioNuoveRichieste$ = this.nuoveRichiesteCurrio$.pipe(
-      map(richieste => richieste.length)
+      map((richieste) => richieste.length)
     );
 
     this.ciSonoNuoveRichieste$ = this.conteggioNuoveRichieste$.pipe(
-      map(count => count > 0)
+      map((count) => count > 0)
     );
   }
 
@@ -79,27 +79,40 @@ export class NavbarComponent implements OnInit, OnDestroy {
   apriRichiestaCurrio(currioId: string | undefined): void {
     if (currioId) {
       this.router.navigate(['/admin/currio/edit', currioId]);
-      const notificationDropdown = document.getElementById('notificationDropdown');
-      if (notificationDropdown && notificationDropdown.parentElement?.classList.contains('show')) {
+      const notificationDropdown = document.getElementById(
+        'notificationDropdown'
+      );
+      if (
+        notificationDropdown &&
+        notificationDropdown.parentElement?.classList.contains('show')
+      ) {
         notificationDropdown.click();
       }
     }
   }
 
   visualizzaTutteLeRichieste(): void {
-    this.router.navigate(['/admin/currio/listacurrio'], { queryParams: { statusFilter: 'nuova_richiesta' } });
-     const notificationDropdown = document.getElementById('notificationDropdown');
-     if (notificationDropdown && notificationDropdown.parentElement?.classList.contains('show')) {
-       notificationDropdown.click();
-     }
+    this.router.navigate(['/admin/currio/listacurrio'], {
+      queryParams: { statusFilter: 'nuova_richiesta' },
+    });
+    const notificationDropdown = document.getElementById(
+      'notificationDropdown'
+    );
+    if (
+      notificationDropdown &&
+      notificationDropdown.parentElement?.classList.contains('show')
+    ) {
+      notificationDropdown.click();
+    }
   }
 
   eliminaTutteLeNotifiche(event: Event): void {
     event.preventDefault();
     event.stopPropagation();
-    console.log("Elimina tutte le notifiche cliccato - implementare logica se necessario.");
+    console.log(
+      'Elimina tutte le notifiche cliccato - implementare logica se necessario.'
+    );
   }
-
 
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();

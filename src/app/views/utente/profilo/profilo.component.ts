@@ -51,7 +51,7 @@ export class ProfiloComponent implements OnInit, OnDestroy {
     private readonly router: Router,
     private readonly store: Store<AppState>,
     private readonly userService: UserService,
-    private readonly authService: AuthService,
+    public readonly authService: AuthService,
     private readonly actions$: Actions,
     @Inject(Storage) private readonly storage: Storage // Inietta Storage
   ) {}
@@ -95,7 +95,7 @@ export class ProfiloComponent implements OnInit, OnDestroy {
             this.initializeForm(firestoreUser);
           } else {
             // Aggiorna solo l'anteprima se non si reinizializza il form
-             this.imagePreview = firestoreUser.photoURL || 'assets/images/default-avatar.png';
+             this.imagePreview = firestoreUser.photoURL || this.authService.DEFAULT_AVATAR_URL;
           }
         } else {
           console.error(`Utente con ID ${userId} non trovato in Firestore.`);
@@ -137,7 +137,7 @@ export class ProfiloComponent implements OnInit, OnDestroy {
       ]),
     }, { validators: this.passwordMatchValidator });
 
-    this.imagePreview = userData.photoURL || 'assets/images/default-avatar.png';
+    this.imagePreview = userData.photoURL || this.authService.DEFAULT_AVATAR_URL;
 
 
     if (this.formChangesSubscription) {
@@ -146,7 +146,7 @@ export class ProfiloComponent implements OnInit, OnDestroy {
     this.formChangesSubscription = this.userForm.valueChanges.subscribe(() => {
       this.updateWarningState();
     });
-    this.updateWarningState(); 
+    this.updateWarningState();
   }
 
   onFileSelected(event: Event): void {
@@ -158,7 +158,7 @@ export class ProfiloComponent implements OnInit, OnDestroy {
       if (!allowedTypes.includes(file.type)) {
         Swal.fire('Errore', 'Formato file non supportato. Seleziona PNG, JPG o GIF.', 'error');
         this.selectedFile = null;
-        this.imagePreview = this.ffuser?.photoURL || 'assets/images/default-avatar.png';
+        this.imagePreview = this.ffuser?.photoURL || this.authService.DEFAULT_AVATAR_URL;
         element.value = "";
         return;
       }
@@ -166,7 +166,7 @@ export class ProfiloComponent implements OnInit, OnDestroy {
       if (file.size > maxSizeInBytes) {
         Swal.fire('Errore', 'File troppo grande. Dimensione massima 2MB.', 'error');
         this.selectedFile = null;
-        this.imagePreview = this.ffuser?.photoURL || 'assets/images/default-avatar.png';
+        this.imagePreview = this.ffuser?.photoURL || this.authService.DEFAULT_AVATAR_URL;
         element.value = "";
         return;
       }
@@ -182,7 +182,7 @@ export class ProfiloComponent implements OnInit, OnDestroy {
       reader.readAsDataURL(this.selectedFile);
     } else {
       this.selectedFile = null;
-      this.imagePreview = this.ffuser?.photoURL || 'assets/images/default-avatar.png';
+      this.imagePreview = this.ffuser?.photoURL || this.authService.DEFAULT_AVATAR_URL;
     }
   }
 
