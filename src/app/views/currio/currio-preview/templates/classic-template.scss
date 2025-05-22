@@ -1,31 +1,34 @@
 .currio-preview-wrapper.classic {
-  font-family: 'Times New Roman', Times, serif;
-  background-color: #fdfcf8;
-  color: #333333;
+  font-family: 'Georgia', 'Times New Roman', Times, serif; // Font più classico
+  background-color: #fdfdfd; // Sfondo leggermente off-white per un look pulito
+  color: #333333; // Colore testo principale scuro per leggibilità
   line-height: 1.7;
+  font-size: 16px; // Dimensione base del font
 
   .classic-theme {
     .container {
-      max-width: 850px;
+      max-width: 800px; // Larghezza contenuta per leggibilità
       margin: 0 auto;
       padding: 0 20px;
     }
   }
 
   .classic-header {
-    background-color: #e8e8e8;
-    padding: 30px 20px;
+    background-color: #f8f8f8; // Header leggermente distinto dallo sfondo
+    padding: 40px 20px;
     text-align: center;
-    border-bottom: 1px solid #cccccc;
+    border-bottom: 1px solid #e0e0e0; // Bordo sottile
     h1 {
-      font-size: 2.5em;
-      margin-bottom: 5px;
-      font-weight: normal;
+      font-size: 2.2em; // Dimensione titolo principale
+      margin-bottom: 8px;
+      font-weight: 600; // Leggermente bold
+      color: #222;
     }
     .classic-tagline {
-      font-size: 1.2em;
+      font-size: 1.1em;
       color: #555555;
       font-style: italic;
+      margin-bottom: 0;
     }
   }
 
@@ -36,121 +39,242 @@
 
   .classic-nav {
     text-align: center;
-    margin-bottom: 30px;
-    padding-bottom: 15px;
-    border-bottom: 1px dashed #dddddd;
+    margin-bottom: 40px; // Più spazio dopo la nav
+    padding-bottom: 20px;
+    border-bottom: 1px dashed #d0d0d0;
+    display: flex; // Per allineare meglio i link e il selettore lingua
+    flex-wrap: wrap; // Permette ai link di andare a capo su schermi piccoli
+    justify-content: center;
+    align-items: center;
+    gap: 10px 15px; // Spazio tra i link
+
     a {
-      margin: 0 10px;
-      font-size: 1.1em;
-      color: #444444;
+      font-size: 1em; // Dimensione font nav
+      color: #4a4a4a;
       text-decoration: none;
-      &:hover { color: #000000; text-decoration: underline;}
+      padding: 5px 10px; // Padding per area cliccabile
+      border-radius: 4px;
+      transition: color 0.2s, background-color 0.2s;
+      &:hover {
+        color: #000000;
+        background-color: #e9e9e9; // Leggero sfondo hover
+      }
     }
     .classic-lang-selector {
-        display: inline-block; margin-left: 20px;
-        a { padding: 3px 6px; font-size: 0.9em;}
-        a.active { background-color: #ddd; border-radius: 2px;}
+      // display: inline-block; // Già flex item
+      // margin-left: 20px; // Gestito da gap
+      display: inline-flex; // Aggiunto per allineare items
+      align-items: center; // Aggiunto per allineare items
+      a {
+        font-size: 0.85em;
+        padding: 3px 6px;
+      }
+      a.active {
+        background-color: #dcdcdc;
+        font-weight: bold;
+        border-radius: 3px; // Aggiunto per coerenza
+      }
+      .separator { color: #aaa; margin: 0 2px;}
     }
   }
 
   .classic-section {
-    margin-bottom: 40px;
+    margin-bottom: 45px; // Spazio consistente tra sezioni
+    padding-top: 15px; // Leggero padding sopra il titolo di sezione
     h2 {
-      font-size: 1.8em;
-      color: #222222;
-      border-bottom: 1px solid #cccccc;
-      padding-bottom: 10px;
-      margin-bottom: 20px;
-      font-weight: bold;
+      font-size: 1.6em; // Titolo di sezione
+      color: #333333;
+      border-bottom: 2px solid #c0c0c0; // Bordo più definito
+      padding-bottom: 12px;
+      margin-bottom: 25px;
+      font-weight: 600; // Più leggibile
     }
-    p { margin-bottom: 15px; font-size: 1em; }
+    p {
+      margin-bottom: 1em; // Spazio standard sotto i paragrafi
+      font-size: 1em;
+      color: #454545;
+    }
     ul {
       list-style-type: disc;
-      margin-left: 20px;
-      margin-bottom: 15px;
-      li { margin-bottom: 5px; }
+      margin-left: 25px; // Indentazione lista
+      margin-bottom: 1em;
+      padding-left: 0;
+      li {
+        margin-bottom: 8px; // Spazio tra item lista
+        color: #454545;
+      }
     }
   }
+
   .classic-button {
-     display: inline-block; padding: 10px 20px; background-color: #555; color: #fff;
-     text-decoration: none; border: 1px solid #333; border-radius: 3px;
+     display: inline-block;
+     padding: 10px 18px;
+     background-color: #666; // Grigio scuro per i bottoni
+     color: #fff;
+     text-decoration: none;
+     border: none; // Rimuovere bordo se si usa bg-color
+     border-radius: 4px; // Bordi leggermente arrotondati
      transition: background-color 0.2s;
-     &:hover { background-color: #333; }
+     font-size: 0.95em;
+     &:hover { background-color: #444; }
   }
-   .classic-download-cv { margin-top: 10px; }
+  .classic-download-cv { margin-top: 15px; }
 
   .classic-about-content {
     display: flex;
     align-items: flex-start;
-    gap: 20px;
+    gap: 25px; // Spazio tra immagine e testo
     .classic-profile-pic {
-      width: 100px; height: 100px; object-fit: cover;
-      border: 1px solid #ccc; padding: 3px;
-      margin-right: 15px;
-      float: left; /* For older browser compatibility if flex gap is not supported */
+      width: 120px; // Immagine profilo leggermente più grande
+      height: 120px;
+      object-fit: cover;
+      border: 3px solid #fff; // Bordo bianco per staccare
+      box-shadow: 0 2px 5px rgba(0,0,0,0.15); // Ombra leggera
+      flex-shrink: 0; // Impedisce all'immagine di restringersi
     }
-    div p:first-child { margin-top:0;}
+    div { // Contenitore del testo
+      flex: 1; // Permette al testo di occupare lo spazio rimanente
+      p:first-child { margin-top:0; }
+    }
+    @media (max-width: 600px) { // Layout a colonna per mobile
+        flex-direction: column;
+        align-items: center; // Centra immagine e testo
+        text-align: center;
+        .classic-profile-pic {
+            margin-bottom: 15px; // Spazio sotto l'immagine
+        }
+    }
   }
 
-
   .classic-cv-item {
-    margin-bottom: 25px;
-    padding-bottom: 15px;
-    border-bottom: 1px dotted #eeeeee;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px dotted #cccccc; // Dotted leggero per separare
     &:last-child { border-bottom: none; margin-bottom: 0;}
-    h3 { font-size: 1.4em; margin-bottom: 5px; color: #444444; }
-    .classic-cv-meta { font-size: 0.9em; color: #666666; margin-bottom: 10px; font-style: italic; }
+    h3 {
+      font-size: 1.3em;
+      margin-bottom: 6px;
+      color: #3a3a3a;
+      font-weight: 600;
+    }
+    .classic-cv-meta {
+      font-size: 0.95em;
+      color: #555555;
+      margin-bottom: 12px;
+      font-style: italic;
+      .meta-separator { // Stile per il separatore
+          color: #aaa;
+          margin: 0 0.4em;
+      }
+    }
   }
 
   .classic-project-item {
-    margin-bottom: 25px;
-    h3 { font-size: 1.3em; margin-bottom: 8px; }
-    .classic-project-image {
-        max-width: 250px; height: auto; float: right; margin-left: 15px; margin-bottom: 10px;
-        border: 1px solid #ddd; padding: 3px;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px dotted #cccccc;
+    &:last-child { border-bottom: none; margin-bottom: 0;}
+
+    h3 {
+      font-size: 1.3em;
+      margin-bottom: 8px;
+      color: #3a3a3a;
+      font-weight: 600;
     }
-    &:after { content: ""; display: table; clear: both; }
+    .classic-project-image {
+      max-width: 200px; // Immagine progetto
+      height: auto;
+      float: right; // Mantenere float per testo che wrappa
+      margin-left: 20px;
+      margin-bottom: 10px;
+      border: 1px solid #d0d0d0;
+      padding: 4px;
+      background-color: #fff;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    &:after { content: ""; display: table; clear: both; } // Clearfix per il float
+
+     @media (max-width: 600px) { // Gestione immagine su mobile
+        .classic-project-image {
+            float: none;
+            display: block;
+            margin: 0 auto 15px auto; // Centra l'immagine
+            max-width: 100%; // Permette all'immagine di adattarsi
+        }
+    }
   }
 
   .classic-link {
-    color: #0066cc;
+    color: #0056b3; // Blu standard per i link
     text-decoration: underline;
-    &:hover { color: #004c99; }
+    font-weight: 500;
+    &:hover { color: #003d80; }
   }
 
   .classic-skills-list {
-    list-style: none; padding-left: 0;
+    list-style: none;
+    padding-left: 0;
+    column-count: 2; // Organizza le skill in due colonne se sono molte
+    column-gap: 30px;
+    @media (max-width: 600px) { // Singola colonna su schermi piccoli
+      column-count: 1;
+    }
     li {
-      margin-bottom: 8px; display: flex; align-items: center;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      font-size: 1em;
       .classic-skill-icon {
-        margin-right: 8px;
-        svg { width: 18px; height: 18px; vertical-align: middle; opacity: 0.8; }
+        margin-right: 10px;
+        color: #555;
+        line-height: 1; // Per allineare meglio SVG
+        svg { width: 20px; height: 20px; vertical-align: middle; opacity: 0.9; }
       }
-      .classic-skill-name { font-weight: bold; }
-      .classic-skill-level { font-size: 0.9em; color: #555; margin-left: 5px; }
+      .classic-skill-name { font-weight: 500; color: #333;}
+      .classic-skill-level { font-size: 0.9em; color: #555555; margin-left: 6px; }
     }
   }
 
   .classic-tags {
-    margin-top: 10px; font-size: 0.9em;
-    strong { color: #333; }
+    margin-top: 12px;
+    font-size: 0.9em;
+    strong { color: #333; font-weight: 600; margin-bottom: 5px; display: block; } // Label per tags
     span {
-      background-color: #f0f0f0; color: #555; padding: 2px 6px;
-      border-radius: 3px; margin-right: 5px; display: inline-block; margin-bottom: 3px;
+      background-color: #e7e7e7; // Sfondo tag più chiaro
+      color: #454545;
+      padding: 3px 8px;
+      border-radius: 3px;
+      margin-right: 6px;
+      display: inline-block;
+      margin-bottom: 5px; // Spazio sotto i tag
+      font-size: 0.85em; // Tag più piccoli
     }
   }
 
   .classic-social-links {
-    margin-top: 15px;
-    a { margin-right: 15px; color: #333; text-decoration: underline; }
+    margin-top: 20px;
+    text-align: center; // Centra i link social se sono in una section contatti
+    a {
+      margin: 0 12px; // Spazio tra icone/link social
+      color: #444;
+      text-decoration: underline;
+      font-size: 1em;
+      &:hover { color: #000; }
+    }
+  }
+
+  #preview-contatti-classic { // Stile specifico per la sezione contatti
+     p { text-align: center; margin-bottom: 0.5em;} // Ridotto margine per link email
+     p a.classic-link {font-size: 1.1em; }
   }
 
   .classic-footer {
     text-align: center;
-    padding: 20px;
-    margin-top: 30px;
-    border-top: 1px solid #cccccc;
+    padding: 25px 20px;
+    margin-top: 40px;
+    border-top: 1px solid #d0d0d0;
     font-size: 0.9em;
     color: #666666;
+    background-color: #f8f8f8; // Leggero sfondo per footer
   }
 }
