@@ -83,7 +83,9 @@
     "ruolo": "Ruolo",
     "ruolo-set": "Ruolo da impostare",
     "avvisoModificheNonSalvate": "Ricordati di salvare le informazioni prima di chiudere la pagina.",
-    "mailverificata": "Email Verificata"
+    "mailverificata": "Email Verificata",
+    "caricamentoimg": "Cambia immagine del profilo",
+    "modificaimmagine": "Modifica immagine profilo"
   },
   "tabella": {
     "head": {

@@ -7,19 +7,26 @@
     <div class="col-lg-4">
       <div class="card mb-4">
         <div class="card-body text-center">
-          <img [src]="imagePreview || ffuser?.photoURL || authService.DEFAULT_AVATAR_URL" alt="avatar" class="rounded-circle img-fluid" style="width: 150px; height: 150px; object-fit: cover;">
 
-          <h5 class="my-3">{{ffuser?.displayName ? (ffuser.displayName) : ('profiloUtente.nome-set' | translate)}}</h5>
-          <p class="text-muted mb-1">{{ffuser?.ruolo ? (ffuser.ruolo | titlecase | translate) : ('profiloUtente.ruolo-set' | translate)}}</p>
-
-          <div class="mt-3">
-            <label for="profileImageUpload" class="form-label">{{'profiloUtente.caricamentoimg' | translate}}</label>
-            <input type="file" class="form-control form-control-sm" id="profileImageUpload" (change)="onFileSelected($event)" accept="image/png, image/jpeg, image/gif">
+          <div class="profile-image-container mb-3 mx-auto">
+            <img [src]="imagePreview || ffuser?.photoURL || authService.DEFAULT_AVATAR_URL" alt="avatar"
+              class="profile-avatar">
+            <button type="button" class="btn btn-light btn-icon rounded-circle edit-profile-image-button shadow-sm"
+              (click)="profileImageUploadInput.click()" title="{{'profiloUtente.modificaimmagine' | translate}}">
+              <i data-feather="edit-2" class="edit-icon" appFeatherIcon></i>
+            </button>
+            <input type="file" #profileImageUploadInput class="d-none" (change)="onFileSelected($event)"
+              accept="image/jpeg, image/png" id="profileImageUpload">
           </div>
+          <h5 class="my-3">{{ffuser?.displayName ? (ffuser.displayName) : ('profiloUtente.nome-set' | translate)}}</h5>
+          <p class="text-muted mb-1">{{ffuser?.ruolo ? (ffuser.ruolo | titlecase | translate) :
+            ('profiloUtente.ruolo-set' | translate)}}</p>
 
           <div class="d-flex justify-content-center mb-2 mt-3" *ngIf="isCurrentUserAdmin && !isViewingOwnProfile">
-            <button type="button" class="btn btn-outline-primary ms-1" >{{'profiloUtente.inviamessaggio' | translate}}</button>
+            <button type="button" class="btn btn-outline-primary ms-1">{{'profiloUtente.inviamessaggio' |
+              translate}}</button>
           </div>
+
         </div>
       </div>
     </div>
@@ -35,13 +42,15 @@
         <div class="card-body">
           <form [formGroup]="userForm" (ngSubmit)="onSubmit($event)" autocomplete="off" *ngIf="userForm">
             <div class="row">
-              <div class="col-md-6"> <div class="mb-3">
+              <div class="col-md-6">
+                <div class="mb-3">
                   <label class="form-label">
                     <p class="mb-0">{{'profiloUtente.nome' | translate}}</p>
                   </label>
                   <input type="text" class="form-control" formControlName="displayName" autocomplete="off"
                     placeholder="{{'profiloUtente.nome-set' | translate}}">
-                  <div *ngIf="userForm.get('displayName')?.touched && userForm.get('displayName')?.invalid" class="text-danger small mt-1">
+                  <div *ngIf="userForm.get('displayName')?.touched && userForm.get('displayName')?.invalid"
+                    class="text-danger small mt-1">
                     <p *ngIf="userForm.get('displayName')?.errors?.['required']">
                       <i class="feather icon-alert-circle"></i> {{'generale.errori.camporichiesto' | translate}}
                     </p>
@@ -54,13 +63,15 @@
                   <label class="form-label">{{'profiloUtente.email' | translate}}</label>
                   <input type="text" class="form-control" formControlName="email" autocomplete="off"
                     placeholder="{{'profiloUtente.email-set' | translate}}" />
-                    </div>
+                </div>
                 <div class="mb-3">
                   <label class="form-label">{{'profiloUtente.cellulare' | translate}}</label>
                   <input type="tel" class="form-control" formControlName="cellulare" autocomplete="off"
                     placeholder="{{'profiloUtente.cellulare-set' | translate}}">
-                  <div *ngIf="userForm.get('cellulare')?.touched && userForm.get('cellulare')?.invalid" class="text-danger small mt-1">
-                    <p *ngIf="userForm.get('cellulare')?.errors?.['pattern'] || userForm.get('cellulare')?.errors?.['minlength']">
+                  <div *ngIf="userForm.get('cellulare')?.touched && userForm.get('cellulare')?.invalid"
+                    class="text-danger small mt-1">
+                    <p
+                      *ngIf="userForm.get('cellulare')?.errors?.['pattern'] || userForm.get('cellulare')?.errors?.['minlength']">
                       <i class="feather icon-alert-circle"></i> Inserire un numero di cellulare valido.
                     </p>
                   </div>
@@ -71,7 +82,7 @@
                     <label class="form-label d-block mb-1">{{'profiloUtente.ruolo' | translate}}</label>
                     <div class="form-switch">
                       <input class="form-check-input" type="checkbox" role="switch" id="roleSwitch"
-                             formControlName="isAdminRole" (change)="onRoleChange($event)">
+                        formControlName="isAdminRole" (change)="onRoleChange($event)">
                       <label class="form-check-label" for="roleSwitch">
                         {{ userForm.get('isAdminRole')?.value ? 'Admin' : 'Cliente' }}
                       </label>
@@ -80,7 +91,7 @@
                       Seleziona per rendere l'utente un Amministratore, deseleziona per renderlo un Cliente.
                     </small>
                     <small class="form-text text-muted" *ngIf="userForm.get('isAdminRole')?.disabled">
-                        Non puoi modificare il tuo ruolo da questa interfaccia.
+                      Non puoi modificare il tuo ruolo da questa interfaccia.
                     </small>
                   </div>
 
@@ -89,33 +100,39 @@
                       <p class="mb-0">{{'tabella.head.mailverificata' | translate}}</p>
                     </label>
                     <div class="form-check form-switch mt-1">
-                       <input type="checkbox" class="form-check-input"
-                              formControlName="emailverified" id="emailVerifiedCheck" (change)="userForm.markAsDirty(); updateWarningState()">
+                      <input type="checkbox" class="form-check-input" formControlName="emailverified"
+                        id="emailVerifiedCheck" (change)="userForm.markAsDirty(); updateWarningState()">
                       <label class="form-check-label" for="emailVerifiedCheck">
-                        {{ (userForm.get('emailverified')?.value ? 'profiloUtente.mailverificata' : 'profiloUtente.mailnonverificata') | translate }}
+                        {{ (userForm.get('emailverified')?.value ? 'profiloUtente.mailverificata' :
+                        'profiloUtente.mailnonverificata') | translate }}
                       </label>
                     </div>
-                     <small class="form-text text-muted" *ngIf="userForm.get('emailverified')?.disabled">
-                        Lo stato di verifica email non è modificabile per il tuo account qui.
+                    <small class="form-text text-muted" *ngIf="userForm.get('emailverified')?.disabled">
+                      Lo stato di verifica email non è modificabile per il tuo account qui.
                     </small>
                   </div>
                 </div>
-                 <div class="my-3">
-                  <button type="submit" class="btn btn-primary" name="changeUser" [disabled]="isUploading || (isLoading$ | async) || (!userForm.dirty && !selectedFile)">
-                    <span *ngIf="!isUploading && !(isLoading$ | async)">{{'profiloUtente.aggiornaprofilo' | translate}}</span>
-                    <span *ngIf="isUploading || (isLoading$ | async)" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                <div class="my-3">
+                  <button type="submit" class="btn btn-primary" name="changeUser"
+                    [disabled]="isUploading || (isLoading$ | async) || (!userForm.dirty && !selectedFile)">
+                    <span *ngIf="!isUploading && !(isLoading$ | async)">{{'profiloUtente.aggiornaprofilo' |
+                      translate}}</span>
+                    <span *ngIf="isUploading || (isLoading$ | async)" class="spinner-border spinner-border-sm"
+                      role="status" aria-hidden="true"></span>
                     <span *ngIf="isUploading || (isLoading$ | async)"> Caricamento...</span>
                   </button>
                 </div>
               </div>
 
-              <div class="col-md-6" *ngIf="isViewingOwnProfile"> <div class="mb-3">
+              <div class="col-md-6" *ngIf="isViewingOwnProfile">
+                <div class="mb-3">
                   <label class="form-label">
                     <p class="mb-0">{{'profiloUtente.password' | translate}}</p>
                   </label>
                   <input type="password" class="form-control mb-2" formControlName="passwordnew"
                     autocomplete="new-password" placeholder="{{'profiloUtente.password-set' | translate}}">
-                  <div *ngIf="userForm.get('passwordnew')?.touched && userForm.get('passwordnew')?.invalid" class="text-danger small mt-1">
+                  <div *ngIf="userForm.get('passwordnew')?.touched && userForm.get('passwordnew')?.invalid"
+                    class="text-danger small mt-1">
                     <p class="text-danger mt-1" *ngIf="userForm.get('passwordnew')?.errors?.['pattern']">
                       <i class="feather icon-alert-circle"></i> {{'generale.errori.passpatt' | translate}}
                     </p>
@@ -123,10 +140,10 @@
                       <i class="feather icon-alert-circle"></i> {{'generale.errori.pass8car' | translate}}
                     </p>
                   </div>
-                  <input type="password" class="form-control" formControlName="passwordnewre" autocomplete="new-password"
-                    placeholder="{{'profiloUtente.password-setre' | translate}}">
-                  <div
-                    *ngIf="userForm.get('passwordnewre')?.touched && userForm.hasError('mismatch')" class="text-danger small mt-1">
+                  <input type="password" class="form-control" formControlName="passwordnewre"
+                    autocomplete="new-password" placeholder="{{'profiloUtente.password-setre' | translate}}">
+                  <div *ngIf="userForm.get('passwordnewre')?.touched && userForm.hasError('mismatch')"
+                    class="text-danger small mt-1">
                     <p class="text-danger mt-1">
                       <i class="feather icon-alert-circle"></i> Le password non coincidono.
                     </p>
@@ -136,9 +153,11 @@
                     {{error}}</div>
                 </div>
                 <div class="my-3">
-                  <button type="submit" class="btn btn-primary" name="changePassword" [disabled]="(isLoading$ | async) || (!userForm.get('passwordnew')?.dirty && !userForm.get('passwordnewre')?.dirty && !(userForm.get('passwordnew')?.value && userForm.get('passwordnewre')?.value) ) || userForm.get('passwordnew')?.invalid || userForm.get('passwordnewre')?.invalid || userForm.hasError('mismatch') ">
+                  <button type="submit" class="btn btn-primary" name="changePassword"
+                    [disabled]="(isLoading$ | async) || (!userForm.get('passwordnew')?.dirty && !userForm.get('passwordnewre')?.dirty && !(userForm.get('passwordnew')?.value && userForm.get('passwordnewre')?.value) ) || userForm.get('passwordnew')?.invalid || userForm.get('passwordnewre')?.invalid || userForm.hasError('mismatch') ">
                     <span *ngIf="!(isLoading$ | async)">{{'profiloUtente.aggiornapassword' | translate}}</span>
-                    <span *ngIf="isLoading$ | async" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    <span *ngIf="isLoading$ | async" class="spinner-border spinner-border-sm" role="status"
+                      aria-hidden="true"></span>
                     <span *ngIf="isLoading$ | async"> Caricamento...</span>
                   </button>
                 </div>
@@ -152,5 +171,5 @@
 </ng-container>
 
 <div *ngIf="!initialLoading && !ffuser" class="alert alert-danger">
-    Impossibile caricare i dati del profilo utente.
+  Impossibile caricare i dati del profilo utente.
 </div>

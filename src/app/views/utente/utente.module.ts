@@ -7,6 +7,7 @@ import { UtenteComponent } from './utente.component';
 import { UtentiComponent } from './utenti/utenti.component';
 import { ProfiloComponent } from './profilo/profilo.component';
 import { TranslateModule } from '@ngx-translate/core';
+import { FeahterIconModule } from 'src/app/shared/feather-icon/feather-icon.module';
 
 const routes: Routes = [
   {
@@ -40,6 +41,7 @@ const routes: Routes = [
     TranslateModule,
     FormsModule,
     ReactiveFormsModule,
+    FeahterIconModule 
   ],
 })
 export class UtenteModule {}
