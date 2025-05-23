@@ -4,7 +4,8 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { AppState } from 'src/app/shared/app.state';
-import { Observable, of, Subscription, take } from 'rxjs';
+import { firstValueFrom, Observable, of, Subscription } from 'rxjs';
+import { filter, map, take, tap } from 'rxjs/operators'; // Added filter and tap
 import { getUser, getUserToken } from '../../auth/state/auth.selector';
 import { UserService } from 'src/app/shared/servizi/user.service';
 import {
@@ -32,19 +33,29 @@ import { Storage, ref, uploadBytesResumable, getDownloadURL } from '@angular/fir
 export class ProfiloComponent implements OnInit, OnDestroy {
   connectedUser$: Observable<User | null> = this.store.select(getUser);
   errorMessage$: Observable<string | null> = this.store.select(getErrorMessage);
-  isLoading$: Observable<boolean> = this.store.select(getLoading);
-  localId: string = '';
+  isLoading$: Observable<boolean> = this.store.select(getLoading); // Used for submit buttons
+
+  localId: string = ''; // ID of the profile being viewed
   emailVerifiedForm: boolean = false;
-  ffuser: User | null = null;
+  ffuser: User | null = null; // User data of the profile being viewed
   userForm: FormGroup;
 
   showUnsavedChangesWarning = false;
   private formChangesSubscription: Subscription | undefined;
   private actionsSubscription: Subscription | undefined;
+  private routeParamsSubscription: Subscription | undefined;
+  private loggedInUserSubscription: Subscription | undefined;
+
 
   selectedFile: File | null = null;
   imagePreview: string | ArrayBuffer | null = null;
   isUploading: boolean = false;
+
+  // Flags for conditional UI
+  isCurrentUserAdmin: boolean = false;
+  isViewingOwnProfile: boolean = false;
+  private loggedInUserId: string | undefined;
+  initialLoading: boolean = true; // For overall component loading state
 
   constructor(
     private readonly route: ActivatedRoute,
@@ -53,19 +64,35 @@ export class ProfiloComponent implements OnInit, OnDestroy {
     private readonly userService: UserService,
     public readonly authService: AuthService,
     private readonly actions$: Actions,
-    @Inject(Storage) private readonly storage: Storage // Inietta Storage
+    @Inject(Storage) private readonly storage: Storage
   ) {}
 
   ngOnInit(): void {
-    this.route.paramMap.subscribe((params) => {
-      const idParam = params.get('id');
-      if (idParam) {
-        this.localId = idParam;
-        this.loadUserDataAndInitializeForm(this.localId);
+    this.initialLoading = true;
+    this.store.dispatch(setLoadingSpinner({ status: true }));
+
+    this.loggedInUserSubscription = this.store.select(getUser).pipe(take(1)).subscribe(loggedInUser => {
+      if (loggedInUser && loggedInUser.localId) {
+        this.loggedInUserId = loggedInUser.localId;
+        this.isCurrentUserAdmin = loggedInUser.ruolo === 'admin';
+
+        this.routeParamsSubscription = this.route.paramMap.subscribe(params => {
+          const idParam = params.get('id');
+          if (idParam) { // Admin viewing a specific profile or user viewing own profile via admin route
+            this.localId = idParam;
+            this.isViewingOwnProfile = this.loggedInUserId === this.localId;
+          } else { // Customer viewing their own profile via /cliente/account
+            this.localId = this.loggedInUserId!; // Safe due to outer if
+            this.isViewingOwnProfile = true;
+          }
+          this.loadUserDataAndInitializeForm(this.localId);
+        });
       } else {
-        console.error("ID utente non trovato nei parametri della rotta.");
-        Swal.fire('Errore', 'ID utente mancante nella rotta.', 'error');
-        this.router.navigate(['/admin/utente/utenti']);
+        // Should be caught by AuthGuard, but as a fallback:
+        console.error("Utente non loggato che tenta di accedere al profilo o ID utente loggato non disponibile.");
+        this.router.navigate(['/auth/login']);
+        this.initialLoading = false;
+        this.store.dispatch(setLoadingSpinner({ status: false }));
       }
     });
 
@@ -73,41 +100,62 @@ export class ProfiloComponent implements OnInit, OnDestroy {
       ofType(changeInfoSuccess, changePasswordSuccess)
     ).subscribe(() => {
       if (this.userForm) {
-        this.userForm.markAsPristine();
+        this.userForm.markAsPristine(); // Mark form as pristine after successful save
+        this.selectedFile = null; // Reset selected file as it has been processed
         this.updateWarningState();
-        // Ricarica i dati utente per aggiornare l'immagine profilo visualizzata, se ffuser è usato per [src]
+        // Reload data to reflect changes, including photoURL which might come from storage
         if (this.localId) {
-            this.loadUserDataAndInitializeForm(this.localId, false); // Non reinizializzare il form completamente se non serve
+          // Re-fetch user data to get the latest, especially photoURL from storage
+          this.loadUserDataAndInitializeForm(this.localId, false); // false to not fully re-init form if not needed for image
         }
       }
     });
   }
 
-  loadUserDataAndInitializeForm(userId: string, initializeFullForm: boolean = true): void {
-    this.store.dispatch(setLoadingSpinner({ status: true }));
+  loadUserDataAndInitializeForm(userId: string, reinitializeFullForm: boolean = true): void {
+    if (!userId) {
+      console.error("ID utente non valido per il caricamento dei dati.");
+      this.initialLoading = false;
+      this.store.dispatch(setLoadingSpinner({ status: false }));
+      Swal.fire('Errore', 'ID utente mancante.', 'error');
+      this.router.navigate([this.isCurrentUserAdmin ? '/admin/utente/utenti' : '/cliente/dashboard']);
+      return;
+    }
+
     this.userService.Searchuser(userId).pipe(take(1)).subscribe({
       next: (firestoreUser) => {
-        this.store.dispatch(setLoadingSpinner({ status: false }));
         if (firestoreUser) {
           this.ffuser = firestoreUser;
-          if(initializeFullForm){
-            this.emailVerifiedForm = firestoreUser.emailVerified || false;
+          this.emailVerifiedForm = firestoreUser.emailVerified || false;
+          if (reinitializeFullForm || !this.userForm) {
             this.initializeForm(firestoreUser);
           } else {
-            // Aggiorna solo l'anteprima se non si reinizializza il form
-             this.imagePreview = firestoreUser.photoURL || this.authService.DEFAULT_AVATAR_URL;
+            // Only update relevant parts if not a full reinitialization, e.g., photo
+            this.userForm.patchValue({
+                displayName: firestoreUser.displayName || '',
+                // email: firestoreUser.email || '', // Email non dovrebbe cambiare
+                cellulare: firestoreUser.cellulare || '',
+                // isAdminRole: firestoreUser.ruolo === 'admin', // Ruolo
+                // emailverified: firestoreUser.emailVerified || false // Email verificata
+            }, { emitEvent: false }); // emitEvent false per non triggerare valueChanges
+            this.imagePreview = firestoreUser.photoURL || this.authService.DEFAULT_AVATAR_URL;
+            this.userForm.markAsPristine();
+            this.updateWarningState();
           }
         } else {
           console.error(`Utente con ID ${userId} non trovato in Firestore.`);
           Swal.fire('Errore', 'Utente non trovato.', 'error')
-            .then(() => this.router.navigate(['/admin/utente/utenti']));
+            .then(() => this.router.navigate([this.isCurrentUserAdmin ? '/admin/utente/utenti' : '/cliente/dashboard']));
         }
+        this.initialLoading = false;
+        this.store.dispatch(setLoadingSpinner({ status: false }));
       },
       error: (err) => {
-        this.store.dispatch(setLoadingSpinner({ status: false }));
         console.error('Errore nel caricamento dati utente da Firestore:', err);
         Swal.fire('Errore Server', 'Impossibile caricare i dati utente.', 'error')
-          .then(() => this.router.navigate(['/admin/utente/utenti']));
+          .then(() => this.router.navigate([this.isCurrentUserAdmin ? '/admin/utente/utenti' : '/cliente/dashboard']));
+        this.initialLoading = false;
+        this.store.dispatch(setLoadingSpinner({ status: false }));
       }
     });
   }
@@ -116,29 +164,46 @@ export class ProfiloComponent implements OnInit, OnDestroy {
     this.userForm = new FormGroup({
       displayName: new FormControl(userData.displayName || '', [
         Validators.required,
-        Validators.minLength(6),
+        Validators.minLength(3), // Adjusted from 6 to 3 for more flexibility
       ]),
       email: new FormControl({value: userData.email || '', disabled: true}, [Validators.required, Validators.email]),
       cellulare: new FormControl(userData.cellulare || '', [
-        Validators.minLength(10),
+        Validators.pattern('^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\\s\\./0-9]*$'), // Generic phone pattern
+        Validators.minLength(9) // Common minimum length
       ]),
-      indirizzo: new FormControl({ value: (userData as any).indirizzo || '', disabled: true }),
-      emailverified: new FormControl({ value: userData.emailVerified || false, disabled: true }),
-      isAdminRole: new FormControl(userData.ruolo === 'admin'),
-      passwordold: new FormControl('', [Validators.minLength(6)]),
-      passwordnew: new FormControl('', [
+      // indirizzo is not in User model, seems to be from an old version or a custom field. Let's remove if not essential or add to model.
+      // For now, assume it's not a core field for this unified component.
+      // indirizzo: new FormControl({ value: (userData as any).indirizzo || '', disabled: true }),
+
+      // Admin-controlled fields
+      emailverified: new FormControl(
+        {
+          value: userData.emailVerified || false,
+          // Email verified can be changed by an admin, but not for their own profile via this UI.
+          // Also, a user cannot change their own verification status.
+          disabled: !this.isCurrentUserAdmin || this.isViewingOwnProfile
+        }
+      ),
+      isAdminRole: new FormControl(
+        {
+          value: userData.ruolo === 'admin',
+          // Role can be changed by an admin, but not for their own profile.
+          disabled: !this.isCurrentUserAdmin || this.isViewingOwnProfile
+        }
+      ),
+
+      // Password fields - only relevant if isViewingOwnProfile
+      // passwordold: new FormControl('', this.isViewingOwnProfile ? [Validators.minLength(6)] : []), // Conditional validator not straightforward here. Handle in template.
+      passwordnew: new FormControl('', this.isViewingOwnProfile ? [
         Validators.minLength(8),
         Validators.pattern(
           /(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*#?&^_-]).{8,}/
         ),
-      ]),
-      passwordnewre: new FormControl('', [
-        Validators.minLength(8),
-      ]),
-    }, { validators: this.passwordMatchValidator });
+      ] : []),
+      passwordnewre: new FormControl('', this.isViewingOwnProfile ? [] : []),
+    }, { validators: this.isViewingOwnProfile ? this.passwordMatchValidator : null });
 
     this.imagePreview = userData.photoURL || this.authService.DEFAULT_AVATAR_URL;
-
 
     if (this.formChangesSubscription) {
       this.formChangesSubscription.unsubscribe();
@@ -146,7 +211,7 @@ export class ProfiloComponent implements OnInit, OnDestroy {
     this.formChangesSubscription = this.userForm.valueChanges.subscribe(() => {
       this.updateWarningState();
     });
-    this.updateWarningState();
+    this.updateWarningState(); // Initial check
   }
 
   onFileSelected(event: Event): void {
@@ -167,12 +232,12 @@ export class ProfiloComponent implements OnInit, OnDestroy {
         Swal.fire('Errore', 'File troppo grande. Dimensione massima 2MB.', 'error');
         this.selectedFile = null;
         this.imagePreview = this.ffuser?.photoURL || this.authService.DEFAULT_AVATAR_URL;
-        element.value = "";
+        element.value = ""; // Clear the input
         return;
       }
 
       this.selectedFile = file;
-      this.userForm.markAsDirty();
+      this.userForm.markAsDirty(); // Mark form as dirty when a new file is selected
       this.updateWarningState();
 
       const reader = new FileReader();
@@ -181,192 +246,223 @@ export class ProfiloComponent implements OnInit, OnDestroy {
       };
       reader.readAsDataURL(this.selectedFile);
     } else {
+      // If no file is selected (e.g., user cancels file dialog), revert to previous or default.
+      // This case might not be hit if the change event only fires on actual selection.
       this.selectedFile = null;
-      this.imagePreview = this.ffuser?.photoURL || this.authService.DEFAULT_AVATAR_URL;
+      // Do not reset imagePreview here unless it's intended to clear it on cancel.
+      // this.imagePreview = this.ffuser?.photoURL || this.authService.DEFAULT_AVATAR_URL;
     }
   }
 
-
   updateWarningState(): void {
-    if (this.userForm && (this.userForm.dirty || this.selectedFile)) {
-      this.showUnsavedChangesWarning = true;
+    if (this.userForm) { // Check if userForm is initialized
+      this.showUnsavedChangesWarning = this.userForm.dirty || !!this.selectedFile;
     } else {
-      this.showUnsavedChangesWarning = false;
+      this.showUnsavedChangesWarning = !!this.selectedFile;
     }
   }
 
   passwordMatchValidator(fg: FormGroup): {[key: string]: boolean} | null {
-    const newPass = fg.get('passwordnew')?.value;
-    const confirmPass = fg.get('passwordnewre')?.value;
+    const newPassControl = fg.get('passwordnew');
+    const confirmPassControl = fg.get('passwordnewre');
 
-    if (newPass || confirmPass) {
-        if (newPass !== confirmPass) {
-            fg.get('passwordnewre')?.setErrors({ mismatch: true });
-            return { 'mismatch': true };
-        } else {
-            const confirmPassControl = fg.get('passwordnewre');
-            if (confirmPassControl && confirmPassControl.hasError('mismatch')) {
+    if (newPassControl && confirmPassControl) {
+        const newPass = newPassControl.value;
+        const confirmPass = confirmPassControl.value;
+
+        // Only validate if newPassword has a value, to allow password fields to be optional if not changing password
+        if (newPass || confirmPass) {
+            if (newPass !== confirmPass) {
+                confirmPassControl.setErrors({ mismatch: true });
+                return { 'mismatch': true };
+            } else {
+                 // Clear mismatch error if passwords match or if one is empty and the other had an error
+                if (confirmPassControl.hasError('mismatch')) {
+                    const errors = confirmPassControl.errors;
+                    if (errors) {
+                        delete errors['mismatch'];
+                        if (Object.keys(errors).length === 0) {
+                            confirmPassControl.setErrors(null);
+                        } else {
+                            confirmPassControl.setErrors(errors);
+                        }
+                    }
+                }
+            }
+        } else { // If both are empty, clear any previous mismatch error
+             if (confirmPassControl.hasError('mismatch')) {
                 confirmPassControl.setErrors(null);
             }
-        }
-    } else {
-        const confirmPassControl = fg.get('passwordnewre');
-        if (confirmPassControl && confirmPassControl.hasError('mismatch')) {
-            confirmPassControl.setErrors(null);
         }
     }
     return null;
   }
 
-
   onRoleChange(event: Event): void {
+    // This method is bound to the (change) event of the role switch.
+    // The form control `isAdminRole` is already updated by Angular Forms.
+    // No specific action needed here unless there's additional logic on role change itself.
+    this.userForm.markAsDirty();
+    this.updateWarningState();
   }
 
   async onSubmit(event: Event) {
     const submitEvent = event as SubmitEvent;
     const submitter = submitEvent.submitter as HTMLButtonElement | null;
 
-    // Logica di validazione specifica per 'changePassword'
-    if (submitter && submitter.name === 'changePassword') {
-      const newPassControl = this.userForm.get('passwordnew');
-      const newRePassControl = this.userForm.get('passwordnewre');
-      newPassControl?.markAsTouched();
-      newRePassControl?.markAsTouched();
-      newPassControl?.updateValueAndValidity();
-      this.userForm.updateValueAndValidity();
-
-
-      if (newPassControl?.invalid || this.userForm.hasError('mismatch')) {
-         Swal.fire('Attenzione', 'Correggi gli errori nel form della password.', 'warning');
-         this.store.dispatch(setLoadingSpinner({ status: false }));
-         return;
-      }
-       if (!newPassControl?.value && !newRePassControl?.value) {
-         Swal.fire('Info', 'Nessuna nuova password inserita.', 'info');
-         return;
-      }
-    } else if (submitter && submitter.name === 'changeUser') {
-        const profileControls = ['displayName', 'cellulare'];
-        let profileFormValid = true;
-        profileControls.forEach(controlName => {
-            const control = this.userForm.get(controlName);
-            control?.markAsTouched();
-            if (control?.invalid) {
-                profileFormValid = false;
-            }
-        });
-        if (!profileFormValid) {
-            Swal.fire('Attenzione', 'Correggi gli errori nei dati del profilo.', 'warning');
-            this.store.dispatch(setLoadingSpinner({ status: false }));
-            return;
-        }
-    }
-
-
-    if (!this.ffuser || !this.localId) {
-        Swal.fire('Errore', 'Dati utente non caricati correttamente.', 'error');
-        this.store.dispatch(setLoadingSpinner({ status: false }));
+    if (this.initialLoading || (this.isLoading$ && await firstValueFrom(this.isLoading$))) {
+        Swal.fire('Attendi', 'Operazione precedente in corso.', 'info');
         return;
     }
 
-    this.store.dispatch(setLoadingSpinner({ status: true }));
-
     if (submitter && submitter.name === 'changePassword') {
-      const passwordNew = this.userForm.value.passwordnew;
+        if (!this.isViewingOwnProfile) {
+            Swal.fire('Errore', 'Non puoi cambiare la password di un altro utente da qui.', 'error');
+            return;
+        }
+        const newPassControl = this.userForm.get('passwordnew');
+        const newRePassControl = this.userForm.get('passwordnewre');
 
-      this.store.select(getUserToken).pipe(take(1)).subscribe(token => {
-          if (token) {
-             this.store.dispatch(changePasswordStart({ idToken: token, password: passwordNew }));
-          } else {
-             this.store.dispatch(setErrorMessage({ message: 'Token utente non valido per cambio password.' }));
-             this.store.dispatch(setLoadingSpinner({ status: false }));
-          }
-      });
+        // Mark as touched to show validation errors
+        newPassControl?.markAsTouched();
+        newRePassControl?.markAsTouched();
+        newPassControl?.updateValueAndValidity({ onlySelf: true });
+        this.userForm.updateValueAndValidity(); // Re-run form-level validators like passwordMatchValidator
+
+        if (!newPassControl?.value && !newRePassControl?.value) {
+            Swal.fire('Info', 'Nessuna nuova password inserita. Nessuna modifica apportata alla password.', 'info');
+            return; // Do nothing if password fields are empty
+        }
+
+        if (newPassControl?.invalid || this.userForm.hasError('mismatch') || newRePassControl?.invalid) {
+            Swal.fire('Attenzione', 'Correggi gli errori nel form della password.', 'warning');
+            return;
+        }
+
+        this.store.dispatch(setLoadingSpinner({ status: true }));
+        const passwordNew = this.userForm.value.passwordnew;
+
+        this.store.select(getUserToken).pipe(take(1)).subscribe(token => {
+            if (token) {
+                this.store.dispatch(changePasswordStart({ idToken: token, password: passwordNew }));
+            } else {
+                this.store.dispatch(setErrorMessage({ message: 'Token utente non valido per cambio password.' }));
+                this.store.dispatch(setLoadingSpinner({ status: false }));
+                 Swal.fire('Errore Sessione', 'Token utente non valido. Effettua nuovamente il login.', 'error');
+            }
+        });
 
     } else if (submitter && submitter.name === 'changeUser') {
+        const profileControlsToValidate = ['displayName', 'cellulare'];
+        let isProfileSectionValid = true;
+        profileControlsToValidate.forEach(controlName => {
+            const control = this.userForm.get(controlName);
+            control?.markAsTouched();
+            if (control?.invalid) {
+                isProfileSectionValid = false;
+            }
+        });
+
+        // For admin-specific fields, ensure they are valid if the admin is editing them
+        if (this.isCurrentUserAdmin && !this.isViewingOwnProfile) {
+            const adminRoleControl = this.userForm.get('isAdminRole');
+            const emailVerifiedControl = this.userForm.get('emailverified');
+            adminRoleControl?.markAsTouched();
+            emailVerifiedControl?.markAsTouched();
+            if (adminRoleControl?.invalid || emailVerifiedControl?.invalid) {
+                isProfileSectionValid = false;
+            }
+        }
+
+        if (!isProfileSectionValid) {
+            Swal.fire('Attenzione', 'Correggi gli errori nei dati del profilo.', 'warning');
+            return;
+        }
+
+        if (!this.ffuser || !this.localId) {
+            Swal.fire('Errore', 'Dati utente di riferimento non caricati correttamente.', 'error');
+            return;
+        }
+
+        if (!this.userForm.dirty && !this.selectedFile) {
+            Swal.fire('Info', 'Nessuna modifica da salvare.', 'info');
+            return;
+        }
+
+        this.store.dispatch(setLoadingSpinner({ status: true }));
         this.isUploading = true;
 
         let photoURLPromise: Promise<string | undefined>;
 
         if (this.selectedFile) {
-          const filePath = `profile-pictures/${this.localId}/${Date.now()}_${this.selectedFile.name}`;
-          const storageRef = ref(this.storage, filePath);
-          const uploadTask = uploadBytesResumable(storageRef, this.selectedFile);
+            const filePath = `profile-pictures/${this.localId}/${Date.now()}_${this.selectedFile.name}`;
+            const storageRef = ref(this.storage, filePath);
+            const uploadTask = uploadBytesResumable(storageRef, this.selectedFile);
 
-          photoURLPromise = new Promise((resolve, reject) => {
+            photoURLPromise = new Promise((resolve, reject) => {
             uploadTask.on('state_changed',
-              (snapshot) => { /* progress */ },
-              (error) => {
+                (snapshot) => { /* progress */ },
+                (error) => {
                 console.error("Errore durante l'upload dell'immagine:", error);
                 Swal.fire('Errore Upload', "Impossibile caricare l'immagine.", 'error');
                 reject(error);
-              },
-              async () => {
+                },
+                async () => {
                 try {
-                  const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-                  resolve(downloadURL);
+                    const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+                    resolve(downloadURL);
                 } catch (urlError) {
-                  reject(urlError);
+                    reject(urlError);
                 }
-              }
+                }
             );
-          });
+            });
         } else {
-          photoURLPromise = Promise.resolve(this.ffuser?.photoURL); // Usa URL esistente se nessun nuovo file
+            photoURLPromise = Promise.resolve(this.ffuser?.photoURL);
         }
 
         try {
-          const newPhotoURL = await photoURLPromise; // Aspetta che l'upload sia completato (se c'è)
+            const newPhotoURL = await photoURLPromise;
 
-          const displayName: string = this.userForm.value.displayName;
-          const cellulare: string = this.userForm.value.cellulare;
-          const isAdminRole: boolean = this.userForm.value.isAdminRole;
-          const newRole = isAdminRole ? 'admin' : 'cliente';
+            const displayName: string = this.userForm.value.displayName;
+            const cellulare: string = this.userForm.value.cellulare;
 
-          const updatedUserData: Partial<User> = {
-            displayName: displayName,
-            cellulare: cellulare,
-            ruolo: newRole,
-            photoURL: newPhotoURL // Questo sarà l'URL nuovo o quello esistente
-          };
+            const updatedUserData: Partial<User> = {
+                displayName: displayName,
+                cellulare: cellulare,
+                photoURL: newPhotoURL
+            };
 
-          const finalUserData = Object.fromEntries(
-             Object.entries(updatedUserData).filter(([_, v]) => v !== undefined)
-          ) as User;
+            if (this.isCurrentUserAdmin && !this.isViewingOwnProfile) {
+                updatedUserData.ruolo = this.userForm.value.isAdminRole ? 'admin' : 'cliente';
+                updatedUserData.emailVerified = this.userForm.value.emailverified;
+            }
 
-          this.store.dispatch(changeInfoStart({ localId: this.localId!, value: finalUserData }));
+            const finalUserData = Object.fromEntries(
+                Object.entries(updatedUserData).filter(([, v]) => v !== undefined && v !== null)
+            ) as User; // Cast as User, ensure model matches
 
-          // Resetta lo stato del file solo dopo il successo dell'operazione changeInfo
-          const successSub = this.actions$.pipe(ofType(changeInfoSuccess), take(1)).subscribe(() => {
-            this.selectedFile = null;
-            // L'imagePreview verrà aggiornato dal loadUserDataAndInitializeForm chiamato nell'ngOnInit dell'actionsSubscription
-             this.userForm.markAsPristine(); // Resetta lo stato dirty del form
-             this.updateWarningState();
-          });
-          this.actionsSubscription?.add(successSub);
+            this.store.dispatch(changeInfoStart({ localId: this.localId!, value: finalUserData }));
 
+            // selectedFile reset and form marking pristine is handled in success action subscription
 
         } catch (error) {
             console.error("Errore nel processo di upload o aggiornamento profilo:", error);
-            this.store.dispatch(setLoadingSpinner({ status: false }));
-            // Potrebbe essere necessario un messaggio di errore specifico per l'upload fallito
+            this.store.dispatch(setErrorMessage({ message: "Errore durante l'aggiornamento del profilo." }));
         } finally {
             this.isUploading = false;
-            // setLoadingSpinner(false) è gestito globalmente dall'effetto NGRX o qui se l'effetto non viene chiamato
+             // setLoadingSpinner false is handled by the effect or after success/failure.
         }
 
     } else {
       console.warn("Azione di submit non riconosciuta o submitter non trovato.");
-      this.store.dispatch(setLoadingSpinner({ status: false }));
     }
   }
 
   ngOnDestroy(): void {
-    if (this.formChangesSubscription) {
-      this.formChangesSubscription.unsubscribe();
-    }
-    if (this.actionsSubscription) {
-      this.actionsSubscription.unsubscribe();
-    }
+    if (this.formChangesSubscription) this.formChangesSubscription.unsubscribe();
+    if (this.actionsSubscription) this.actionsSubscription.unsubscribe();
+    if (this.routeParamsSubscription) this.routeParamsSubscription.unsubscribe();
+    if (this.loggedInUserSubscription) this.loggedInUserSubscription.unsubscribe();
   }
 }

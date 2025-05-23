@@ -7,17 +7,18 @@ import { FeahterIconModule } from 'src/app/shared/feather-icon/feather-icon.modu
 import { NgbDropdownModule, NgbCollapseModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { CoreModule } from '../../core/core.module';
 
-// Layout Cliente
 import { CustomerLayoutComponent } from './customer-layout/customer-layout.component';
 import { CustomerSidebarComponent } from './customer-layout/customer-sidebar/customer-sidebar.component';
 import { CustomerNavbarComponent } from './customer-layout/customer-navbar/customer-navbar.component';
 import { CustomerFooterComponent } from './customer-layout/customer-footer/customer-footer.component';
 
-// Pagine specifiche
 import { CustomerDashboardHomeComponent } from './dashboard-home/dashboard-home.component';
-import { AccountInfoComponent } from './account-info/account-info.component';
 import { CurrioEditComponent } from 'src/app/views/currio/currio-edit/currio-edit.component';
 import { CurrioModule } from 'src/app/views/currio/currio.module';
+
+import { ProfiloComponent } from 'src/app/views/utente/profilo/profilo.component';
+import { UtenteModule } from 'src/app/views/utente/utente.module';
+
 
 const routes: Routes = [
   {
@@ -28,17 +29,17 @@ const routes: Routes = [
       {
         path: 'dashboard',
         component: CustomerDashboardHomeComponent,
-        data: { title: 'customer.dashboard.title' },
+        data: { title: 'customer.dashboard.welcome' },
       },
       {
         path: 'account',
-        component: AccountInfoComponent,
-        data: { title: 'customer.account.title' },
+        component: ProfiloComponent,
+        data: { title: 'customer.menu.profile' },
       },
       {
         path: 'currio',
         component: CurrioEditComponent,
-        data: { title: 'customer.currio.title' },
+        data: { title: 'customer.menu.currio' },
       },
     ],
   },
@@ -51,7 +52,6 @@ const routes: Routes = [
     CustomerNavbarComponent,
     CustomerFooterComponent,
     CustomerDashboardHomeComponent,
-    AccountInfoComponent,
   ],
   imports: [
     CommonModule,
@@ -65,6 +65,7 @@ const routes: Routes = [
     NgbTooltipModule,
     CoreModule,
     CurrioModule,
+    UtenteModule,
   ],
 })
 export class CustomerModule {}
