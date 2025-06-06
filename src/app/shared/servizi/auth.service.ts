@@ -79,6 +79,54 @@ ChangeInfo(idToken: string, displayName: string, photoURL: string): Observable<a
   }
 
 
+  /**
+   * New method to handle both Auth creation and Firestore document creation in one go.
+   * @param email The user's email.
+   * @param password The user's password.
+   * @param additionalData Additional data for the user profile (displayName, ruolo, etc.).
+   */
+  async SignUpAndCreateUserDocument(email: string, password: string, additionalData: Partial<User>): Promise<void> {
+    try {
+      const result = await this.afAuth.createUserWithEmailAndPassword(email, password);
+      if (!result.user) {
+        throw new Error("User object is null after registration.");
+      }
+      const user = result.user;
+
+      // Update Firebase Auth Profile
+      await user.updateProfile({
+        displayName: additionalData.displayName,
+        photoURL: additionalData.photoURL
+      });
+
+      // Prepare data for Firestore
+      const userDoc: User = {
+        localId: user.uid,
+        email: user.email,
+        displayName: additionalData.displayName || user.displayName || '',
+        photoURL: additionalData.photoURL || user.photoURL || this.DEFAULT_AVATAR_URL,
+        ruolo: additionalData.ruolo || 'cliente',
+        emailVerified: user.emailVerified
+      };
+
+      // Set data in Firestore
+      await this.SetUserDataInFirestore(userDoc);
+
+      // Optionally send verification email
+      await this.SendVerificationMail();
+
+    } catch (error) {
+      console.error("Errore durante SignUpAndCreateUserDocument:", error);
+      // Re-throw the error so the component can catch it and display a message.
+      throw error;
+    }
+  }
+
+  private SetUserDataInFirestore(user: User): Promise<void> {
+    const userRef: AngularFirestoreDocument<User> = this.afs.doc(`users/${user.localId}`);
+    return userRef.set(user, { merge: true });
+  }
+
 
   // Registrazione con email/password
   SignUp(email: string, password: string) {
