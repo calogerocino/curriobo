@@ -21,6 +21,15 @@
     }
   }
 
+  .accordion-error-icon {
+    color: theme-color(danger);
+    margin-left: 10px;
+    i {
+        width: 18px;
+        height: 18px;
+    }
+  }
+
   // Sovrascrivi stili ng-bootstrap se necessario per coerenza con il tema
   // Nota: potresti aver bisogno di ::ng-deep per sovrascrivere stili incapsulati,
   // ma usalo con cautela. È preferibile definire variabili SCSS di ng-bootstrap se il tema lo permette.
@@ -120,4 +129,3 @@
     font-weight: 500;
   }
 }
-

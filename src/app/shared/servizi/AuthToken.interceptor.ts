@@ -10,6 +10,7 @@ import {
   HttpRequest,
 } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from 'src/environments/environment';
 
 @Injectable()
 export class AuthTokenInterceptor implements HttpInterceptor {
@@ -21,9 +22,13 @@ export class AuthTokenInterceptor implements HttpInterceptor {
     return this.store.select(getUserToken).pipe(
       take(1),
       exhaustMap((token) => {
-        if (!token) {
+        // Se non c'è un token o la richiesta non è per il nostro database Firebase,
+        // inoltra la richiesta senza modificarla.
+        if (!token || !req.url.includes(environment.firebase.databaseURL)) {
           return next.handle(req);
         }
+
+        // Se la richiesta è per il database Firebase, aggiungi il token.
         let modifiedReq = req.clone({
           params: req.params.append('auth', token),
         });

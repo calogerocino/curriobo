@@ -17,7 +17,7 @@
 <ng-container *ngSwitchCase="'modern'">
         <header class="modern-header-bootstrap shadow-sm">
             <nav class="navbar navbar-expand-md navbar-light bg-white">
-                <div class="container">
+                <div class="container-fluid">
                     <a class="navbar-brand fs-3 fw-bolder text-primary" href="#homeModern" (click)="$event.preventDefault(); smoothScrollTo('#homeModern')">{{ currio.nomePortfolio }}</a>
                     <button class="navbar-toggler" type="button" (click)="toggleMobileMenu()" [attr.aria-expanded]="isMobileMenuOpen" aria-controls="navbarNavModern" aria-label="Toggle navigation">
                         <span class="navbar-toggler-icon"></span>

@@ -1,5 +1,5 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { FormGroup, Validators, FormBuilder, FormArray } from '@angular/forms';
+import { Component, OnDestroy, OnInit, ChangeDetectorRef } from '@angular/core';
+import { FormGroup, Validators, FormBuilder, FormArray, AbstractControl } from '@angular/forms';
 import { Currio, CurrioProgetto, CurrioEsperienza, CurrioCompetenza } from 'src/app/shared/models/currio.model';
 import { getCurrioById, getCurrioLoading, getCurrios } from '../state/currio.selector';
 import { AppState } from 'src/app/shared/app.state';
@@ -15,6 +15,8 @@ import { Actions, ofType } from '@ngrx/effects';
 import { User } from 'src/app/shared/models/user.interface';
 import { getUser } from '../../auth/state/auth.selector';
 import { AuthService } from 'src/app/shared/servizi/auth.service';
+import { CvParsingService, ParsedCvData } from 'src/app/shared/servizi/cv-parsing.service';
+import { CurrioService } from 'src/app/shared/servizi/currio.service';
 
 @Component({
   selector: 'app-currio-edit',
@@ -32,6 +34,7 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
   isSubmitting$: Observable<boolean>;
   isLoadingCurrio = true;
   showUnsavedChangesWarning = false;
+  formError: string | null = null;
 
   currentUser$: Observable<User | null> = this.store.select(getUser);
   currentUserRole: 'admin' | 'cliente' | undefined;
@@ -44,7 +47,10 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
     private readonly router: Router,
     private readonly fb: FormBuilder,
     private readonly actions$: Actions,
-    private readonly authService: AuthService
+    private readonly authService: AuthService,
+    private readonly cvParsingService: CvParsingService,
+    private readonly currioService: CurrioService,
+    private readonly cdr: ChangeDetectorRef
   ) {
     this.isSubmitting$ = this.store.select(getCurrioLoading);
   }
@@ -197,7 +203,12 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
   }
 
   private subscribeToFormChanges(): void {
-    const formSub = this.currioForm.valueChanges.subscribe(() => this.updateWarningState());
+    const formSub = this.currioForm.valueChanges.subscribe(() => {
+        this.updateWarningState();
+        if (this.currioForm.dirty) {
+            this.formError = null;
+        }
+    });
     this.subscriptions.add(formSub);
   }
 
@@ -207,6 +218,7 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
     ).subscribe(() => {
       this.currioForm.markAsPristine();
       this.updateWarningState();
+      this.formError = null;
       if (this.currioId) {
          this.store.dispatch(loadCurrioById({id: this.currioId}));
       }
@@ -215,12 +227,17 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
   }
 
   updateWarningState(): void {
-    this.showUnsavedChangesWarning = this.currioForm && this.currioForm.dirty;
+    this.showUnsavedChangesWarning = this.currioForm && this.currioForm.dirty && !this.formError;
   }
 
   selectTemplate(templateName: 'modern' | 'vintage' | 'classic'): void {
     this.currioForm.get('templateScelto')?.setValue(templateName);
     this.currioForm.markAsDirty();
+  }
+
+  isAccordionSectionInvalid(section: 'progetti' | 'esperienze' | 'competenze'): boolean {
+    const formArray = this.currioForm.get(section) as FormArray;
+    return formArray.invalid && (formArray.dirty || formArray.touched);
   }
 
   get progettiFormArray() { return this.currioForm.get('progetti') as FormArray; }
@@ -331,9 +348,13 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
   onSubmit(): void {
     if (!this.currioForm.valid) {
       this.currioForm.markAllAsTouched();
-      Swal.fire('Attenzione', 'Per favore, correggi gli errori nel form.', 'warning');
+      this.formError = "Attenzione, alcuni campi non sono validi. Controlla le sezioni evidenziate e correggi gli errori.";
+      this.showUnsavedChangesWarning = false;
+      Swal.fire('Attenzione', this.formError, 'warning');
       return;
     }
+
+    this.formError = null;
 
     if (!this.currio || !this.currio.id) {
       Swal.fire('Errore', 'Impossibile salvare, dati Curriò di riferimento mancanti o ID non valido.', 'error');
@@ -411,6 +432,76 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
       Swal.fire('Errore', "Operazione non permessa o ID del Curriò non disponibile.", 'error');
     }
   }
+
+  autoFillFromCv(): void {
+    if (!this.currio?.curriculumUrl) {
+      Swal.fire('Attenzione', 'Nessun curriculum caricato per questo Curriò.', 'warning');
+      return;
+    }
+
+    Swal.fire({
+      title: 'Analisi del CV in corso...',
+      text: 'Stiamo estraendo le informazioni dal documento. Attendere prego.',
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      }
+    });
+
+    this.cvParsingService.parseCvFromUrl(this.currio.curriculumUrl).subscribe({
+      next: (parsedData) => {
+        this.clearAndPopulateFormArray(this.esperienzeFormArray, parsedData.esperienze, this.createEsperienzaGroup.bind(this));
+        this.clearAndPopulateFormArray(this.competenzeFormArray, parsedData.competenze, this.createCompetenzaGroup.bind(this));
+        this.clearAndPopulateFormArray(this.progettiFormArray, parsedData.progetti, this.createProgettoGroup.bind(this));
+
+        this.currioForm.markAsDirty();
+        this.updateWarningState();
+        
+        Swal.fire('Successo!', 'I campi sono stati compilati con le informazioni estratte dal CV.', 'success');
+      },
+      error: (err) => {
+        console.error("Errore durante l'analisi del CV:", err);
+        Swal.fire('Errore', err.message || "Si è verificato un errore durante l'analisi del CV.", 'error');
+      }
+    });
+  }
+
+  deleteCurriculum(): void {
+    if (!this.currio || !this.currio.curriculumUrl) {
+        Swal.fire('Attenzione', 'Nessun curriculum da eliminare.', 'warning');
+        return;
+    }
+
+    Swal.fire({
+        title: 'Sei sicuro?',
+        text: "Vuoi eliminare definitivamente il file del curriculum? L'operazione non è reversibile.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Sì, eliminalo!',
+        cancelButtonText: 'Annulla'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            this.store.dispatch(setLoadingSpinner({ status: true }));
+            const fileUrl = this.currio!.curriculumUrl!;
+            this.currioService.deleteFileByUrl(fileUrl)
+                .then(() => {
+                    const updatedCurrio: Currio = {
+                        ...this.currio!,
+                        curriculumUrl: undefined
+                    };
+                    this.store.dispatch(updateCurrio({ currio: updatedCurrio }));
+                })
+                .catch(error => {
+                    console.error("Errore eliminazione file CV da storage:", error);
+                    Swal.fire('Errore', 'Impossibile eliminare il file del CV.', 'error');
+                    this.store.dispatch(setLoadingSpinner({ status: false }));
+                });
+        }
+    });
+  }
+
 
    private handleCurrioLoadingError(message: string, error?: any): void {
     console.error(message, error || '');
