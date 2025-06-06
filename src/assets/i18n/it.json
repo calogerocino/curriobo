@@ -119,6 +119,13 @@
           "vintage": "Vintage",
           "classic": "Classico"
         },
+        "altreCompetenze": {
+          "softSkill": "Soft Skill",
+          "linguaNome": "Lingua",
+          "linguaLivello": "Livello",
+          "linguaCert": "Certificazione"
+      },
+        "altreCompetenzeTitle": "Soft Skills e Lingue",
         "nomePortfolio": "Nome del Tuo Curriò (es. Portfolio di Mario Rossi)",
         "heroTitle": "Titolo Principale (es. Ciao, sono Mario!)",
         "heroSubtitle": "Sottotitolo (una breve descrizione di te)",
