@@ -159,26 +159,21 @@ export class CompletaRegistrazioneComponent implements OnInit, OnDestroy {
     const displayName = this.currioData.datiCliente.nome;
 
     try {
-      await this.authService.SignUpAndCreateUserDocument(email, password, {
+      const newUserId = await this.authService.SignUpAndCreateUserDocument(email, password, {
         displayName: displayName,
         ruolo: 'cliente',
         photoURL: this.authService.DEFAULT_AVATAR_URL
       });
 
       if (this.currioData && this.currioData.id) {
-        // Fetch the newly created user's ID to link it to the currio
-        // This part might need adjustment based on how you can get the new UID back
-        // For now, we assume the user will log in and the link will be established then.
-        // A better approach would be to get the UID back from SignUpAndCreateUserDocument
-        // For now, we just update the Curriò status.
         const updatedCurrio: Currio = {
           ...this.currioData,
+          userId: newUserId, // <-- COLLEGAMENTO FONDAMENTALE
           status: 'attivo',
           tokenRegistrazione: undefined,
           tokenRegistrazioneScadenza: undefined,
         };
-        // We can't set the userId here without logging in first.
-        // Let's assume the linking happens on first login.
+        
         this.store.dispatch(
           CurrioActions.updateCurrio({ currio: updatedCurrio })
         );

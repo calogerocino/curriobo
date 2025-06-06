@@ -3,15 +3,26 @@
     <div class="loading-spinner"></div>
   </div>
 
-  <div *ngIf="!isLoading && !currio" class="error-container">
+  <div *ngIf="!isLoading && !currio && !isPrivateForViewer" class="error-container">
     <h2 class="error-title">{{ 'currioPreview.errorTitle' | translate }}</h2>
     <p class="error-message">{{ 'currioPreview.errorMessage' | translate }}</p>
-    <a routerLink="/admin/currio/listacurrio" *ngIf="isUserAdmin$ | async" class="button button-primary">
-      {{ 'currioPreview.backToList' | translate }}
+    <a routerLink="/" class="button button-primary">
+      Torna alla Home
     </a>
   </div>
 
-  <div *ngIf="!isLoading && currio">
+  <div *ngIf="isPrivateForViewer" class="private-view-container">
+    <div class="private-view-content">
+      <div class="icon-container">
+        <i class="feather icon-lock"></i>
+      </div>
+      <h2>Questo Curriò è Privato</h2>
+      <p>Il proprietario sta ancora lavorando su questo Curriò. Riprova più tardi!</p>
+      <a routerLink="/" class="btn btn-outline-primary mt-3">Torna alla Home</a>
+    </div>
+  </div>
+
+  <div *ngIf="!isLoading && currio && !isPrivateForViewer">
     <ng-container [ngSwitch]="currio.templateScelto">
 
 <ng-container *ngSwitchCase="'modern'">

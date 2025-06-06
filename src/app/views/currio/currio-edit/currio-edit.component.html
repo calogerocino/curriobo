@@ -13,12 +13,12 @@
 <div class="row mb-3" *ngIf="currio && currio.id">
   <div class="col-md-12 d-flex justify-content-between align-items-center">
     <div>
-      <button type="button" (click)="openPreviewInNewTab()" class="btn btn-info me-2 mr-2">
+      <button type="button" (click)="openPreviewInNewTab()" class="btn btn-info me-2">
         <i class="feather icon-external-link"></i> Anteprima Curriò
       </button>
     </div>
     <div>
-      <button type="submit" form="currioUnifiedForm" class="btn btn-primary mr-2"
+      <button type="submit" form="currioUnifiedForm" class="btn btn-primary me-2"
         [disabled]="!currioForm.valid || (isSubmitting$ | async) || !currioForm.dirty">
         <i class="feather icon-save"></i>
         <span *ngIf="!(isSubmitting$ | async)">
@@ -28,10 +28,10 @@
           aria-hidden="true"></span>
         <span *ngIf="isSubmitting$ | async"> Salvataggio...</span>
       </button>
-      <button type="button" class="btn btn-secondary me-2 mr-2" (click)="goBack()">
+      <button type="button" class="btn btn-secondary me-2" (click)="goBack()">
         <i class="feather go-back"></i> {{'generale.shared.annulla' | translate}}
       </button>
-      <button type="button" class="btn btn-danger me-2" (click)="onDeleteCurrio()" *ngIf="isUserAdmin">
+      <button type="button" class="btn btn-danger" (click)="onDeleteCurrio()" *ngIf="isUserAdmin">
         <i class="feather icon-trash"></i> {{'generale.shared.elimina' | translate}}
       </button>
     </div>
@@ -63,6 +63,26 @@
     <div class="row">
 
       <div class="col-md-6">
+         <div class="card mb-3">
+            <div class="card-header">
+                <h5 class="mb-0">Impostazioni di Visibilità</h5>
+            </div>
+            <div class="card-body">
+                <div class="form-check form-switch form-switch-lg d-flex align-items-center justify-content-between">
+                    <div>
+                        <input class="form-check-input" type="checkbox" id="privacyToggle" 
+                               [checked]="currio.status === 'attivo'" 
+                               (change)="togglePrivacyStatus()">
+                        <label class="form-check-label" for="privacyToggle">
+                            <span *ngIf="currio.status === 'attivo'" class="text-success fw-bold">Pubblico</span>
+                            <span *ngIf="currio.status !== 'attivo'" class="text-danger fw-bold">Privato</span>
+                        </label>
+                    </div>
+                    <small class="text-muted" *ngIf="currio.status === 'attivo'">Il tuo Curriò è visibile a tutti.</small>
+                    <small class="text-muted" *ngIf="currio.status !== 'attivo'">Solo tu e l'admin potete vederlo.</small>
+                </div>
+            </div>
+        </div>
         <div class="card mb-3" *ngIf="isUserAdmin && currio.curriculumUrl">
           <div class="card-header">
             <h5 class="mb-0">Gestione Curriculum (CV)</h5>
