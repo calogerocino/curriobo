@@ -10,7 +10,7 @@ import { getCurrios, getCurrioSubmissions } from "../state/currio.selector";
 import { loadCurrios, loadCurrioSubmissions, deleteCurrio } from "../state/currio.action";
 import Swal from 'sweetalert2';
 
-type CurrioStatusType = 'nuova_richiesta' | 'invito_spedito' | 'attivo' | 'archiviato';
+type CurrioStatusType = 'nuova_richiesta' | 'invito_spedito' | 'attivo' | 'privato' | 'archiviato';
 
 @Component({
   selector: "app-listacurrio",
@@ -41,7 +41,7 @@ export class ListaCurrioComponent implements OnInit, OnDestroy {
       map(params => params.get('statusFilter') as CurrioStatusType | "" | null),
       distinctUntilChanged()
     ).subscribe(statusFilterParam => {
-      if (statusFilterParam && ['nuova_richiesta', 'invito_spedito', 'attivo', 'archiviato'].includes(statusFilterParam)) {
+      if (statusFilterParam && ['nuova_richiesta', 'invito_spedito', 'attivo', 'archiviato', 'privato'].includes(statusFilterParam)) {
         this.selectedStatusFilter = statusFilterParam;
       } else {
         this.selectedStatusFilter = "";
@@ -119,6 +119,8 @@ export class ListaCurrioComponent implements OnInit, OnDestroy {
         return 'bg-success text-white';
       case 'archiviato':
         return 'bg-secondary text-white';
+        case 'privato':
+          return 'bg-secondary text-black';
       default:
         return 'bg-light text-dark';
     }

@@ -66,7 +66,7 @@ export interface Currio {
   linguaDefault?: 'it' | 'en';
   templateScelto?: 'modern' | 'vintage' | 'classic';
   userId?: string;
-  status?: 'nuova_richiesta' | 'invito_spedito' | 'attivo' | 'archiviato';
+  status?: 'nuova_richiesta' | 'invito_spedito' | 'attivo' | 'privato' | 'archiviato';
   datiCliente?: DatiClienteCurrio;
   tokenRegistrazione?: string;
   tokenRegistrazioneScadenza?: number;

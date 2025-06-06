@@ -95,20 +95,28 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
         this.store.dispatch(loadCurrios());
         const currioByUserSub = this.store.select(getCurrios).pipe(
           map(currios => currios.find(c => c.userId === this.currentUserId)),
-          filter(currio => !!currio),
-          take(1)
+          // Rimosso il filter per gestire il caso in cui il currio non esiste
+          take(1) 
         ).subscribe(userCurrio => {
           if (userCurrio && userCurrio.id) {
             this.currioId = userCurrio.id;
             this.store.dispatch(loadCurrioById({ id: this.currioId }));
             this.subscribeToSpecificCurrio(this.currioId);
           } else {
+            // Se nessun currio è associato all'utente, gestisci l'errore e ferma il caricamento
             this.handleCurrioLoadingError('Nessun Curriò trovato per questo account cliente.');
           }
         });
         this.subscriptions.add(currioByUserSub);
       } else {
-        this.handleCurrioLoadingError('ID utente non disponibile per caricare il Curriò del cliente.');
+        // Se non abbiamo ancora un ID utente (es. login in corso), aspettiamo
+        // Ma se l'utente è loggato e non ha ID, c'è un problema
+        // Per sicurezza, fermiamo il caricamento dopo un po' se l'ID non arriva.
+        setTimeout(() => {
+          if(this.isLoadingCurrio && !this.currentUserId) {
+            this.handleCurrioLoadingError('Impossibile recuperare l\'ID utente. Prova a ricaricare la pagina.');
+          }
+        }, 5000);
       }
     } else {
        this.handleCurrioLoadingError('Rotta non riconosciuta o dati insufficienti per caricamento Curriò.');
@@ -152,6 +160,7 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
       heroSubtitle: [''],
       linguaDefault: ['it', Validators.required],
       templateScelto: ['modern', Validators.required],
+      status: ['attivo', Validators.required],
       chiSonoFotoUrl: [''],
       chiSonoDescrizione1: [''],
       chiSonoDescrizione2: [''],
@@ -182,6 +191,7 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
       heroSubtitle: this.currio.heroSubtitle || '',
       linguaDefault: this.currio.linguaDefault || 'it',
       templateScelto: this.currio.templateScelto || 'modern',
+      status: this.currio.status === 'privato' ? 'privato' : 'attivo',
       chiSonoFotoUrl: this.currio.chiSonoFotoUrl || '',
       chiSonoDescrizione1: this.currio.chiSonoDescrizione1 || '',
       chiSonoDescrizione2: this.currio.chiSonoDescrizione2 || '',
@@ -221,19 +231,34 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
   private subscribeToSuccessActions(): void {
     const successSub = this.actions$.pipe(
       ofType(updateCurrioSuccess)
-    ).subscribe(() => {
+    ).subscribe((action) => {
+      if (this.currio && action.currio.changes.status) {
+          this.currio.status = action.currio.changes.status;
+          this.currioForm.get('status')?.patchValue(action.currio.changes.status, { emitEvent: false });
+      }
+
       this.currioForm.markAsPristine();
       this.updateWarningState();
       this.formError = null;
-      if (this.currioId) {
-         this.store.dispatch(loadCurrioById({id: this.currioId}));
-      }
     });
     this.subscriptions.add(successSub);
   }
 
   updateWarningState(): void {
     this.showUnsavedChangesWarning = this.currioForm && this.currioForm.dirty && !this.formError;
+  }
+
+  togglePrivacyStatus() {
+      if (!this.currio) return;
+
+      const newStatus = this.currio.status === 'privato' ? 'attivo' : 'privato';
+      const updatedCurrio: Currio = {
+          ...this.currio,
+          status: newStatus
+      };
+
+      this.store.dispatch(setLoadingSpinner({ status: true }));
+      this.store.dispatch(updateCurrio({ currio: updatedCurrio }));
   }
 
   selectTemplate(templateName: 'modern' | 'vintage' | 'classic'): void {
@@ -246,12 +271,10 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
     return !!formGroup && formGroup.invalid && (formGroup.dirty || formGroup.touched);
   }
 
-  // Soft Skills
   get softSkillsFormArray() { return this.currioForm.get('altreCompetenze.softSkills') as FormArray; }
   addSoftSkill(): void { this.softSkillsFormArray.push(this.fb.control('', Validators.required)); this.currioForm.markAsDirty(); }
   removeSoftSkill(index: number): void { this.softSkillsFormArray.removeAt(index); this.currioForm.markAsDirty(); }
 
-  // Lingue
   get lingueFormArray() { return this.currioForm.get('altreCompetenze.lingue') as FormArray; }
   createLinguaGroup(lingua?: CurrioLingua): FormGroup {
     return this.fb.group({
@@ -396,6 +419,7 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
       heroSubtitle: formValue.heroSubtitle,
       linguaDefault: formValue.linguaDefault,
       templateScelto: formValue.templateScelto,
+      status: this.currio.status,
       chiSonoFotoUrl: formValue.chiSonoFotoUrl,
       chiSonoDescrizione1: formValue.chiSonoDescrizione1,
       chiSonoDescrizione2: formValue.chiSonoDescrizione2,

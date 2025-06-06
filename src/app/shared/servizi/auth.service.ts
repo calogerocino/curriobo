@@ -84,8 +84,9 @@ ChangeInfo(idToken: string, displayName: string, photoURL: string): Observable<a
    * @param email The user's email.
    * @param password The user's password.
    * @param additionalData Additional data for the user profile (displayName, ruolo, etc.).
+   * @returns A promise that resolves with the new user's UID.
    */
-  async SignUpAndCreateUserDocument(email: string, password: string, additionalData: Partial<User>): Promise<void> {
+  async SignUpAndCreateUserDocument(email: string, password: string, additionalData: Partial<User>): Promise<string> {
     try {
       const result = await this.afAuth.createUserWithEmailAndPassword(email, password);
       if (!result.user) {
@@ -93,13 +94,11 @@ ChangeInfo(idToken: string, displayName: string, photoURL: string): Observable<a
       }
       const user = result.user;
 
-      // Update Firebase Auth Profile
       await user.updateProfile({
         displayName: additionalData.displayName,
         photoURL: additionalData.photoURL
       });
 
-      // Prepare data for Firestore
       const userDoc: User = {
         localId: user.uid,
         email: user.email,
@@ -109,15 +108,13 @@ ChangeInfo(idToken: string, displayName: string, photoURL: string): Observable<a
         emailVerified: user.emailVerified
       };
 
-      // Set data in Firestore
       await this.SetUserDataInFirestore(userDoc);
-
-      // Optionally send verification email
       await this.SendVerificationMail();
+      
+      return user.uid; // Ritorna l'ID dell'utente creato
 
     } catch (error) {
       console.error("Errore durante SignUpAndCreateUserDocument:", error);
-      // Re-throw the error so the component can catch it and display a message.
       throw error;
     }
   }
