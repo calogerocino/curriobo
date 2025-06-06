@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { from, Observable, of } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
-import { CurrioCompetenza, CurrioEsperienza, CurrioProgetto } from '../models/currio.model';
+import { AltreCompetenze, CurrioCompetenza, CurrioEsperienza, CurrioProgetto } from '../models/currio.model';
 import { environment } from 'src/environments/environment';
 
 declare const pdfjsLib: any;
@@ -10,6 +10,7 @@ declare const pdfjsLib: any;
 export interface ParsedCvData {
   esperienze: CurrioEsperienza[];
   competenze: CurrioCompetenza[];
+  altreCompetenze: AltreCompetenze;
   progetti: CurrioProgetto[];
 }
 
@@ -29,28 +30,26 @@ export class CvParsingService {
   parseCvFromUrl(cvUrl: string): Observable<ParsedCvData> {
     return this.extractTextFromPdf(cvUrl).pipe(
       switchMap(extractedText => {
-        if (!extractedText) {
-          throw new Error('Estrazione del testo dal CV fallita o il CV è vuoto.');
+        if (!extractedText || extractedText.trim().length === 0) {
+          throw new Error('Estrazione del testo dal CV fallita. Il file potrebbe essere un\'immagine o vuoto.');
         }
         return this.getParsedDataFromGemini(extractedText);
       }),
       catchError(error => {
-        console.error("Errore nel processo di parsing del CV:", error);
-        throw error;
+        console.error("Errore dettagliato nel processo di parsing del CV:", error);
+        throw new Error(error.message || "Si è verificato un errore sconosciuto durante l'analisi.");
       })
     );
   }
 
   private extractTextFromPdf(url: string): Observable<string> {
     if (typeof pdfjsLib === 'undefined') {
-        return from(Promise.reject('La libreria pdf.js non è stata caricata.'));
+        return from(Promise.reject(new Error('La libreria di analisi PDF (pdf.js) non è stata caricata correttamente.')));
     }
-
-    // Fetch the PDF as an ArrayBuffer using HttpClient to bypass CORS issues.
+    
     return this.http.get(url, { responseType: 'arraybuffer' }).pipe(
       switchMap(data => {
         const promise = new Promise<string>((resolve, reject) => {
-          // Pass the ArrayBuffer to pdf.js
           const loadingTask = pdfjsLib.getDocument({ data: new Uint8Array(data) });
           loadingTask.promise.then((pdf: any) => {
             const numPages = pdf.numPages;
@@ -85,9 +84,10 @@ export class CvParsingService {
     const prompt = `
       Analizza il seguente testo estratto da un curriculum vitae e restituisci le informazioni in un formato JSON strutturato secondo lo schema fornito.
       Interpreta le sezioni e compila i campi nel modo più accurato possibile.
+      - 'competenze' si riferisce solo a competenze tecniche/hard skills (es. 'JavaScript', 'SQL', 'Photoshop').
+      - 'altreCompetenze.softSkills' si riferisce a competenze trasversali (es. 'Teamwork', 'Problem Solving').
+      - 'altreCompetenze.lingue' elenca le lingue conosciute, specificando il livello (es. 'Madrelingua', 'B2', 'Fluente') e se c'è una certificazione.
       - Per le 'esperienze', distingui tra 'lavoro' e 'formazione'.
-      - Per le 'competenze', cerca di identificare il livello di padronanza se menzionato.
-      - Per i 'progetti', includi le tecnologie o i tag se sono elencati.
       - Se un'informazione non è presente, lascia il campo come stringa vuota o array vuoto.
 
       Testo del CV:
@@ -130,6 +130,23 @@ export class CvParsingService {
                   "livello": { "type": "STRING" }
                 }
               }
+            },
+            "altreCompetenze": {
+                type: "OBJECT",
+                properties: {
+                    "softSkills": { "type": "ARRAY", "items": { "type": "STRING" } },
+                    "lingue": {
+                        type: "ARRAY",
+                        items: {
+                            type: "OBJECT",
+                            properties: {
+                                "nome": { "type": "STRING" },
+                                "livello": { "type": "STRING" },
+                                "certificazione": { "type": "BOOLEAN" }
+                            }
+                        }
+                    }
+                }
             },
             "progetti": {
               type: "ARRAY",

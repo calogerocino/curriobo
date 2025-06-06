@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit, ChangeDetectorRef } from '@angular/core';
 import { FormGroup, Validators, FormBuilder, FormArray, AbstractControl } from '@angular/forms';
-import { Currio, CurrioProgetto, CurrioEsperienza, CurrioCompetenza } from 'src/app/shared/models/currio.model';
+import { Currio, CurrioProgetto, CurrioEsperienza, CurrioCompetenza, CurrioLingua } from 'src/app/shared/models/currio.model';
 import { getCurrioById, getCurrioLoading, getCurrios } from '../state/currio.selector';
 import { AppState } from 'src/app/shared/app.state';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -161,6 +161,10 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
         linkedin: [''],
         instagram: [''],
       }),
+      altreCompetenze: this.fb.group({
+        softSkills: this.fb.array([]),
+        lingue: this.fb.array([])
+      }),
       progetti: this.fb.array([]),
       esperienze: this.fb.array([]),
       competenze: this.fb.array([])
@@ -189,6 +193,8 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
       }
     });
 
+    this.clearAndPopulateFormArray(this.softSkillsFormArray, this.currio.altreCompetenze?.softSkills, (skill: string) => this.fb.control(skill, Validators.required));
+    this.clearAndPopulateFormArray(this.lingueFormArray, this.currio.altreCompetenze?.lingue, this.createLinguaGroup.bind(this));
     this.clearAndPopulateFormArray(this.progettiFormArray, this.currio.progetti, this.createProgettoGroup.bind(this));
     this.clearAndPopulateFormArray(this.esperienzeFormArray, this.currio.esperienze, this.createEsperienzaGroup.bind(this));
     this.clearAndPopulateFormArray(this.competenzeFormArray, this.currio.competenze, this.createCompetenzaGroup.bind(this));
@@ -197,7 +203,7 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
     this.updateWarningState();
   }
 
-  private clearAndPopulateFormArray(formArray: FormArray, items: any[] | undefined, createGroupFn: (item?: any) => FormGroup): void {
+  private clearAndPopulateFormArray(formArray: FormArray, items: any[] | undefined, createGroupFn: (item?: any) => AbstractControl): void {
     this.clearFormArray(formArray);
     items?.forEach(item => formArray.push(createGroupFn(item)));
   }
@@ -235,10 +241,28 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
     this.currioForm.markAsDirty();
   }
 
-  isAccordionSectionInvalid(section: 'progetti' | 'esperienze' | 'competenze'): boolean {
-    const formArray = this.currioForm.get(section) as FormArray;
-    return formArray.invalid && (formArray.dirty || formArray.touched);
+  isAccordionSectionInvalid(section: 'progetti' | 'esperienze' | 'competenze' | 'altreCompetenze'): boolean {
+    const formGroup = this.currioForm.get(section);
+    return !!formGroup && formGroup.invalid && (formGroup.dirty || formGroup.touched);
   }
+
+  // Soft Skills
+  get softSkillsFormArray() { return this.currioForm.get('altreCompetenze.softSkills') as FormArray; }
+  addSoftSkill(): void { this.softSkillsFormArray.push(this.fb.control('', Validators.required)); this.currioForm.markAsDirty(); }
+  removeSoftSkill(index: number): void { this.softSkillsFormArray.removeAt(index); this.currioForm.markAsDirty(); }
+
+  // Lingue
+  get lingueFormArray() { return this.currioForm.get('altreCompetenze.lingue') as FormArray; }
+  createLinguaGroup(lingua?: CurrioLingua): FormGroup {
+    return this.fb.group({
+      id: [lingua?.id || uuidv4()],
+      nome: [lingua?.nome || '', Validators.required],
+      livello: [lingua?.livello || '', Validators.required],
+      certificazione: [lingua?.certificazione || false, Validators.required]
+    });
+  }
+  addLingua(): void { this.lingueFormArray.push(this.createLinguaGroup()); this.currioForm.markAsDirty(); }
+  removeLingua(index: number): void { this.lingueFormArray.removeAt(index); this.currioForm.markAsDirty(); }
 
   get progettiFormArray() { return this.currioForm.get('progetti') as FormArray; }
   createProgettoGroup(progetto?: CurrioProgetto): FormGroup {
@@ -378,7 +402,8 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
       contatti: formValue.contatti,
       progetti: formValue.progetti.map((p:CurrioProgetto) => ({...p, id: p.id || uuidv4()})),
       esperienze: formValue.esperienze.map((e:CurrioEsperienza) => ({...e, id: e.id || uuidv4()})),
-      competenze: formValue.competenze.map((c:CurrioCompetenza) => ({...c, id: c.id || uuidv4()}))
+      competenze: formValue.competenze.map((c:CurrioCompetenza) => ({...c, id: c.id || uuidv4()})),
+      altreCompetenze: formValue.altreCompetenze
     };
     this.store.dispatch(updateCurrio({ currio: currioToUpdate }));
   }
@@ -453,6 +478,11 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
         this.clearAndPopulateFormArray(this.esperienzeFormArray, parsedData.esperienze, this.createEsperienzaGroup.bind(this));
         this.clearAndPopulateFormArray(this.competenzeFormArray, parsedData.competenze, this.createCompetenzaGroup.bind(this));
         this.clearAndPopulateFormArray(this.progettiFormArray, parsedData.progetti, this.createProgettoGroup.bind(this));
+        
+        if (parsedData.altreCompetenze) {
+            this.clearAndPopulateFormArray(this.softSkillsFormArray, parsedData.altreCompetenze.softSkills, (skill: string) => this.fb.control(skill, Validators.required));
+            this.clearAndPopulateFormArray(this.lingueFormArray, parsedData.altreCompetenze.lingue, this.createLinguaGroup.bind(this));
+        }
 
         this.currioForm.markAsDirty();
         this.updateWarningState();

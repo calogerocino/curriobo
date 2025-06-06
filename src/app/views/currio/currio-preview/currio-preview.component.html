@@ -27,7 +27,7 @@
                             <li class="nav-item"><a class="nav-link text-secondary" href="#homeModern" (click)="closeMobileMenuAndScroll('#homeModern')">{{ 'currioPreview.navHome' | translate }}</a></li>
                             <li class="nav-item" *ngIf="currio.progetti && currio.progetti.length > 0"><a class="nav-link text-secondary" href="#progettiModern" (click)="closeMobileMenuAndScroll('#progettiModern')">{{ 'currioPreview.navProjects' | translate }}</a></li>
                             <li class="nav-item" *ngIf="currio.esperienze && currio.esperienze.length > 0"><a class="nav-link text-secondary" href="#curriculumModern" (click)="closeMobileMenuAndScroll('#curriculumModern')">{{ 'currioPreview.navCV' | translate }}</a></li>
-                            <li class="nav-item" *ngIf="currio.competenze && currio.competenze.length > 0"><a class="nav-link text-secondary" href="#competenzeModern" (click)="closeMobileMenuAndScroll('#competenzeModern')">{{ 'currioPreview.navSkills' | translate }}</a></li>
+                            <li class="nav-item" *ngIf="(currio.competenze && currio.competenze.length > 0) || (currio.altreCompetenze && (currio.altreCompetenze.softSkills?.length || currio.altreCompetenze.lingue?.length))"><a class="nav-link text-secondary" href="#competenzeModern" (click)="closeMobileMenuAndScroll('#competenzeModern')">{{ 'currioPreview.navSkills' | translate }}</a></li>
                             <li class="nav-item" *ngIf="currio.chiSonoDescrizione1"><a class="nav-link text-secondary" href="#chiSonoModern" (click)="closeMobileMenuAndScroll('#chiSonoModern')">{{ 'currioPreview.navAbout' | translate }}</a></li>
                             <li class="nav-item" *ngIf="currio.contatti?.email"><a class="nav-link text-secondary" href="#contattiModern" (click)="closeMobileMenuAndScroll('#contattiModern')">{{ 'currioPreview.navContact' | translate }}</a></li>
                             <li class="nav-item language-selector ms-md-3 d-flex align-items-center mt-2 mt-md-0">
@@ -117,42 +117,52 @@
             </div>
         </section>
 
-        <section id="competenzeModern" class="py-5 vintage-animated-bg-bootstrap" *ngIf="currio.competenze && currio.competenze.length > 0">
+        <section id="competenzeModern" class="py-5 vintage-animated-bg-bootstrap" *ngIf="(currio.competenze && currio.competenze.length > 0) || (currio.altreCompetenze && (currio.altreCompetenze.softSkills?.length || currio.altreCompetenze.lingue?.length))">
             <div class="container px-4">
                 <h2 class="display-5 fw-bold text-center text-dark mb-5">{{ 'currioPreview.skillsTitle' | translate }}</h2>
-                <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 g-3 text-center">
-                    <div class="col" *ngFor="let competenza of currio.competenze">
-                        <div class="p-3 bg-light rounded shadow-sm h-100 d-flex flex-column align-items-center justify-content-center skill-item-bootstrap">
-                            <div *ngIf="competenza.icona" [innerHTML]="competenza.icona | safeHtml" class="skill-icon-wrapper-bootstrap mx-auto mb-2" [style.background-color]="getSkillBackgroundColor(competenza.nome || '')"></div>
-                            <div *ngIf="!competenza.icona" class="skill-icon-placeholder-bootstrap mx-auto mb-2" [style.background-color]="getSkillBackgroundColor(competenza.nome || '')">
-                                {{ getSkillInitials(competenza.nome || '') }}
+
+                <div class="row g-5">
+                    <!-- Technical Skills -->
+                    <div [ngClass]="{'col-lg-12': !currio.altreCompetenze || (!currio.altreCompetenze.softSkills?.length && !currio.altreCompetenze.lingue?.length), 'col-lg-8': currio.altreCompetenze && (currio.altreCompetenze.softSkills?.length || currio.altreCompetenze.lingue?.length)}" *ngIf="currio.competenze && currio.competenze.length > 0">
+                      <h3 class="fs-4 fw-semibold text-dark mb-4 text-center">Competenze Tecniche</h3>
+                        <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 g-3 text-center">
+                            <div class="col" *ngFor="let competenza of currio.competenze">
+                                <div class="p-3 bg-light rounded shadow-sm h-100 d-flex flex-column align-items-center justify-content-center skill-item-bootstrap">
+                                    <div *ngIf="competenza.icona" [innerHTML]="competenza.icona | safeHtml" class="skill-icon-wrapper-bootstrap mx-auto mb-2" [style.background-color]="getSkillBackgroundColor(competenza.nome || '')"></div>
+                                    <div *ngIf="!competenza.icona" class="skill-icon-placeholder-bootstrap mx-auto mb-2" [style.background-color]="getSkillBackgroundColor(competenza.nome || '')">
+                                        {{ getSkillInitials(competenza.nome || '') }}
+                                    </div>
+                                    <h3 class="fs-6 fw-semibold text-dark mt-1 mb-0 text-break">{{ competenza.nome }}</h3>
+                                    <p *ngIf="competenza.livello" class="small text-secondary mb-0">{{ competenza.livello }}</p>
+                                </div>
                             </div>
-                            <h3 class="fs-6 fw-semibold text-dark mt-1 mb-0 text-break">{{ competenza.nome }}</h3>
-                            <p *ngIf="competenza.livello" class="small text-secondary mb-0">{{ competenza.livello }}</p>
                         </div>
+                    </div>
+                    <!-- Soft Skills & Languages -->
+                    <div [ngClass]="{'col-lg-12': !currio.competenze || currio.competenze.length === 0, 'col-lg-4': currio.competenze && currio.competenze.length > 0}" *ngIf="currio.altreCompetenze && (currio.altreCompetenze.softSkills?.length || currio.altreCompetenze.lingue?.length)">
+                         <div *ngIf="currio.altreCompetenze.softSkills && currio.altreCompetenze.softSkills.length > 0" class="mb-4">
+                            <h3 class="fs-4 fw-semibold text-dark mb-3 text-center">Soft Skills</h3>
+                            <div class="info-card-bootstrap shadow-sm rounded p-3 bg-light">
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item bg-light" *ngFor="let skill of currio.altreCompetenze.softSkills">{{ skill }}</li>
+                                </ul>
+                            </div>
+                         </div>
+                         <div *ngIf="currio.altreCompetenze.lingue && currio.altreCompetenze.lingue.length > 0">
+                            <h3 class="fs-4 fw-semibold text-dark mb-3 text-center">Lingue</h3>
+                            <div class="info-card-bootstrap shadow-sm rounded p-3 bg-light">
+                                <div class="list-group list-group-flush">
+                                    <div *ngFor="let lingua of currio.altreCompetenze.lingue" class="list-group-item bg-light d-flex justify-content-between align-items-center">
+                                        <span><strong>{{ lingua.nome }}:</strong> {{ lingua.livello }}</span>
+                                        <span *ngIf="lingua.certificazione" class="badge bg-primary rounded-pill">Cert.</span>
+                                    </div>
+                                </div>
+                            </div>
+                         </div>
                     </div>
                 </div>
             </div>
         </section>
-
-        <!-- <section id="softSkillsLanguagesModern" class="py-5 bg-white" *ngIf="(currio.altreCompetenze?.softSkills && currio.altreCompetenze.softSkills.length > 0) || (currio.altreCompetenze?.lingue && currio.altreCompetenze.lingue.length > 0)">
-            <div class="container px-4">
-                <div class="row g-4 g-md-5">
-                    <div class="col-md-6" *ngIf="currio.altreCompetenze?.softSkills && currio.altreCompetenze.softSkills.length > 0">
-                        <h3 class="fs-4 fw-semibold text-center text-dark mb-4">{{ 'currioPreview.cvSoftSkillsTitle' | translate }}</h3>
-                        <ul class="list-group list-group-flush info-card-bootstrap shadow rounded p-3 bg-white">
-                            <li class="list-group-item border-0" *ngFor="let skill of currio.altreCompetenze.softSkills">{{ skill }}</li>
-                        </ul>
-                    </div>
-                    <div class="col-md-6" *ngIf="currio.altreCompetenze?.lingue && currio.altreCompetenze.lingue.length > 0">
-                        <h3 class="fs-4 fw-semibold text-center text-dark mb-4">{{ 'currioPreview.cvLanguagesTitle' | translate }}</h3>
-                        <div class="info-card-bootstrap shadow rounded p-4 bg-white">
-                            <p class="text-dark mb-1" *ngFor="let lingua of currio.altreCompetenze.lingue"><strong>{{ lingua.nome }}:</strong> <span class="text-secondary">{{ lingua.livello }}</span></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section> -->
 
         <section id="chiSonoModern" class="py-5 bg-light" *ngIf="currio.chiSonoDescrizione1">
             <div class="container px-4 text-center col-md-8 col-lg-6">
@@ -198,7 +208,7 @@
                 <a *ngIf="currio.esperienze && currio.esperienze.length > 0"
                   (click)="$event.preventDefault(); smoothScrollTo('#preview-curriculum-vintage')">{{'currioPreview.navCV'
                   | translate }}</a>
-                <a *ngIf="currio.competenze && currio.competenze.length > 0"
+                <a *ngIf="(currio.competenze && currio.competenze.length > 0) || (currio.altreCompetenze && (currio.altreCompetenze.softSkills?.length || currio.altreCompetenze.lingue?.length))"
                   (click)="$event.preventDefault(); smoothScrollTo('#preview-competenze-vintage')">{{'currioPreview.navSkills'
                   | translate }}</a>
                 <a *ngIf="currio.chiSonoDescrizione1"
@@ -278,21 +288,38 @@
             </div>
           </section>
 
-          <section id="preview-competenze-vintage" class="vintage-section"
-            *ngIf="currio.competenze && currio.competenze.length > 0">
-            <div class="container">
-              <h2 class="vintage-section-title">{{ 'currioPreview.skillsTitle' | translate }}</h2>
-              <div class="vintage-skills-grid">
-                <div *ngFor="let competenza of currio.competenze" class="vintage-skill-item">
-                  <div *ngIf="competenza.icona" [innerHTML]="competenza.icona | safeHtml" class="vintage-skill-icon">
+          <section id="preview-competenze-vintage" class="vintage-section" *ngIf="(currio.competenze && currio.competenze.length > 0) || (currio.altreCompetenze && (currio.altreCompetenze.softSkills?.length || currio.altreCompetenze.lingue?.length))">
+              <div class="container">
+                  <h2 class="vintage-section-title">{{ 'currioPreview.skillsTitle' | translate }}</h2>
+                  <div *ngIf="currio.competenze && currio.competenze.length > 0" class="mb-5">
+                      <h3 class="text-center" style="font-family: 'Playfair Display', serif;">Competenze Tecniche</h3>
+                      <div class="vintage-skills-grid">
+                          <div *ngFor="let competenza of currio.competenze" class="vintage-skill-item">
+                              <div *ngIf="competenza.icona" [innerHTML]="competenza.icona | safeHtml" class="vintage-skill-icon"></div>
+                              <div *ngIf="!competenza.icona" class="vintage-skill-icon-placeholder">{{ getSkillInitials(competenza.nome || '') }}</div>
+                              <h3 *ngIf="competenza.nome">{{ competenza.nome }}</h3>
+                              <p *ngIf="competenza.livello">{{ competenza.livello }}</p>
+                          </div>
+                      </div>
                   </div>
-                  <div *ngIf="!competenza.icona" class="vintage-skill-icon-placeholder">{{
-                    getSkillInitials(competenza.nome || '') }}</div>
-                  <h3 *ngIf="competenza.nome">{{ competenza.nome }}</h3>
-                  <p *ngIf="competenza.livello">{{ competenza.livello }}</p>
-                </div>
+                  <div *ngIf="currio.altreCompetenze" class="row">
+                    <div class="col-md-6" *ngIf="currio.altreCompetenze.softSkills && currio.altreCompetenze.softSkills.length > 0">
+                        <h3 class="text-center" style="font-family: 'Playfair Display', serif;">Soft Skills</h3>
+                        <ul class="list-group">
+                          <li *ngFor="let skill of currio.altreCompetenze.softSkills" class="list-group-item" style="background-color: #e9dbc6; border-color: #d4c3a2;">{{skill}}</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6" *ngIf="currio.altreCompetenze.lingue && currio.altreCompetenze.lingue.length > 0">
+                        <h3 class="text-center" style="font-family: 'Playfair Display', serif;">Lingue</h3>
+                        <ul class="list-group">
+                          <li *ngFor="let lingua of currio.altreCompetenze.lingue" class="list-group-item d-flex justify-content-between align-items-center" style="background-color: #e9dbc6; border-color: #d4c3a2;">
+                            {{lingua.nome}} - {{lingua.livello}}
+                            <span *ngIf="lingua.certificazione" class="badge bg-dark rounded-pill">Cert.</span>
+                          </li>
+                        </ul>
+                    </div>
+                  </div>
               </div>
-            </div>
           </section>
 
           <section id="preview-chi-sono-vintage" class="vintage-section" *ngIf="currio.chiSonoDescrizione1">
@@ -309,7 +336,7 @@
           </section>
 
           <section id="preview-contatti-vintage" class="vintage-section" *ngIf="currio.contatti?.email">
-            <div class="container">
+            <div class="container text-center">
               <h2 class="vintage-section-title">{{ 'currioPreview.contactTitle' | translate }}</h2>
               <p *ngIf="currio.contatti?.email">{{ 'currioPreview.contactSubtitle' | translate }}</p>
               <a [href]="'mailto:' + currio.contatti.email" class="vintage-button vintage-contact-button">{{
@@ -354,7 +381,7 @@
               <a *ngIf="currio.esperienze && currio.esperienze.length > 0"
                 (click)="$event.preventDefault(); smoothScrollTo('#preview-curriculum-classic')">{{'currioPreview.navCV'
                 | translate }}</a>
-              <a *ngIf="currio.competenze && currio.competenze.length > 0"
+              <a *ngIf="(currio.competenze && currio.competenze.length > 0) || (currio.altreCompetenze && (currio.altreCompetenze.softSkills?.length || currio.altreCompetenze.lingue?.length))"
                 (click)="$event.preventDefault(); smoothScrollTo('#preview-competenze-classic')">{{'currioPreview.navSkills'
                 | translate }}</a>
               <a *ngIf="currio.chiSonoDescrizione1"
@@ -436,17 +463,35 @@
               </div>
             </section>
 
-            <section id="preview-competenze-classic" class="classic-section"
-              *ngIf="currio.competenze && currio.competenze.length > 0">
-              <h2>{{ 'currioPreview.skillsTitle' | translate }}</h2>
-              <ul class="classic-skills-list">
-                <li *ngFor="let competenza of currio.competenze">
-                  <span *ngIf="competenza.icona" [innerHTML]="competenza.icona | safeHtml"
-                    class="classic-skill-icon"></span>
-                  <strong class="classic-skill-name" *ngIf="competenza.nome">{{ competenza.nome }}</strong>
-                  <span *ngIf="competenza.livello" class="classic-skill-level"> ({{ competenza.livello }})</span>
-                </li>
-              </ul>
+            <section id="preview-competenze-classic" class="classic-section" *ngIf="(currio.competenze && currio.competenze.length > 0) || (currio.altreCompetenze && (currio.altreCompetenze.softSkills?.length || currio.altreCompetenze.lingue?.length))">
+                <h2>{{ 'currioPreview.skillsTitle' | translate }}</h2>
+
+                <div *ngIf="currio.competenze && currio.competenze.length > 0" class="mb-4">
+                  <h3 style="font-size: 1.3em; color: #3a3a3a; font-weight: 600;">Competenze Tecniche</h3>
+                  <ul class="classic-skills-list">
+                      <li *ngFor="let competenza of currio.competenze">
+                          <span *ngIf="competenza.icona" [innerHTML]="competenza.icona | safeHtml" class="classic-skill-icon"></span>
+                          <strong class="classic-skill-name" *ngIf="competenza.nome">{{ competenza.nome }}</strong>
+                          <span *ngIf="competenza.livello" class="classic-skill-level"> ({{ competenza.livello }})</span>
+                      </li>
+                  </ul>
+                </div>
+                
+                <div *ngIf="currio.altreCompetenze && currio.altreCompetenze.softSkills && currio.altreCompetenze.softSkills.length > 0" class="mb-4">
+                   <h3 style="font-size: 1.3em; color: #3a3a3a; font-weight: 600;">Soft Skills</h3>
+                   <ul>
+                     <li *ngFor="let skill of currio.altreCompetenze.softSkills">{{skill}}</li>
+                   </ul>
+                </div>
+
+                <div *ngIf="currio.altreCompetenze && currio.altreCompetenze.lingue && currio.altreCompetenze.lingue.length > 0">
+                   <h3 style="font-size: 1.3em; color: #3a3a3a; font-weight: 600;">Lingue</h3>
+                   <ul>
+                     <li *ngFor="let lingua of currio.altreCompetenze.lingue">
+                       <strong>{{lingua.nome}}:</strong> {{lingua.livello}} <span *ngIf="lingua.certificazione">(Certificato)</span>
+                     </li>
+                   </ul>
+                </div>
             </section>
 
             <section id="preview-contatti-classic" class="classic-section" *ngIf="currio.contatti?.email">

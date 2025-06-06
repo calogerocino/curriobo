@@ -26,6 +26,18 @@ export interface CurrioCompetenza {
   icona?: string;
 }
 
+export interface CurrioLingua {
+  id?: string;
+  nome: string;
+  livello: string;
+  certificazione: boolean;
+}
+
+export interface AltreCompetenze {
+  softSkills?: string[];
+  lingue?: CurrioLingua[];
+}
+
 export interface CurrioContatti {
   email?: string;
   github?: string;
@@ -45,6 +57,7 @@ export interface Currio {
   progetti?: CurrioProgetto[];
   esperienze?: CurrioEsperienza[];
   competenze?: CurrioCompetenza[];
+  altreCompetenze?: AltreCompetenze;
   chiSonoFotoUrl?: string;
   chiSonoDescrizione1?: string;
   chiSonoDescrizione2?: string;
