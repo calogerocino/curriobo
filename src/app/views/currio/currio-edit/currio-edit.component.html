@@ -13,12 +13,12 @@
 <div class="row mb-3" *ngIf="currio && currio.id">
   <div class="col-md-12 d-flex justify-content-between align-items-center">
     <div>
-      <button type="button" (click)="openPreviewInNewTab()" class="btn btn-info me-2">
+      <button type="button" (click)="openPreviewInNewTab()" class="btn btn-info mr-2">
         <i class="feather icon-external-link"></i> Anteprima Curriò
       </button>
     </div>
     <div>
-      <button type="submit" form="currioUnifiedForm" class="btn btn-primary me-2"
+      <button type="submit" form="currioUnifiedForm" class="btn btn-primary mr-2"
         [disabled]="!currioForm.valid || (isSubmitting$ | async) || !currioForm.dirty">
         <i class="feather icon-save"></i>
         <span *ngIf="!(isSubmitting$ | async)">
@@ -28,7 +28,7 @@
           aria-hidden="true"></span>
         <span *ngIf="isSubmitting$ | async"> Salvataggio...</span>
       </button>
-      <button type="button" class="btn btn-secondary me-2" (click)="goBack()">
+      <button type="button" class="btn btn-secondary mr-2" (click)="goBack()">
         <i class="feather go-back"></i> {{'generale.shared.annulla' | translate}}
       </button>
       <button type="button" class="btn btn-danger" (click)="onDeleteCurrio()" *ngIf="isUserAdmin">
@@ -70,8 +70,8 @@
             <div class="card-body">
                 <div class="form-check form-switch form-switch-lg d-flex align-items-center justify-content-between">
                     <div>
-                        <input class="form-check-input" type="checkbox" id="privacyToggle" 
-                               [checked]="currio.status === 'attivo'" 
+                        <input class="form-check-input" type="checkbox" id="privacyToggle"
+                               [checked]="currio.status === 'attivo'"
                                (change)="togglePrivacyStatus()">
                         <label class="form-check-label" for="privacyToggle">
                             <span *ngIf="currio.status === 'attivo'" class="text-success fw-bold">Pubblico</span>
@@ -90,16 +90,16 @@
           <div class="card-body">
             <p class="text-muted small">Usa queste azioni per gestire il CV caricato per questo Curriò.</p>
             <div class="d-flex flex-wrap">
-              <button type="button" (click)="openCurriculum()" class="btn btn-outline-secondary me-2">
-                <i class="feather icon-file-text me-1"></i> Visualizza CV
+              <button type="button" (click)="openCurriculum()" class="btn btn-outline-secondary mr-2">
+                <i class="feather icon-file-text mr-1"></i> Visualizza CV
               </button>
-              <button type="button" class="btn btn-outline-info me-2" (click)="autoFillFromCv()" [disabled]="(isSubmitting$ | async)">
-                <i class="feather icon-edit-3 me-1"></i>
+              <button type="button" class="btn btn-outline-info mr-2" (click)="autoFillFromCv()" [disabled]="(isSubmitting$ | async)">
+                <i class="feather icon-edit-3 mr-1"></i>
                 <span *ngIf="!(isSubmitting$ | async)">Auto-compila campi da CV</span>
                 <span *ngIf="(isSubmitting$ | async)">Analisi in corso...</span>
               </button>
               <button type="button" class="btn btn-outline-danger" (click)="deleteCurriculum()">
-                <i class="feather icon-trash-2 me-1"></i> Elimina CV
+                <i class="feather icon-trash-2 mr-1"></i> Elimina CV
               </button>
             </div>
           </div>
@@ -256,7 +256,7 @@
                 <div class="mb-4">
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <label class="form-label mb-0">Soft Skills</label>
-                        <button type="button" class="btn btn-sm btn-outline-secondary" (click)="addSoftSkill()">
+                        <button type="button" class="btn btn-sm btn-outline-primary" (click)="addSoftSkill()">
                             <i class="feather icon-plus"></i> Aggiungi
                         </button>
                     </div>
@@ -272,7 +272,7 @@
                 <div>
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <label class="form-label mb-0">Lingue</label>
-                        <button type="button" class="btn btn-sm btn-outline-secondary" (click)="addLingua()">
+                        <button type="button" class="btn btn-sm btn-outline-primary" (click)="addLingua()">
                             <i class="feather icon-plus"></i> Aggiungi
                         </button>
                     </div>
