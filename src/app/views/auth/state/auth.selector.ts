@@ -1,5 +1,6 @@
 import { createFeatureSelector, createSelector } from '@ngrx/store';
 import { AuthState } from './auth.state';
+import { User } from 'src/app/shared/models/user.interface';
 
 export const AUTH_STATE_NAME = 'auth';
 
@@ -13,3 +14,6 @@ export const getUser = createSelector(getAuthState, (state) => state.user);
 export const getUserToken = createSelector(getAuthState, (state) => state.user?.token);
 
 export const getUserlocalId = createSelector(getAuthState, (state) => state.user?.localId);
+export const isUserAdmin = createSelector(getUser, (user: User | null) => {
+    return user ? user.ruolo === 'admin' : false;
+});

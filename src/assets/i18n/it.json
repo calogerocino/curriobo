@@ -119,6 +119,13 @@
           "vintage": "Vintage",
           "classic": "Classico"
         },
+        "altreCompetenze": {
+          "softSkill": "Soft Skill",
+          "linguaNome": "Lingua",
+          "linguaLivello": "Livello",
+          "linguaCert": "Certificazione"
+      },
+        "altreCompetenzeTitle": "Soft Skills e Lingue",
         "nomePortfolio": "Nome del Tuo Curriò (es. Portfolio di Mario Rossi)",
         "heroTitle": "Titolo Principale (es. Ciao, sono Mario!)",
         "heroSubtitle": "Sottotitolo (una breve descrizione di te)",
@@ -248,7 +255,7 @@
       "imageAlt": "Illustrazione dei vantaggi di Curriò"
     },
     "pricing": {
-      "title": "Scegli il Piano Perfetto per Te",
+      "title": "Scegli il piano perfetto per te",
       "subtitle": "Inizia gratuitamente o sblocca funzionalità avanzate per far brillare il tuo profilo.",
       "month": "una tantum",
       "popular": "Popolare",

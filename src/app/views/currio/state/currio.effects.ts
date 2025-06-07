@@ -108,7 +108,10 @@ export class CurrioEffects {
         return this.currioService.updateCurrio({ id, ...dataToUpdate } as any).pipe(
           map(() => {
             this.store.dispatch(setLoadingSpinner({ status: false }));
-            Swal.fire('Aggiornato!', 'Il Curriò è stato aggiornato con successo.', 'success'); // Aggiunto feedback
+            // Mostra il popup di successo solo se non stiamo inviando un invito
+            if (!action.currio.tokenRegistrazione) {
+              Swal.fire('Aggiornato!', 'Il Curriò è stato aggiornato con successo.', 'success');
+            }
             return CurrioActions.updateCurrioSuccess({ currio: { id: action.currio.id, changes: dataToUpdate }});
           }),
           catchError(err => {

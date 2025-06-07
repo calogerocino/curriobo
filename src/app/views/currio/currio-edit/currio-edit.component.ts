@@ -1,6 +1,6 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { FormGroup, Validators, FormBuilder, FormArray } from '@angular/forms';
-import { Currio, CurrioProgetto, CurrioEsperienza, CurrioCompetenza } from 'src/app/shared/models/currio.model';
+import { Component, OnDestroy, OnInit, ChangeDetectorRef } from '@angular/core';
+import { FormGroup, Validators, FormBuilder, FormArray, AbstractControl } from '@angular/forms';
+import { Currio, CurrioProgetto, CurrioEsperienza, CurrioCompetenza, CurrioLingua } from 'src/app/shared/models/currio.model';
 import { getCurrioById, getCurrioLoading, getCurrios } from '../state/currio.selector';
 import { AppState } from 'src/app/shared/app.state';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -15,6 +15,8 @@ import { Actions, ofType } from '@ngrx/effects';
 import { User } from 'src/app/shared/models/user.interface';
 import { getUser } from '../../auth/state/auth.selector';
 import { AuthService } from 'src/app/shared/servizi/auth.service';
+import { CvParsingService, ParsedCvData } from 'src/app/shared/servizi/cv-parsing.service';
+import { CurrioService } from 'src/app/shared/servizi/currio.service';
 
 @Component({
   selector: 'app-currio-edit',
@@ -32,6 +34,7 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
   isSubmitting$: Observable<boolean>;
   isLoadingCurrio = true;
   showUnsavedChangesWarning = false;
+  formError: string | null = null;
 
   currentUser$: Observable<User | null> = this.store.select(getUser);
   currentUserRole: 'admin' | 'cliente' | undefined;
@@ -44,7 +47,10 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
     private readonly router: Router,
     private readonly fb: FormBuilder,
     private readonly actions$: Actions,
-    private readonly authService: AuthService
+    private readonly authService: AuthService,
+    private readonly cvParsingService: CvParsingService,
+    private readonly currioService: CurrioService,
+    private readonly cdr: ChangeDetectorRef
   ) {
     this.isSubmitting$ = this.store.select(getCurrioLoading);
   }
@@ -89,20 +95,28 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
         this.store.dispatch(loadCurrios());
         const currioByUserSub = this.store.select(getCurrios).pipe(
           map(currios => currios.find(c => c.userId === this.currentUserId)),
-          filter(currio => !!currio),
-          take(1)
+          // Rimosso il filter per gestire il caso in cui il currio non esiste
+          take(1) 
         ).subscribe(userCurrio => {
           if (userCurrio && userCurrio.id) {
             this.currioId = userCurrio.id;
             this.store.dispatch(loadCurrioById({ id: this.currioId }));
             this.subscribeToSpecificCurrio(this.currioId);
           } else {
+            // Se nessun currio è associato all'utente, gestisci l'errore e ferma il caricamento
             this.handleCurrioLoadingError('Nessun Curriò trovato per questo account cliente.');
           }
         });
         this.subscriptions.add(currioByUserSub);
       } else {
-        this.handleCurrioLoadingError('ID utente non disponibile per caricare il Curriò del cliente.');
+        // Se non abbiamo ancora un ID utente (es. login in corso), aspettiamo
+        // Ma se l'utente è loggato e non ha ID, c'è un problema
+        // Per sicurezza, fermiamo il caricamento dopo un po' se l'ID non arriva.
+        setTimeout(() => {
+          if(this.isLoadingCurrio && !this.currentUserId) {
+            this.handleCurrioLoadingError('Impossibile recuperare l\'ID utente. Prova a ricaricare la pagina.');
+          }
+        }, 5000);
       }
     } else {
        this.handleCurrioLoadingError('Rotta non riconosciuta o dati insufficienti per caricamento Curriò.');
@@ -146,6 +160,7 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
       heroSubtitle: [''],
       linguaDefault: ['it', Validators.required],
       templateScelto: ['modern', Validators.required],
+      status: ['attivo', Validators.required],
       chiSonoFotoUrl: [''],
       chiSonoDescrizione1: [''],
       chiSonoDescrizione2: [''],
@@ -154,6 +169,10 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
         github: [''],
         linkedin: [''],
         instagram: [''],
+      }),
+      altreCompetenze: this.fb.group({
+        softSkills: this.fb.array([]),
+        lingue: this.fb.array([])
       }),
       progetti: this.fb.array([]),
       esperienze: this.fb.array([]),
@@ -172,6 +191,7 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
       heroSubtitle: this.currio.heroSubtitle || '',
       linguaDefault: this.currio.linguaDefault || 'it',
       templateScelto: this.currio.templateScelto || 'modern',
+      status: this.currio.status === 'privato' ? 'privato' : 'attivo',
       chiSonoFotoUrl: this.currio.chiSonoFotoUrl || '',
       chiSonoDescrizione1: this.currio.chiSonoDescrizione1 || '',
       chiSonoDescrizione2: this.currio.chiSonoDescrizione2 || '',
@@ -183,6 +203,8 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
       }
     });
 
+    this.clearAndPopulateFormArray(this.softSkillsFormArray, this.currio.altreCompetenze?.softSkills, (skill: string) => this.fb.control(skill, Validators.required));
+    this.clearAndPopulateFormArray(this.lingueFormArray, this.currio.altreCompetenze?.lingue, this.createLinguaGroup.bind(this));
     this.clearAndPopulateFormArray(this.progettiFormArray, this.currio.progetti, this.createProgettoGroup.bind(this));
     this.clearAndPopulateFormArray(this.esperienzeFormArray, this.currio.esperienze, this.createEsperienzaGroup.bind(this));
     this.clearAndPopulateFormArray(this.competenzeFormArray, this.currio.competenze, this.createCompetenzaGroup.bind(this));
@@ -191,37 +213,79 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
     this.updateWarningState();
   }
 
-  private clearAndPopulateFormArray(formArray: FormArray, items: any[] | undefined, createGroupFn: (item?: any) => FormGroup): void {
+  private clearAndPopulateFormArray(formArray: FormArray, items: any[] | undefined, createGroupFn: (item?: any) => AbstractControl): void {
     this.clearFormArray(formArray);
     items?.forEach(item => formArray.push(createGroupFn(item)));
   }
 
   private subscribeToFormChanges(): void {
-    const formSub = this.currioForm.valueChanges.subscribe(() => this.updateWarningState());
+    const formSub = this.currioForm.valueChanges.subscribe(() => {
+        this.updateWarningState();
+        if (this.currioForm.dirty) {
+            this.formError = null;
+        }
+    });
     this.subscriptions.add(formSub);
   }
 
   private subscribeToSuccessActions(): void {
     const successSub = this.actions$.pipe(
       ofType(updateCurrioSuccess)
-    ).subscribe(() => {
+    ).subscribe((action) => {
+      if (this.currio && action.currio.changes.status) {
+          this.currio.status = action.currio.changes.status;
+          this.currioForm.get('status')?.patchValue(action.currio.changes.status, { emitEvent: false });
+      }
+
       this.currioForm.markAsPristine();
       this.updateWarningState();
-      if (this.currioId) {
-         this.store.dispatch(loadCurrioById({id: this.currioId}));
-      }
+      this.formError = null;
     });
     this.subscriptions.add(successSub);
   }
 
   updateWarningState(): void {
-    this.showUnsavedChangesWarning = this.currioForm && this.currioForm.dirty;
+    this.showUnsavedChangesWarning = this.currioForm && this.currioForm.dirty && !this.formError;
+  }
+
+  togglePrivacyStatus() {
+      if (!this.currio) return;
+
+      const newStatus = this.currio.status === 'privato' ? 'attivo' : 'privato';
+      const updatedCurrio: Currio = {
+          ...this.currio,
+          status: newStatus
+      };
+
+      this.store.dispatch(setLoadingSpinner({ status: true }));
+      this.store.dispatch(updateCurrio({ currio: updatedCurrio }));
   }
 
   selectTemplate(templateName: 'modern' | 'vintage' | 'classic'): void {
     this.currioForm.get('templateScelto')?.setValue(templateName);
     this.currioForm.markAsDirty();
   }
+
+  isAccordionSectionInvalid(section: 'progetti' | 'esperienze' | 'competenze' | 'altreCompetenze'): boolean {
+    const formGroup = this.currioForm.get(section);
+    return !!formGroup && formGroup.invalid && (formGroup.dirty || formGroup.touched);
+  }
+
+  get softSkillsFormArray() { return this.currioForm.get('altreCompetenze.softSkills') as FormArray; }
+  addSoftSkill(): void { this.softSkillsFormArray.push(this.fb.control('', Validators.required)); this.currioForm.markAsDirty(); }
+  removeSoftSkill(index: number): void { this.softSkillsFormArray.removeAt(index); this.currioForm.markAsDirty(); }
+
+  get lingueFormArray() { return this.currioForm.get('altreCompetenze.lingue') as FormArray; }
+  createLinguaGroup(lingua?: CurrioLingua): FormGroup {
+    return this.fb.group({
+      id: [lingua?.id || uuidv4()],
+      nome: [lingua?.nome || '', Validators.required],
+      livello: [lingua?.livello || '', Validators.required],
+      certificazione: [lingua?.certificazione || false, Validators.required]
+    });
+  }
+  addLingua(): void { this.lingueFormArray.push(this.createLinguaGroup()); this.currioForm.markAsDirty(); }
+  removeLingua(index: number): void { this.lingueFormArray.removeAt(index); this.currioForm.markAsDirty(); }
 
   get progettiFormArray() { return this.currioForm.get('progetti') as FormArray; }
   createProgettoGroup(progetto?: CurrioProgetto): FormGroup {
@@ -331,9 +395,13 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
   onSubmit(): void {
     if (!this.currioForm.valid) {
       this.currioForm.markAllAsTouched();
-      Swal.fire('Attenzione', 'Per favore, correggi gli errori nel form.', 'warning');
+      this.formError = "Attenzione, alcuni campi non sono validi. Controlla le sezioni evidenziate e correggi gli errori.";
+      this.showUnsavedChangesWarning = false;
+      Swal.fire('Attenzione', this.formError, 'warning');
       return;
     }
+
+    this.formError = null;
 
     if (!this.currio || !this.currio.id) {
       Swal.fire('Errore', 'Impossibile salvare, dati Curriò di riferimento mancanti o ID non valido.', 'error');
@@ -351,13 +419,15 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
       heroSubtitle: formValue.heroSubtitle,
       linguaDefault: formValue.linguaDefault,
       templateScelto: formValue.templateScelto,
+      status: this.currio.status,
       chiSonoFotoUrl: formValue.chiSonoFotoUrl,
       chiSonoDescrizione1: formValue.chiSonoDescrizione1,
       chiSonoDescrizione2: formValue.chiSonoDescrizione2,
       contatti: formValue.contatti,
       progetti: formValue.progetti.map((p:CurrioProgetto) => ({...p, id: p.id || uuidv4()})),
       esperienze: formValue.esperienze.map((e:CurrioEsperienza) => ({...e, id: e.id || uuidv4()})),
-      competenze: formValue.competenze.map((c:CurrioCompetenza) => ({...c, id: c.id || uuidv4()}))
+      competenze: formValue.competenze.map((c:CurrioCompetenza) => ({...c, id: c.id || uuidv4()})),
+      altreCompetenze: formValue.altreCompetenze
     };
     this.store.dispatch(updateCurrio({ currio: currioToUpdate }));
   }
@@ -411,6 +481,81 @@ export class CurrioEditComponent implements OnInit, OnDestroy {
       Swal.fire('Errore', "Operazione non permessa o ID del Curriò non disponibile.", 'error');
     }
   }
+
+  autoFillFromCv(): void {
+    if (!this.currio?.curriculumUrl) {
+      Swal.fire('Attenzione', 'Nessun curriculum caricato per questo Curriò.', 'warning');
+      return;
+    }
+
+    Swal.fire({
+      title: 'Analisi del CV in corso...',
+      text: 'Stiamo estraendo le informazioni dal documento. Attendere prego.',
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      }
+    });
+
+    this.cvParsingService.parseCvFromUrl(this.currio.curriculumUrl).subscribe({
+      next: (parsedData) => {
+        this.clearAndPopulateFormArray(this.esperienzeFormArray, parsedData.esperienze, this.createEsperienzaGroup.bind(this));
+        this.clearAndPopulateFormArray(this.competenzeFormArray, parsedData.competenze, this.createCompetenzaGroup.bind(this));
+        this.clearAndPopulateFormArray(this.progettiFormArray, parsedData.progetti, this.createProgettoGroup.bind(this));
+        
+        if (parsedData.altreCompetenze) {
+            this.clearAndPopulateFormArray(this.softSkillsFormArray, parsedData.altreCompetenze.softSkills, (skill: string) => this.fb.control(skill, Validators.required));
+            this.clearAndPopulateFormArray(this.lingueFormArray, parsedData.altreCompetenze.lingue, this.createLinguaGroup.bind(this));
+        }
+
+        this.currioForm.markAsDirty();
+        this.updateWarningState();
+        
+        Swal.fire('Successo!', 'I campi sono stati compilati con le informazioni estratte dal CV.', 'success');
+      },
+      error: (err) => {
+        console.error("Errore durante l'analisi del CV:", err);
+        Swal.fire('Errore', err.message || "Si è verificato un errore durante l'analisi del CV.", 'error');
+      }
+    });
+  }
+
+  deleteCurriculum(): void {
+    if (!this.currio || !this.currio.curriculumUrl) {
+        Swal.fire('Attenzione', 'Nessun curriculum da eliminare.', 'warning');
+        return;
+    }
+
+    Swal.fire({
+        title: 'Sei sicuro?',
+        text: "Vuoi eliminare definitivamente il file del curriculum? L'operazione non è reversibile.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Sì, eliminalo!',
+        cancelButtonText: 'Annulla'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            this.store.dispatch(setLoadingSpinner({ status: true }));
+            const fileUrl = this.currio!.curriculumUrl!;
+            this.currioService.deleteFileByUrl(fileUrl)
+                .then(() => {
+                    const updatedCurrio: Currio = {
+                        ...this.currio!,
+                        curriculumUrl: undefined
+                    };
+                    this.store.dispatch(updateCurrio({ currio: updatedCurrio }));
+                })
+                .catch(error => {
+                    console.error("Errore eliminazione file CV da storage:", error);
+                    Swal.fire('Errore', 'Impossibile eliminare il file del CV.', 'error');
+                    this.store.dispatch(setLoadingSpinner({ status: false }));
+                });
+        }
+    });
+  }
+
 
    private handleCurrioLoadingError(message: string, error?: any): void {
     console.error(message, error || '');

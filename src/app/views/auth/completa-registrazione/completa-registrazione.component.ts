@@ -15,7 +15,6 @@ import * as CurrioActions from 'src/app/views/currio/state/currio.action';
 import Swal from 'sweetalert2';
 import { Subscription, firstValueFrom, timeout, catchError, of } from 'rxjs';
 import { setLoadingSpinner } from 'src/app/shared/store/shared.actions';
-import { User as FirebaseAuthUserType } from '@firebase/auth-types';
 import { Actions, ofType } from '@ngrx/effects';
 
 @Component({
@@ -160,38 +159,21 @@ export class CompletaRegistrazioneComponent implements OnInit, OnDestroy {
     const displayName = this.currioData.datiCliente.nome;
 
     try {
-      const result =
-        await this.authService.afAuth.createUserWithEmailAndPassword(
-          email,
-          password
-        );
-      const newAuthUser = result.user as FirebaseAuthUserType;
-
-      if (!newAuthUser) {
-        throw new Error('Creazione utente Firebase Auth fallita.');
-      }
-
-      if (displayName) {
-        await newAuthUser.updateProfile({ displayName: displayName });
-      }
-
-      await this.authService.SetUserData({
-        uid: newAuthUser.uid,
-        email: newAuthUser.email,
-        displayName: displayName || newAuthUser.displayName || '',
-        photoURL: newAuthUser.photoURL || this.authService.DEFAULT_AVATAR_URL,
-        emailVerified: newAuthUser.emailVerified,
+      const newUserId = await this.authService.SignUpAndCreateUserDocument(email, password, {
+        displayName: displayName,
         ruolo: 'cliente',
+        photoURL: this.authService.DEFAULT_AVATAR_URL
       });
 
       if (this.currioData && this.currioData.id) {
         const updatedCurrio: Currio = {
           ...this.currioData,
-          userId: newAuthUser.uid,
+          userId: newUserId, // <-- COLLEGAMENTO FONDAMENTALE
           status: 'attivo',
           tokenRegistrazione: undefined,
           tokenRegistrazioneScadenza: undefined,
         };
+        
         this.store.dispatch(
           CurrioActions.updateCurrio({ currio: updatedCurrio })
         );
@@ -220,6 +202,7 @@ export class CompletaRegistrazioneComponent implements OnInit, OnDestroy {
         'success'
       );
       this.router.navigate(['/auth/login']);
+
     } catch (error: any) {
       this.errorMessage = this.authService.getErrorMessage(
         error.code || error.message
