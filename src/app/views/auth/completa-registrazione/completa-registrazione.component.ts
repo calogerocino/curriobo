@@ -159,21 +159,25 @@ export class CompletaRegistrazioneComponent implements OnInit, OnDestroy {
     const displayName = this.currioData.datiCliente.nome;
 
     try {
-      const newUserId = await this.authService.SignUpAndCreateUserDocument(email, password, {
-        displayName: displayName,
-        ruolo: 'cliente',
-        photoURL: this.authService.DEFAULT_AVATAR_URL
-      });
+      const newUserId = await this.authService.SignUpAndCreateUserDocument(
+        email,
+        password,
+        {
+          displayName: displayName,
+          ruolo: 'cliente',
+          photoURL: this.authService.DEFAULT_AVATAR_URL,
+        }
+      );
 
       if (this.currioData && this.currioData.id) {
         const updatedCurrio: Currio = {
           ...this.currioData,
-          userId: newUserId, // <-- COLLEGAMENTO FONDAMENTALE
+          userId: newUserId,
           status: 'attivo',
           tokenRegistrazione: undefined,
           tokenRegistrazioneScadenza: undefined,
         };
-        
+
         this.store.dispatch(
           CurrioActions.updateCurrio({ currio: updatedCurrio })
         );
@@ -202,7 +206,6 @@ export class CompletaRegistrazioneComponent implements OnInit, OnDestroy {
         'success'
       );
       this.router.navigate(['/auth/login']);
-
     } catch (error: any) {
       this.errorMessage = this.authService.getErrorMessage(
         error.code || error.message
