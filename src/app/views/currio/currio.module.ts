@@ -9,6 +9,7 @@ import { CurrioEditComponent } from './currio-edit/currio-edit.component';
 import { CurrioPreviewComponent } from './currio-preview/currio-preview.component';
 import { TranslateModule } from '@ngx-translate/core';
 import { SafeHtmlPipe } from 'src/app/shared/pipes/safe-html.pipe';
+import { FeahterIconModule } from 'src/app/shared/feather-icon/feather-icon.module';
 
 const routes: Routes = [
   {
@@ -49,6 +50,7 @@ const routes: Routes = [
     FormsModule,
     ReactiveFormsModule,
     TranslateModule.forChild(),
+    FeahterIconModule
   ]
 })
 export class CurrioModule {}

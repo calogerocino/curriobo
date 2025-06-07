@@ -98,13 +98,14 @@
       "descrizione": "Descrizioni"
     }
   },
-  "status": {
-    "nuova_richiesta": "Nuova Richiesta",
-    "invito_spedito": "Invito Spedito",
-    "attivo": "Attivo",
-    "archiviato": "Archiviato",
-    "sconosciuto": "Sconosciuto"
-  },
+"status": {
+  "nuova_richiesta": "Nuova Richiesta",
+  "invito_spedito": "Invito Spedito",
+  "attivo": "Pubblico",
+  "privato": "Privato", 
+  "archiviato": "Archiviato",
+  "sconosciuto": "Sconosciuto"
+},
   "customer": {
     "menu": {
       "profile": "Il Mio Profilo",

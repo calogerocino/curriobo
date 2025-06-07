@@ -25,12 +25,17 @@ const _currioReducer = createReducer(
   })),
   on(CurrioActions.loadCurrioByIdSuccess, (state, { currio }) => {
     if (!currio || typeof currio.id === 'undefined') {
-      console.error("Reducer: loadCurrioByIdSuccess ha ricevuto un currio undefined o un currio senza id:", currio);
+      console.error(
+        'Reducer: loadCurrioByIdSuccess ha ricevuto un currio undefined o un currio senza id:',
+        currio
+      );
       return {
         ...state,
         selectedCurrio: null,
         loading: false,
-        error: state.error || "Errore nell'elaborazione dei dati del Curriò dopo il recupero.",
+        error:
+          state.error ||
+          "Errore nell'elaborazione dei dati del Curriò dopo il recupero.",
       };
     }
     return {
@@ -48,17 +53,23 @@ const _currioReducer = createReducer(
     currios: [...state.currios, currio],
     loading: false,
   })),
-  on(CurrioActions.updateCurrioSuccess, (state, { currio }) => ({
-    ...state,
-    currios: state.currios.map((c) =>
-      c.id === currio.id ? { ...c, ...currio.changes } : c
-    ),
-    selectedCurrio:
-      state.selectedCurrio?.id === currio.id
+on(CurrioActions.updateCurrioSuccess, (state, { currio }) => {
+    const updatedCurrios = state.currios.map(existingCurrio => {
+        if (existingCurrio.id === currio.id) {
+            return { ...existingCurrio, ...currio.changes };
+        }
+        return existingCurrio;
+    });
+    const updatedSelectedCurrio = state.selectedCurrio?.id === currio.id
         ? ({ ...state.selectedCurrio, ...currio.changes } as Currio)
-        : state.selectedCurrio,
-    loading: false,
-  })),
+        : state.selectedCurrio;
+    return {
+        ...state,
+        loading: false,
+        currios: updatedCurrios,
+        selectedCurrio: updatedSelectedCurrio
+    };
+}),
   on(CurrioActions.deleteCurrioSuccess, (state, { id }) => ({
     ...state,
     currios: state.currios.filter((c) => c.id !== id),

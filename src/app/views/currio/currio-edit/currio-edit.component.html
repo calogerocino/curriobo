@@ -16,6 +16,13 @@
       <button type="button" (click)="openPreviewInNewTab()" class="btn btn-info mr-2">
         <i class="feather icon-external-link"></i> Anteprima Curriò
       </button>
+      <button type="button" class="btn mr-2"
+        [ngClass]="{'btn-success': currio.status === 'attivo', 'btn-danger': currio.status !== 'attivo'}"
+        (click)="togglePrivacyStatus()" title="Clicca per cambiare lo stato di visibilità">
+        <i [ngClass]="currio.status === 'attivo' ? 'feather icon-unlock' : 'feather icon-lock'" class="icon-sm"></i>
+        <span *ngIf="currio.status === 'attivo'" class="ml-2">{{ 'status.attivo' | translate }}</span>
+        <span *ngIf="currio.status !== 'attivo'" class="ml-2">{{ 'status.privato' | translate }}</span>
+      </button>
     </div>
     <div>
       <button type="submit" form="currioUnifiedForm" class="btn btn-primary mr-2"
@@ -48,11 +55,10 @@
 
 <div *ngIf="!isLoadingCurrio && currio && currio.id">
   <div *ngIf="formError" class="alert alert-danger d-flex align-items-center mb-3" role="alert">
-      <i class="feather icon-alert-circle me-2"></i>
-      <div>{{ formError }}</div>
+    <i class="feather icon-alert-circle me-2"></i>
+    <div>{{ formError }}</div>
   </div>
-  <div *ngIf="showUnsavedChangesWarning" class="alert alert-warning d-flex align-items-center mb-3"
-    role="alert">
+  <div *ngIf="showUnsavedChangesWarning" class="alert alert-warning d-flex align-items-center mb-3" role="alert">
     <i class="feather icon-alert-triangle me-2"></i>
     <div>
       {{ 'profiloUtente.avvisoModificheNonSalvate' | translate }}
@@ -63,26 +69,6 @@
     <div class="row">
 
       <div class="col-md-6">
-         <div class="card mb-3">
-            <div class="card-header">
-                <h5 class="mb-0">Impostazioni di Visibilità</h5>
-            </div>
-            <div class="card-body">
-                <div class="form-check form-switch form-switch-lg d-flex align-items-center justify-content-between">
-                    <div>
-                        <input class="form-check-input" type="checkbox" id="privacyToggle"
-                               [checked]="currio.status === 'attivo'"
-                               (change)="togglePrivacyStatus()">
-                        <label class="form-check-label" for="privacyToggle">
-                            <span *ngIf="currio.status === 'attivo'" class="text-success fw-bold">Pubblico</span>
-                            <span *ngIf="currio.status !== 'attivo'" class="text-danger fw-bold">Privato</span>
-                        </label>
-                    </div>
-                    <small class="text-muted" *ngIf="currio.status === 'attivo'">Il tuo Curriò è visibile a tutti.</small>
-                    <small class="text-muted" *ngIf="currio.status !== 'attivo'">Solo tu e l'admin potete vederlo.</small>
-                </div>
-            </div>
-        </div>
         <div class="card mb-3" *ngIf="isUserAdmin && currio.curriculumUrl">
           <div class="card-header">
             <h5 class="mb-0">Gestione Curriculum (CV)</h5>
@@ -93,7 +79,8 @@
               <button type="button" (click)="openCurriculum()" class="btn btn-outline-secondary mr-2">
                 <i class="feather icon-file-text mr-1"></i> Visualizza CV
               </button>
-              <button type="button" class="btn btn-outline-info mr-2" (click)="autoFillFromCv()" [disabled]="(isSubmitting$ | async)">
+              <button type="button" class="btn btn-outline-info mr-2" (click)="autoFillFromCv()"
+                [disabled]="(isSubmitting$ | async)">
                 <i class="feather icon-edit-3 mr-1"></i>
                 <span *ngIf="!(isSubmitting$ | async)">Auto-compila campi da CV</span>
                 <span *ngIf="(isSubmitting$ | async)">Analisi in corso...</span>
@@ -246,65 +233,76 @@
 
       <div class="col-md-6">
         <div class="card mb-3" formGroupName="altreCompetenze">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <span>Soft Skills e Lingue</span>
-                <span *ngIf="isAccordionSectionInvalid('altreCompetenze')" class="accordion-error-icon">
-                    <i class="feather icon-alert-circle"></i>
-                </span>
-            </div>
-            <div class="card-body">
-                <div class="mb-4">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <label class="form-label mb-0">Soft Skills</label>
-                        <button type="button" class="btn btn-sm btn-outline-primary" (click)="addSoftSkill()">
-                            <i class="feather icon-plus"></i> Aggiungi
-                        </button>
-                    </div>
-                    <div formArrayName="softSkills">
-                        <div *ngFor="let skillCtrl of softSkillsFormArray.controls; let i = index" class="input-group input-group-sm mb-2">
-                            <input type="text" class="form-control" [formControlName]="i" placeholder="Es. Lavoro di squadra">
-                            <button class="btn btn-outline-danger btn-sm" type="button" (click)="removeSoftSkill(i)"><i class="feather icon-x"></i></button>
-                        </div>
-                        <div *ngIf="softSkillsFormArray.length === 0" class="text-muted small text-center py-2">Nessuna soft skill aggiunta.</div>
-                    </div>
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <span>Soft Skills e Lingue</span>
+            <span *ngIf="isAccordionSectionInvalid('altreCompetenze')" class="accordion-error-icon">
+              <i class="feather icon-alert-circle"></i>
+            </span>
+          </div>
+          <div class="card-body">
+            <div class="mb-4">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <label class="form-label mb-0">Soft Skills</label>
+                <button type="button" class="btn btn-sm btn-outline-primary" (click)="addSoftSkill()">
+                  <i class="feather icon-plus"></i> Aggiungi
+                </button>
+              </div>
+              <div formArrayName="softSkills">
+                <div *ngFor="let skillCtrl of softSkillsFormArray.controls; let i = index"
+                  class="input-group input-group-sm mb-2">
+                  <input type="text" class="form-control" [formControlName]="i" placeholder="Es. Lavoro di squadra">
+                  <button class="btn btn-outline-danger btn-sm" type="button" (click)="removeSoftSkill(i)"><i
+                      class="feather icon-x"></i></button>
                 </div>
+                <div *ngIf="softSkillsFormArray.length === 0" class="text-muted small text-center py-2">Nessuna soft
+                  skill aggiunta.</div>
+              </div>
+            </div>
 
-                <div>
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <label class="form-label mb-0">Lingue</label>
-                        <button type="button" class="btn btn-sm btn-outline-primary" (click)="addLingua()">
-                            <i class="feather icon-plus"></i> Aggiungi
-                        </button>
+            <div>
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <label class="form-label mb-0">Lingue</label>
+                <button type="button" class="btn btn-sm btn-outline-primary" (click)="addLingua()">
+                  <i class="feather icon-plus"></i> Aggiungi
+                </button>
+              </div>
+              <div formArrayName="lingue">
+                <div *ngFor="let linguaGroup of lingueFormArray.controls; let i = index" [formGroupName]="i"
+                  class="p-2 border rounded mb-2">
+                  <div class="row gx-2">
+                    <div class="col-5">
+                      <input type="text" class="form-control form-control-sm" formControlName="nome"
+                        placeholder="Lingua">
                     </div>
-                    <div formArrayName="lingue">
-                        <div *ngFor="let linguaGroup of lingueFormArray.controls; let i = index" [formGroupName]="i" class="p-2 border rounded mb-2">
-                            <div class="row gx-2">
-                                <div class="col-5">
-                                    <input type="text" class="form-control form-control-sm" formControlName="nome" placeholder="Lingua">
-                                </div>
-                                <div class="col-4">
-                                    <input type="text" class="form-control form-control-sm" formControlName="livello" placeholder="Livello (es. B2)">
-                                </div>
-                                <div class="col d-flex align-items-center">
-                                    <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" role="switch" [id]="'cert-' + i" formControlName="certificazione">
-                                        <label class="form-check-label small" [for]="'cert-' + i">Cert.?</label>
-                                    </div>
-                                    <button class="btn btn-icon btn-sm btn-outline-danger ms-auto" type="button" (click)="removeLingua(i)"><i class="feather icon-trash-2"></i></button>
-                                </div>
-                            </div>
-                            <div *ngIf="linguaGroup.get('nome')?.invalid && linguaGroup.get('nome')?.touched" class="text-danger small mt-1">Nome lingua obbligatorio</div>
-                            <div *ngIf="linguaGroup.get('livello')?.invalid && linguaGroup.get('livello')?.touched" class="text-danger small mt-1">Livello obbligatorio</div>
-                        </div>
-                        <div *ngIf="lingueFormArray.length === 0" class="text-muted small text-center py-2">Nessuna lingua aggiunta.</div>
+                    <div class="col-4">
+                      <input type="text" class="form-control form-control-sm" formControlName="livello"
+                        placeholder="Livello (es. B2)">
                     </div>
+                    <div class="col d-flex align-items-center">
+                      <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" role="switch" [id]="'cert-' + i"
+                          formControlName="certificazione">
+                        <label class="form-check-label small" [for]="'cert-' + i">Cert.?</label>
+                      </div>
+                      <button class="btn btn-icon btn-sm btn-outline-danger ms-auto" type="button"
+                        (click)="removeLingua(i)"><i class="feather icon-trash-2"></i></button>
+                    </div>
+                  </div>
+                  <div *ngIf="linguaGroup.get('nome')?.invalid && linguaGroup.get('nome')?.touched"
+                    class="text-danger small mt-1">Nome lingua obbligatorio</div>
+                  <div *ngIf="linguaGroup.get('livello')?.invalid && linguaGroup.get('livello')?.touched"
+                    class="text-danger small mt-1">Livello obbligatorio</div>
                 </div>
+                <div *ngIf="lingueFormArray.length === 0" class="text-muted small text-center py-2">Nessuna lingua
+                  aggiunta.</div>
+              </div>
             </div>
+          </div>
         </div>
         <div class="card mb-3">
           <div class="card-header d-flex justify-content-between align-items-center">
             <span>{{ 'customer.currio.competenzeTitle' | translate }}</span>
-             <span *ngIf="isAccordionSectionInvalid('competenze')" class="accordion-error-icon">
+            <span *ngIf="isAccordionSectionInvalid('competenze')" class="accordion-error-icon">
               <i class="feather icon-alert-circle"></i>
             </span>
             <button type="button" class="btn btn-sm btn-outline-primary" (click)="addCompetenza()">
@@ -313,11 +311,14 @@
           </div>
           <div class="card-body accordion-container" formArrayName="competenze">
             <ngb-accordion #accCompetenze="ngbAccordion" [closeOthers]="true" activeIds="">
-              <ngb-panel *ngFor="let competenzaCtrl of competenzeFormArray.controls; let i = index" [id]="'competenza-' + i">
+              <ngb-panel *ngFor="let competenzaCtrl of competenzeFormArray.controls; let i = index"
+                [id]="'competenza-' + i">
                 <ng-template ngbPanelTitle>
                   <div class="d-flex justify-content-between align-items-center w-100">
-                    <span>{{ 'Competenza' | translate }} {{i + 1}}: {{ competenzaCtrl.get('nome')?.value || ('Nuova Competenza' | translate) }}</span>
-                    <button type="button" class="btn btn-sm btn-outline-danger btn-remove-item" (click)="removeCompetenza(i); $event.stopPropagation()">
+                    <span>{{ 'Competenza' | translate }} {{i + 1}}: {{ competenzaCtrl.get('nome')?.value || ('Nuova
+                      Competenza' | translate) }}</span>
+                    <button type="button" class="btn btn-sm btn-outline-danger btn-remove-item"
+                      (click)="removeCompetenza(i); $event.stopPropagation()">
                       <i class="feather icon-trash-2"></i>
                     </button>
                   </div>
@@ -327,7 +328,8 @@
                     <div class="mb-2">
                       <label class="form-label">{{ 'customer.currio.form.competenza.nome' | translate }}</label>
                       <input type="text" class="form-control form-control-sm" formControlName="nome">
-                      <div *ngIf="competenzaCtrl.get('nome')?.invalid && competenzaCtrl.get('nome')?.touched" class="text-danger small mt-1">Nome competenza obbligatorio</div>
+                      <div *ngIf="competenzaCtrl.get('nome')?.invalid && competenzaCtrl.get('nome')?.touched"
+                        class="text-danger small mt-1">Nome competenza obbligatorio</div>
                     </div>
                     <div class="mb-2">
                       <label class="form-label">{{ 'customer.currio.form.competenza.livello' | translate }}</label>
@@ -337,7 +339,8 @@
                       <label class="form-label">{{ 'customer.currio.form.competenza.icona' | translate }}</label>
                       <textarea class="form-control form-control-sm" formControlName="icona" rows="2"
                         placeholder='<svg>...</svg>'></textarea>
-                      <small class="form-text text-muted">Incolla qui il codice SVG completo per l'icona (opzionale).</small>
+                      <small class="form-text text-muted">Incolla qui il codice SVG completo per l'icona
+                        (opzionale).</small>
                     </div>
                   </div>
                 </ng-template>
@@ -351,7 +354,7 @@
         <div class="card mb-3">
           <div class="card-header d-flex justify-content-between align-items-center">
             <span>{{ 'customer.currio.esperienzeTitle' | translate }}</span>
-             <span *ngIf="isAccordionSectionInvalid('esperienze')" class="accordion-error-icon">
+            <span *ngIf="isAccordionSectionInvalid('esperienze')" class="accordion-error-icon">
               <i class="feather icon-alert-circle"></i>
             </span>
             <button type="button" class="btn btn-sm btn-outline-primary" (click)="addEsperienza()">
@@ -360,11 +363,14 @@
           </div>
           <div class="card-body accordion-container" formArrayName="esperienze">
             <ngb-accordion #accEsperienze="ngbAccordion" [closeOthers]="true" activeIds="">
-              <ngb-panel *ngFor="let esperienzaCtrl of esperienzeFormArray.controls; let i = index" [id]="'esperienza-' + i">
+              <ngb-panel *ngFor="let esperienzaCtrl of esperienzeFormArray.controls; let i = index"
+                [id]="'esperienza-' + i">
                 <ng-template ngbPanelTitle>
                   <div class="d-flex justify-content-between align-items-center w-100">
-                    <span>{{ 'Esperienza/Formazione' | translate }} {{i + 1}}: {{ esperienzaCtrl.get('titolo')?.value || ('Nuova Esperienza/Formazione' | translate )}}</span>
-                    <button type="button" class="btn btn-sm btn-outline-danger btn-remove-item" (click)="removeEsperienza(i); $event.stopPropagation()">
+                    <span>{{ 'Esperienza/Formazione' | translate }} {{i + 1}}: {{ esperienzaCtrl.get('titolo')?.value ||
+                      ('Nuova Esperienza/Formazione' | translate )}}</span>
+                    <button type="button" class="btn btn-sm btn-outline-danger btn-remove-item"
+                      (click)="removeEsperienza(i); $event.stopPropagation()">
                       <i class="feather icon-trash-2"></i>
                     </button>
                   </div>
@@ -375,7 +381,8 @@
                       <div class="col-md-6 mb-2">
                         <label class="form-label">{{ 'customer.currio.form.esperienza.titolo' | translate }}</label>
                         <input type="text" class="form-control form-control-sm" formControlName="titolo">
-                        <div *ngIf="esperienzaCtrl.get('titolo')?.invalid && esperienzaCtrl.get('titolo')?.touched" class="text-danger small mt-1">Titolo obbligatorio</div>
+                        <div *ngIf="esperienzaCtrl.get('titolo')?.invalid && esperienzaCtrl.get('titolo')?.touched"
+                          class="text-danger small mt-1">Titolo obbligatorio</div>
                       </div>
                       <div class="col-md-6 mb-2">
                         <label class="form-label">{{ 'customer.currio.form.esperienza.tipo' | translate }}</label>
@@ -386,28 +393,35 @@
                       </div>
                     </div>
                     <div class="mb-2">
-                      <label class="form-label">{{ 'customer.currio.form.esperienza.aziendaScuola' | translate }}</label>
+                      <label class="form-label">{{ 'customer.currio.form.esperienza.aziendaScuola' | translate
+                        }}</label>
                       <input type="text" class="form-control form-control-sm" formControlName="aziendaScuola">
-                      <div *ngIf="esperienzaCtrl.get('aziendaScuola')?.invalid && esperienzaCtrl.get('aziendaScuola')?.touched" class="text-danger small mt-1">Campo obbligatorio</div>
+                      <div
+                        *ngIf="esperienzaCtrl.get('aziendaScuola')?.invalid && esperienzaCtrl.get('aziendaScuola')?.touched"
+                        class="text-danger small mt-1">Campo obbligatorio</div>
                     </div>
                     <div class="mb-2">
                       <label class="form-label">{{ 'customer.currio.form.esperienza.date' | translate }}</label>
                       <input type="text" class="form-control form-control-sm" formControlName="date">
-                       <div *ngIf="esperienzaCtrl.get('date')?.invalid && esperienzaCtrl.get('date')?.touched" class="text-danger small mt-1">Campo obbligatorio</div>
+                      <div *ngIf="esperienzaCtrl.get('date')?.invalid && esperienzaCtrl.get('date')?.touched"
+                        class="text-danger small mt-1">Campo obbligatorio</div>
                     </div>
                     <div class="mb-2">
-                      <label class="form-label">{{ 'customer.currio.form.esperienza.descrizioneBreve' | translate }}</label>
-                      <textarea class="form-control form-control-sm" formControlName="descrizioneBreve" rows="2"></textarea>
+                      <label class="form-label">{{ 'customer.currio.form.esperienza.descrizioneBreve' | translate
+                        }}</label>
+                      <textarea class="form-control form-control-sm" formControlName="descrizioneBreve"
+                        rows="2"></textarea>
                     </div>
                     <div formArrayName="dettagli">
                       <label class="form-label">{{ 'customer.currio.form.esperienza.dettagli' | translate }}</label>
                       <div *ngFor="let dettaglioCtrl of getDettagli(i).controls; let detIndex = index"
                         class="input-group input-group-sm mb-1">
                         <input type="text" class="form-control" [formControlName]="detIndex">
-                        <button class="btn btn-outline-danger btn-sm" type="button" (click)="removeDettaglio(i, detIndex)"><i
-                            class="feather icon-x"></i></button>
+                        <button class="btn btn-outline-danger btn-sm" type="button"
+                          (click)="removeDettaglio(i, detIndex)"><i class="feather icon-x"></i></button>
                       </div>
-                      <button type="button" class="btn btn-outline-secondary btn-sm mt-1" (click)="addDettaglio(i)">Aggiungi
+                      <button type="button" class="btn btn-outline-secondary btn-sm mt-1"
+                        (click)="addDettaglio(i)">Aggiungi
                         Dettaglio</button>
                     </div>
                     <div formArrayName="competenzeAcquisite" class="mt-2">
@@ -446,8 +460,10 @@
               <ngb-panel *ngFor="let progettoCtrl of progettiFormArray.controls; let i = index" [id]="'progetto-' + i">
                 <ng-template ngbPanelTitle>
                   <div class="d-flex justify-content-between align-items-center w-100">
-                    <span>{{ 'Progetto' | translate }} {{i + 1}}: {{ progettoCtrl.get('titolo')?.value || ('Nuovo Progetto' | translate) }}</span>
-                    <button type="button" class="btn btn-sm btn-outline-danger btn-remove-item" (click)="removeProgetto(i); $event.stopPropagation()">
+                    <span>{{ 'Progetto' | translate }} {{i + 1}}: {{ progettoCtrl.get('titolo')?.value || ('Nuovo
+                      Progetto' | translate) }}</span>
+                    <button type="button" class="btn btn-sm btn-outline-danger btn-remove-item"
+                      (click)="removeProgetto(i); $event.stopPropagation()">
                       <i class="feather icon-trash-2"></i>
                     </button>
                   </div>
@@ -457,12 +473,14 @@
                     <div class="mb-2">
                       <label class="form-label">{{ 'customer.currio.form.progetto.titolo' | translate }}</label>
                       <input type="text" class="form-control form-control-sm" formControlName="titolo">
-                      <div *ngIf="progettoCtrl.get('titolo')?.invalid && progettoCtrl.get('titolo')?.touched" class="text-danger small mt-1">Titolo obbligatorio</div>
+                      <div *ngIf="progettoCtrl.get('titolo')?.invalid && progettoCtrl.get('titolo')?.touched"
+                        class="text-danger small mt-1">Titolo obbligatorio</div>
                     </div>
                     <div class="mb-2">
                       <label class="form-label">{{ 'customer.currio.form.progetto.descrizione' | translate }}</label>
                       <textarea class="form-control form-control-sm" formControlName="descrizione" rows="2"></textarea>
-                      <div *ngIf="progettoCtrl.get('descrizione')?.invalid && progettoCtrl.get('descrizione')?.touched" class="text-danger small mt-1">Descrizione obbligatoria</div>
+                      <div *ngIf="progettoCtrl.get('descrizione')?.invalid && progettoCtrl.get('descrizione')?.touched"
+                        class="text-danger small mt-1">Descrizione obbligatoria</div>
                     </div>
                     <div class="mb-2">
                       <label class="form-label">{{ 'customer.currio.form.progetto.immagineUrl' | translate }}</label>
@@ -524,8 +542,8 @@
           <div class="input-group input-group-sm mb-2">
             <input type="text" class="form-control form-control-sm" [value]="linkRegistrazione" readonly
               #registrationLinkInput>
-            <button class="btn btn-outline-secondary btn-sm" type="button" id="copyLinkBtnUnified" (click)="copyToClipboard(registrationLinkInput)"><i
-                class="feather icon-copy"></i> Copia</button>
+            <button class="btn btn-outline-secondary btn-sm" type="button" id="copyLinkBtnUnified"
+              (click)="copyToClipboard(registrationLinkInput)"><i class="feather icon-copy"></i> Copia</button>
           </div>
           <a href="mailto:{{ currio.datiCliente.email }}?subject=Completa la creazione del tuo Curriò&body=Ciao {{ currio.datiCliente.nome }},%0D%0A%0D%0Acompleta la creazione del tuo account per Curriò al seguente link: {{ encodedLinkRegistrazione }}%0D%0A%0D%0AIl link scadrà tra 24 ore."
             class="btn btn-sm btn-outline-primary mt-1">

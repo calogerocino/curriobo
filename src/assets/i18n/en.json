@@ -97,12 +97,13 @@
     }
   },
   "status": {
-    "nuova_richiesta": "New Request",
-    "invito_spedito": "Invitation Sent",
-    "attivo": "Active",
-    "archiviato": "Archived",
-    "sconosciuto": "Unknown"
-  },
+  "nuova_richiesta": "New Request",
+  "invito_spedito": "Invitation Sent",
+  "attivo": "Public", 
+  "privato": "Private",
+  "archiviato": "Archived",
+  "sconosciuto": "Unknown"
+},
   "customer": {
     "menu": {
       "profile": "My Profile",
